@@ -11,6 +11,9 @@
 </script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;600&display=swap">
 <style>
 /* Identité « cahier de maths » : papier quadrillé, encre bleue, marge rouge, fiches bristol.
@@ -297,6 +300,25 @@ footer{color:var(--muted); font-size:13px; margin-top:32px; padding-top:16px; bo
 table.t{display:block; max-width:100%; overflow-x:auto; width:max-content}
 .f{max-width:100%}
 .fiche > *, .fiche li{min-width:0}
+
+/* formules KaTeX */
+.math{color:var(--ink); background-color:var(--f-bg); background-image:linear-gradient(var(--f-grid) 1px,transparent 1px),linear-gradient(90deg,var(--f-grid) 1px,transparent 1px); background-size:12px 12px;
+  border:1px solid var(--line); border-left:3px solid var(--accent); border-radius:2px 6px 6px 2px; padding:6px 16px; overflow-x:auto; overflow-y:hidden; max-width:100%}
+.math .katex-display{margin:.35em 0}
+.katex{font-size:1.07em}
+.math-note{font-size:14px; color:var(--muted); margin-top:6px}
+ol.algo{margin:0; padding-left:22px; display:grid; gap:6px; max-width:78ch}
+/* illustrations interactives */
+.viz{border:1px solid var(--line); border-radius:8px; padding:14px; background:var(--paper); display:grid; grid-template-columns:minmax(0,1fr); gap:10px; margin:4px 0; box-shadow:var(--shadow)}
+.viz figcaption{display:flex; flex-wrap:wrap; gap:4px 10px; align-items:baseline}
+.viz figcaption b{font-family:var(--f-display); font-size:16px}
+.viz figcaption span{font-size:13px; color:var(--muted)}
+.viz-ctrl{display:flex; flex-wrap:wrap; gap:8px 18px; align-items:center; font-size:14px}
+.viz-ctrl label{display:inline-flex; align-items:center; gap:8px; white-space:nowrap; font-variant-numeric:tabular-nums}
+.viz-ctrl label b{min-width:2.6em; display:inline-block}
+.viz-ctrl input[type=range]{width:min(200px,52vw); accent-color:var(--accent)}
+.viz-out{font-size:14px; line-height:1.55; color:var(--ink)}
+canvas.viz-cv{width:100%; display:block; border:1px solid var(--line); border-radius:6px; background:var(--paper); touch-action:pan-y}
 </style>
 </head>
 <body>
@@ -389,7 +411,7 @@ const chName = id => (CH.find(c => c.id === id) || {}).name;
    FICHES
    ===================================================================== */
 const FICHES = {
-intro: `
+intro: String.raw`
 <ul>
   <li><b>Supervisé</b> : on observe x<sub>1</sub>,…,x<sub>n</sub> <i>et</i> leurs étiquettes y<sub>1</sub>,…,y<sub>n</sub> ; on apprend f telle que f(x) ≈ y pour un nouvel x.</li>
   <li><b>Non supervisé</b> : pas d'étiquettes. <b>Clustering</b> : trouver des groupes. <b>Réduction de dimension</b> : représenter les données dans un espace de plus petite dimension, pour calculer plus vite, visualiser ou améliorer un modèle supervisé entraîné ensuite. <b>Estimation de densité</b> : estimer la loi ℙ dont x₁,…,xₙ sont des réalisations i.i.d. (ex. un histogramme).</li>
@@ -398,15 +420,18 @@ intro: `
 </ul>
 <div class="grid2">
   <div><h3>Fonction de coût, risque</h3>
-  <div class="f">ℓ(y,y)=0   et   ℓ(y,y')&gt;0 si y≠y'
-R(f) = E[ ℓ(Y, f(X)) ]          (risque)
-f* = argmin R(f)               (règle optimale)
-R̂ₙ(f) = 1/n Σ ℓ(yᵢ, f(xᵢ))      (risque empirique, ERM)</div></div>
+  <div class="math">\[\begin{aligned}
+&\ell(y,y)=0 \quad\text{et}\quad \ell(y,y')>0 \ \text{ si } y\neq y' \\
+&R(f)=\mathbb{E}\big[\ell(Y,f(X))\big] && \text{(risque)}\\
+&f^*=\operatorname*{arg\,min}_{f} R(f) && \text{(règle optimale)}\\
+&\hat R_n(f)=\frac1n\sum_{i=1}^n \ell\big(y_i,f(x_i)\big) && \text{(risque empirique, ERM)}
+\end{aligned}\]</div></div>
   <div><h3>Règles optimales à connaître</h3>
-  <div class="f">coût quadratique  →  f*(x) = E[Y | X=x]
-coût absolu       →  f*(x) = médiane(Y | X=x)
-coût 0/1          →  f*(x) = argmax_k P(Y=k | X=x)
-                     (classifieur de Bayes)</div></div>
+  <div class="math">\[\begin{aligned}
+\text{coût quadratique} &\;\Rightarrow\; f^*(x)=\mathbb{E}[Y\mid X=x]\\
+\text{coût absolu} &\;\Rightarrow\; f^*(x)=\text{médiane}(Y\mid X=x)\\
+\text{coût 0/1} &\;\Rightarrow\; f^*(x)=\operatorname*{arg\,max}_k\ \mathbb{P}(Y=k\mid X=x)
+\end{aligned}\]</div><p class="math-note">Le dernier est le <b>classifieur de Bayes</b>.</p></div>
 </div>
 <details class="fold"><summary>Démonstration : f*(x) = E[Y | X=x] pour le coût quadratique</summary>
 <p style="margin-top:8px">On suppose que ℙ_{X,Y} a une densité, avec E[Y²] &lt; ∞ et E[f(X)²] &lt; ∞. Alors R(f) = E[(Y−f(X))²] = E_X[ E_{Y|X}[(Y−f(X))² | X] ] = ∫ p(x) ∫ (y−f(x))² p(y|x) dy dx.<br>
@@ -415,8 +440,10 @@ Il suffit de minimiser, pour chaque x, g_x(c) = ∫(y−c)² p(y|x) dy, c'est-à
   <li><b>Biais inductif</b> : on cherche f dans un sous-ensemble ℱ plutôt que dans toutes les fonctions mesurables. Exemple : ℱ = {x ↦ φ(⟨w,x⟩+b)} (classes d'hypothèses) ; avec φ = identité, c'est la régression linéaire.</li>
 </ul>
 <h3>K plus proches voisins</h3>
-<div class="f">Classification :  f(x) = argmax_k  Σ_{i : xᵢ ∈ N_K(x)} 1{yᵢ = k}
-Régression     :  f(x) = 1/K  Σ_{i : xᵢ ∈ N_K(x)} yᵢ</div>
+<div class="math">\[\begin{aligned}
+\text{Classification :}\quad & f(x)=\operatorname*{arg\,max}_{k}\sum_{i\,:\,x_i\in N_K(x)} \mathbf 1\{y_i=k\}\\
+\text{Régression :}\quad & f(x)=\frac1K\sum_{i\,:\,x_i\in N_K(x)} y_i
+\end{aligned}\]</div>
 <ul>
   <li>Hyperparamètres : <b>K</b> (choisi par validation croisée) et la <b>distance</b> (souvent euclidienne).</li>
   <li>Méthode <b>non paramétrique</b>, simple, mais coûteuse : n distances en O(nd) puis tri O(n log n). Souffre du <b>fléau de la dimension</b>.</li>
@@ -425,9 +452,10 @@ Régression     :  f(x) = 1/K  Σ_{i : xᵢ ∈ N_K(x)} yᵢ</div>
   <li>Variante pondérée (exam 2025) : poids exp(−d<sub>i</sub>(x)²/h) → les voisins proches comptent plus. h grand ≈ KNN classique ; h petit ≈ 1-NN.</li>
   <li>Il faut <b>standardiser</b> les variables (sinon la variable à grande échelle domine la distance).</li>
 </ul>
+<figure class="viz" data-viz="knn"></figure>
 <div class="tp"><b>TP1-2 :</b> taux d'erreur nul avec K=1 évalué sur les données d'apprentissage, non nul sur des données mises de côté. Normalisation min-max (x−min)/(max−min) sur iris. Avec K = taille de l'apprentissage, toutes les prédictions = espèce majoritaire.</div>`,
 
-eval: `
+eval: String.raw`
 <div class="grid2">
 <div><h3>Matrice de confusion (convention du cours)</h3>
 <div class="scroll"><table class="t">
@@ -437,12 +465,14 @@ eval: `
 <p class="lead" style="margin-top:6px;font-size:13px">Lignes = classe prédite, colonnes = classe réelle (comme <code>table(pred, réel)</code> en R ; l'ordre des arguments de <code>table()</code> décide de l'orientation).</p>
 <p class="lead" style="margin-top:6px;font-size:13px">Attention : en multiclasse, le texte de la diapo 45 définit M<sub>i,j</sub> = nombre d'exemples de la classe i prédits j (lignes = réel), alors que sa figure met le prédit en lignes. À l'examen, <b>écris l'orientation en tête de ta matrice</b>. Précision de k = M[k,k] / nb de prédictions k ; sensibilité de k = M[k,k] / nb de vrais k.</p></div>
 <div><h3>Métriques</h3>
-<div class="f">Accuracy    = (TP+TN) / total
-Sensibilité = rappel = TP / (TP+FN)   (taux de vrais positifs)
-Précision   = TP / (TP+FP)
-Spécificité = TN / (TN+FP)            (taux de vrais négatifs)
-F1 = 2·P·R/(P+R) = 2TP / (2TP+FP+FN)
-FPR = FP/(FP+TN) = 1 − spécificité</div></div>
+<div class="math">\[\begin{aligned}
+\text{Accuracy} &= \frac{TP+TN}{TP+TN+FP+FN}\\
+\text{Sensibilité (rappel)} &= \frac{TP}{TP+FN} && \text{taux de vrais positifs}\\
+\text{Précision} &= \frac{TP}{TP+FP}\\
+\text{Spécificité} &= \frac{TN}{TN+FP} && \text{taux de vrais négatifs}\\
+F_1 &= \frac{2\,P\,R}{P+R}=\frac{2\,TP}{2\,TP+FP+FN}\\
+\text{FPR} &= \frac{FP}{FP+TN}=1-\text{spécificité}
+\end{aligned}\]</div></div>
 </div>
 <ul>
   <li>Accuracy trompeuse si classes <b>déséquilibrées</b> : prédire toujours la classe majoritaire donne une bonne accuracy et une sensibilité nulle.</li>
@@ -460,6 +490,7 @@ FPR = FP/(FP+TN) = 1 − spécificité</div></div>
   <li><b>Sur-apprentissage</b> : modèle trop complexe, capture le bruit (variance forte). <b>Sous-apprentissage</b> : modèle trop simple, mauvais même sur l'apprentissage (biais fort).</li>
   <li><b>Biais</b> : à quel point f(x) vise à côté de la vraie étiquette. <b>Variance</b> : à quel point f change quand les données d'apprentissage changent.</li>
 </ul>
+<figure class="viz" data-viz="biasvar"></figure>
 <h3>Sélection de modèle</h3>
 <div class="scroll"><table class="t">
 <tr><th>Apprentissage</th><th>Validation</th><th>Test</th></tr>
@@ -469,12 +500,13 @@ FPR = FP/(FP+TN) = 1 − spécificité</div></div>
   <li>Les noms « validation » et « test » sont parfois inversés dans la littérature. Ce qui compte : le troisième jeu sert à évaluer le modèle <i>sélectionné</i>. Avec seulement deux jeux, c'est le jeu de test qui sert à sélectionner.</li>
   <li><b>Holdout</b> : un seul découpage (test trop petit → estimation très variable ; trop grand → le modèle voit trop peu de données). <b>Leave-p-out</b> : C(n,p) tests ; leave-one-out : n tests.</li>
 </ul>
+<figure class="viz" data-viz="kfold"></figure>
 <details class="fold"><summary>Exercice du cours : précision macro vs micro</summary>
 <p style="margin-top:8px">Situation 1 (TP/FP) : A 1/1, B 10/90, C 1/1, D 1/1 → précisions 0,5 ; 0,1 ; 0,5 ; 0,5. <b>Macro = 0,4</b> ; <b>micro = 13/106 ≈ 0,123</b>.<br>
 Situation 2 : A 0/2, B 90/10, C 0/2, D 0/2 → 0 ; 0,9 ; 0 ; 0. <b>Macro = 0,225</b> ; <b>micro = 90/106 ≈ 0,849</b>.<br>
 Le micro-average est dominé par la classe B, très représentée. Le macro-average révèle les mauvaises performances sur les classes rares.</p></details>`,
 
-reglog: `
+reglog: String.raw`
 <ul>
   <li><b>Classifieur linéaire</b> : la frontière de décision est un <span class="key">hyperplan</span> (une droite en dimension 2). Il est composé d'une fonction affine h(x)=⟨w,x⟩+b, qui fixe l'hyperplan, et d'une fonction φ qui transforme la position par rapport à l'hyperplan en étiquette.</li>
   <li>Linéaires : régression logistique, SVM (marge rigide/souple). Non linéaires : KNN, CART, SVM à noyau.</li>
@@ -482,15 +514,14 @@ reglog: `
 </ul>
 <div class="grid2">
 <div><h3>Classifieur des demi-espaces</h3>
-<div class="f">f(x) = sign(⟨w,x⟩ + b)   ∈ {−1, 1}
-coût 0/1 : minimise le nombre d'erreurs
-→ n'importe quel hyperplan séparateur convient</div></div>
+<div class="math">\[f(x)=\operatorname{sign}\big(\langle w,x\rangle+b\big)\in\{-1,1\}\]</div><p class="math-note">Coût 0/1 : on minimise le nombre d'erreurs, donc n'importe quel hyperplan séparateur convient.</p></div>
 <div><h3>Régression logistique</h3>
-<div class="f">σ(z) = 1 / (1 + exp(−z))  ∈ ]0,1[
-P̂(Y=1|x) = σ(⟨w,x⟩ + b)
-(ŵ,b̂) = argmin 1/n Σ log(1 + exp(−yᵢ(⟨w,xᵢ⟩+b)))
-ŷ = 1  si σ(⟨ŵ,x⟩+b̂) ≥ α, sinon ŷ = −1
-(α = 0,5 souvent ; le cours note le seuil α, les sujets s)</div></div>
+<div class="math">\[\begin{aligned}
+&\sigma(z)=\frac{1}{1+e^{-z}}\in\,]0,1[\\
+&\hat{\mathbb P}(Y=1\mid x)=\sigma(\langle w,x\rangle+b)\\
+&(\hat w,\hat b)=\operatorname*{arg\,min}_{w,b}\ \frac1n\sum_{i=1}^n\log\Big(1+\exp\big(-y_i(\langle w,x_i\rangle+b)\big)\Big)\\
+&\hat y=1 \ \text{ si } \sigma(\langle \hat w,x\rangle+\hat b)\ge\alpha,\quad \text{sinon } \hat y=-1
+\end{aligned}\]</div><p class="math-note">α = 0,5 souvent ; le cours note le seuil α, les sujets le notent s.</p></div>
 </div>
 <ul>
   <li>Dans ce chapitre, 𝒴 = {−1, 1} « sans perte de généralité ».</li>
@@ -499,6 +530,7 @@ P̂(Y=1|x) = σ(⟨w,x⟩ + b)
   <li>Le coût 0/1 des demi-espaces est difficile à minimiser et ne pénalise <i>que</i> les erreurs : la droite peut frôler les points → <b>risque de sur-apprentissage</b>. La logistique évite mieux cet écueil et donne une probabilité.</li>
   <li>Seuil α &lt; 0,5 : plus de positifs prédits → sensibilité ↑. Ça a du sens quand rater un positif est grave (ex. prédire une maladie).</li>
 </ul>
+<figure class="viz" data-viz="sigmoid"></figure>
 <h3>Courbe ROC et AUC</h3>
 <ul>
   <li>Pour chaque seuil s de 0 à 1 : on classe, on calcule <b>FPR</b> (abscisse) et <b>TPR = sensibilité</b> (ordonnée). La courbe relie ces points.</li>
@@ -508,6 +540,7 @@ P̂(Y=1|x) = σ(⟨w,x⟩ + b)
   <li>L'AUC sur l'échantillon de validation sert à comparer des modèles (ex. choix des variables). La courbe ROC aide à choisir le seuil.</li>
   <li>Pour un KNN ou un arbre, le score est la <b>proportion de voisins (ou d'observations de la feuille) de classe 1</b>.</li>
 </ul>
+<figure class="viz" data-viz="roc"></figure>
 <h3>Multiclasse</h3>
 <div class="scroll"><table class="t">
 <tr><th></th><th>One-versus-all</th><th>One-versus-one</th></tr>
@@ -517,7 +550,7 @@ P̂(Y=1|x) = σ(⟨w,x⟩ + b)
 <p>Alternative : régression softmax (un seul modèle global).</p>
 <div class="tp"><b>TP3 (prostate, 53 patients) :</b> <code>glm(lymph ~ ..., family="binomial")</code> ; on passe <code>acid</code> au log (loi très dissymétrique). Avec s = 1/2 : 3/33 faux positifs et 6/20 faux négatifs. Meilleur modèle selon l'AUC sur validation : log(acid) + taille.</div>`,
 
-cart: `
+cart: String.raw`
 <ul>
   <li><b>Arbre de décision</b> : chaque nœud teste une condition sur <b>une seule variable</b> ; les feuilles portent une étiquette. Modèle hiérarchique : chaque test dépend des précédents.</li>
   <li>Atouts : variables qualitatives sans encodage (apprentissage non métrique), données hétérogènes, multiclasse direct, classes multimodales, <b>interprétable</b>.</li>
@@ -525,14 +558,12 @@ cart: `
   <li>Nombre de régions = nombre de feuilles. Feuille : vote majoritaire (classification) ou moyenne (régression).</li>
 </ul>
 <h3>Choix d'une coupure</h3>
-<div class="f">IG(R_l, R_m) = I(R) − (n_l/n)·I(R_l) − (n_m/n)·I(R_m)     (n = effectif du nœud R)
-  « gain d'information » : on choisit la variable séparatrice x^j et le seuil
-  (s si continue, ensemble S de modalités si qualitative) qui le maximisent
-
-Gini      I(R) = Σ_k p_k (1 − p_k) = 1 − Σ p_k²
-Entropie  I(R) = − Σ_k p_k log₂ p_k
-Erreur    I(R) = 1 − max_k p_k
-Régression : minimiser n_L·MSE(R_L) + n_R·MSE(R_R)</div>
+<div class="math">\[IG(R_l,R_m)=\mathcal I(R)-\frac{n_l}{n}\,\mathcal I(R_l)-\frac{n_m}{n}\,\mathcal I(R_m)\qquad(n=\text{effectif du nœud }R)\]</div><p class="math-note">« Gain d'information » : on choisit la variable séparatrice x<sup>j</sup> et le seuil (s si elle est continue, ensemble S de modalités si elle est qualitative) qui le maximisent.</p><div class="math">\[\begin{aligned}
+\text{Gini} &:\ \mathcal I(R)=\sum_{k} p_k(1-p_k)=1-\sum_k p_k^2\\
+\text{Entropie} &:\ \mathcal I(R)=-\sum_k p_k\log_2 p_k\\
+\text{Erreur} &:\ \mathcal I(R)=1-\max_k p_k\\
+\text{Régression} &:\ \text{minimiser } n_l\,\mathrm{MSE}(R_l)+n_m\,\mathrm{MSE}(R_m)
+\end{aligned}\]</div>
 <ul>
   <li>Gini = Σ_{k≠k'} p_k p_k' : probabilité de mal étiqueter un exemple tiré au hasard dans R si on l'étiquetait au hasard selon la distribution des classes de R. Minimiser l'entropie revient à maximiser le gain d'information.</li>
   <li>Exemple du cours : nœud [27, 18] → Gini = 1 − 0,6² − 0,4² = <b>0,48</b>. Feuille pure → 0.</li>
@@ -547,36 +578,41 @@ Régression : minimiser n_L·MSE(R_L) + n_R·MSE(R_R)</div>
 <tr><td>qualitative ordinale</td><td>par seuil (en respectant l'ordre) ou par regroupement de modalités</td></tr>
 <tr><td>quantitative discrète</td><td>par seuil en général ; regroupement si peu de valeurs (on perd l'ordre)</td></tr></table></div>
 <p>À comparer avec les KNN et la logistique : ils ont besoin d'une représentation numérique des variables, et la logistique passe par OvA ou OvO en multiclasse.</p>
+<figure class="viz" data-viz="cart"></figure>
 <h3>Taille de l'arbre</h3>
 <ul>
   <li>Arbre peu profond → sous-apprentissage ; trop profond → sur-apprentissage.</li>
   <li>Stratégie 1 : profondeur max, nb de feuilles max, effectif min par feuille, choisis par validation croisée. Profondeur ↑ : biais ↓, variance ↑.</li>
   <li>Stratégie 2 : <b>élagage</b>. On construit l'arbre maximal (feuilles pures), puis on garde le sous-arbre minimisant
-  <div class="f" style="margin-top:6px">C_λ(T) = Σ_{l=1}^{|T|} n_l · I(R_l) + λ|T|</div>
+  <div class="math">\[C_\lambda(T)=\sum_{l=1}^{|T|} n_l\,\mathcal I(R_l)+\lambda\,|T|\]</div>
   λ choisi sur la validation. <span class="key">λ ↑ → arbre plus petit → biais ↑, variance ↓.</span></li>
   <li>|T| = 1 : on prédit la classe majoritaire, erreur d'apprentissage = proportion des autres classes. Arbre maximal : erreur d'apprentissage = 0.</li>
   <li>Les arbres sont des <b>apprenants faibles</b> → méthodes ensemblistes (bagging, forêts aléatoires, boosting).</li>
 </ul>
 <div class="tp"><b>TP4 :</b> <code>rpart</code> utilise Gini par défaut. <code>cp</code> joue le rôle de λ : <code>printcp</code>/<code>plotcp</code>, on garde le cp qui minimise <code>xerror</code> (erreur de validation croisée 10-fold par défaut), puis <code>prune(tree, cp=bestcp)</code>. Sur un nœud de <code>rpart.plot</code>, la correction lit : classe majoritaire, « indice d'impureté » (en pratique, la proportion de la classe 1 dans le nœud), % des individus.</div>`,
 
-svm: `
+svm: String.raw`
 <ul>
   <li><b>Linéairement séparable</b> : il existe un hyperplan avec tous les positifs d'un côté et tous les négatifs de l'autre. Il en existe alors une infinité.</li>
   <li>SVM : on choisit celui qui <b>maximise la marge</b> γ = distance de l'hyperplan au point le plus proche. C'est robuste aux petites perturbations.</li>
-  <li>Distance d'un point à l'hyperplan : d(x,H) = |⟨w,x⟩+b| / ‖w‖. Avec la normalisation des contraintes, <span class="key">γ = 1/‖w‖</span>.</li>
+  <li>Distance d'un point à l'hyperplan : \(d(x,H)=\dfrac{|\langle w,x\rangle+b|}{\|w\|}\). Avec la normalisation des contraintes, <span class="key">\(\gamma=1/\|w\|\)</span>.</li>
   <li><b>Vecteurs de support</b> (marge rigide) : points sur H<sup>+</sup> : ⟨w,x⟩+b = 1 et H<sup>−</sup> : ⟨w,x⟩+b = −1. Seuls eux définissent l'hyperplan. La zone entre H<sup>+</sup> et H<sup>−</sup> est la zone d'indécision ; en marge rigide, elle ne contient aucune observation.</li>
 </ul>
 <div class="grid2">
 <div><h3>Marge rigide (primal)</h3>
-<div class="f">min ½‖w‖²
-s.c. yᵢ(⟨w,xᵢ⟩ + b) ≥ 1   ∀i
-classifieur : sign(⟨ŵ,x⟩ + b̂)</div></div>
+<div class="math">\[\begin{aligned}
+&\min_{w,b}\ \tfrac12\|w\|^2\\
+&\text{s.c. } y_i(\langle w,x_i\rangle+b)\ge 1\quad\forall i\\
+&\text{classifieur : } \operatorname{sign}(\langle\hat w,x\rangle+\hat b)
+\end{aligned}\]</div></div>
 <div><h3>Dual (marge rigide)</h3>
-<div class="f">max Σαᵢ − ½ ΣΣ αᵢαⱼ yᵢyⱼ ⟨xᵢ,xⱼ⟩
-s.c. Σαᵢyᵢ = 0,  αᵢ ≥ 0
-ŵ = Σ α̂ᵢ yᵢ xᵢ
-b̂ = 1 − min_{i : yᵢ=1} ⟨ŵ,xᵢ⟩
-classifieur : sign(Σ α̂ᵢ yᵢ ⟨xᵢ,x⟩ + b̂)</div></div>
+<div class="math">\[\begin{aligned}
+&\max_{\alpha}\ \sum_i\alpha_i-\tfrac12\sum_i\sum_j\alpha_i\alpha_j y_iy_j\langle x_i,x_j\rangle\\
+&\text{s.c. }\textstyle\sum_i\alpha_iy_i=0,\quad \alpha_i\ge0\\
+&\hat w=\textstyle\sum_i\hat\alpha_i y_i x_i\\
+&\hat b=1-\min_{i\,:\,y_i=1}\langle\hat w,x_i\rangle\\
+&\text{classifieur : }\operatorname{sign}\big(\textstyle\sum_i\hat\alpha_i y_i\langle x_i,x\rangle+\hat b\big)
+\end{aligned}\]</div></div>
 </div>
 <ul>
   <li>Problème convexe et quadratique. Le primal est en dimension d+1, le dual en n : peu de données et beaucoup de variables → dual.</li>
@@ -584,18 +620,19 @@ classifieur : sign(Σ α̂ᵢ yᵢ ⟨xᵢ,x⟩ + b̂)</div></div>
   <li>KKT, écart complémentaire : α̂ᵢ [yᵢ(⟨ŵ,xᵢ⟩+b̂) − 1] = 0. Deux cas : un point hors de H<sup>±</sup> a α̂ᵢ = 0 ; si α̂ᵢ &gt; 0, le point est sur H<sup>±</sup> (vecteur de support). Le dual identifie des vecteurs de support (pas forcément tous).</li>
 </ul>
 <h3>Marge souple</h3>
-<div class="f">min ½‖w‖² + C Σ ξᵢ
-s.c. yᵢ(⟨w,xᵢ⟩ + b) ≥ 1 − ξᵢ,  ξᵢ ≥ 0
-⇔ min 1/(2Cn)‖w‖² + 1/n Σ ℓ_hinge   avec ℓ_hinge = max(0, 1 − yᵢ(⟨w,xᵢ⟩+b))
-  → minimisation du risque empirique RÉGULARISÉ ; la régularisation ‖w‖²/(2Cn)
-    évite le sur-apprentissage</div>
+<div class="math">\[\begin{aligned}
+&\min_{w,b,\xi}\ \tfrac12\|w\|^2+C\sum_{i=1}^n\xi_i\\
+&\text{s.c. } y_i(\langle w,x_i\rangle+b)\ge1-\xi_i,\quad \xi_i\ge0\\
+\iff\ &\min_{w,b}\ \frac{1}{2Cn}\|w\|^2+\frac1n\sum_{i=1}^n \max\big(0,\,1-y_i(\langle w,x_i\rangle+b)\big)
+\end{aligned}\]</div><p class="math-note">Le terme max(0, …) est la <b>perte hinge</b>. C'est une minimisation du risque empirique <b>régularisé</b> : la régularisation ‖w‖²/(2Cn) évite le sur-apprentissage.</p>
 <div class="scroll"><table class="t">
 <tr><th>ξᵢ = 0</th><th>0 &lt; ξᵢ &lt; 1</th><th>ξᵢ = 1</th><th>ξᵢ &gt; 1</th></tr>
 <tr><td>bien classé, hors de la zone d'indécision (ou sur H<sup>±</sup>)</td><td>bien classé mais dans la zone d'indécision</td><td>sur l'hyperplan H</td><td><b>mal classé</b></td></tr></table></div>
-<div class="f">Dual souple : même problème avec 0 ≤ αᵢ ≤ C
-b̂ = yᵢ − Σⱼ α̂ⱼ yⱼ ⟨xⱼ,xᵢ⟩   pour un i tel que 0 &lt; α̂ᵢ &lt; C
-KKT : α̂ᵢ [yᵢ(⟨ŵ,xᵢ⟩+b̂) − 1 + ξᵢ] = 0
-α̂ᵢ &gt; 0 et ξᵢ = 0 ⇒ vecteur de support (sur H±) ;  α̂ᵢ &gt; 0 et ξᵢ &gt; 0 ⇒ outlier</div>
+<div class="math">\[\begin{aligned}
+&\text{Dual souple : même problème avec } 0\le\alpha_i\le C\\
+&\hat b=y_i-\textstyle\sum_j\hat\alpha_j y_j\langle x_j,x_i\rangle\quad\text{pour un } i \text{ tel que } 0\lt\hat\alpha_i\lt C\\
+&\text{KKT : }\hat\alpha_i\big[y_i(\langle\hat w,x_i\rangle+\hat b)-1+\xi_i\big]=0
+\end{aligned}\]</div><p class="math-note">\(\hat\alpha_i>0\) et \(\xi_i=0\) ⇒ vecteur de support (sur H<sup>±</sup>) ; \(\hat\alpha_i>0\) et \(\xi_i>0\) ⇒ outlier.</p>
 <ul>
   <li>En marge souple, le classifieur n'utilise que les points tels que α̂ᵢ &gt; 0 : vecteurs de support et outliers (points dans la marge ou mal classés).</li>
   <li>Paramètres : w, b (et les ξᵢ). <b>Hyperparamètre : C</b>.</li>
@@ -603,6 +640,7 @@ KKT : α̂ᵢ [yᵢ(⟨ŵ,xᵢ⟩+b̂) − 1 + ξᵢ] = 0
   <li><span class="key">C petit</span> → on accorde moins d'importance aux outliers : marge large, beaucoup de points dans la marge → biais ↑, variance ↓.</li>
   <li>Même sur des données séparables, la marge souple peut mieux généraliser.</li>
 </ul>
+<figure class="viz" data-viz="svm"></figure>
 <h3>SVM à noyau</h3>
 <ul>
   <li>Utile quand les données ne sont <b>pas séparables linéairement, même à quelques points près</b>. On les envoie par φ dans un espace où elles le deviennent.</li>
@@ -611,15 +649,18 @@ KKT : α̂ᵢ [yᵢ(⟨ŵ,xᵢ⟩+b̂) − 1 + ξᵢ] = 0
   <li>Exemple du cours : φ(x) = (1, x₁…x_d, x₁x₁, x₁x₂, …, x_d x_d) donne ⟨φ(x),φ(x̃)⟩ = 1 + ⟨x,x̃⟩ + ⟨x,x̃⟩². Le calcul direct coûte O(d²), la formule de droite O(d).</li>
   <li>k valide si <b>symétrique</b> (k(x,x̃) = k(x̃,x)) et <b>semi-défini positif</b> : ∀N, ∀x₁…x_N, ∀a₁…a_N ∈ ℝ, ΣΣ aᵢaⱼ k(xᵢ,xⱼ) ≥ 0. Alors il existe φ telle que k(x,x̃) = ⟨φ(x),φ(x̃)⟩ (théorème de Moore-Aronszajn). Matrice de Gram K<sub>ij</sub> = k(xᵢ,xⱼ).</li>
 </ul>
-<div class="f">linéaire     k(x,x') = ⟨x,x'⟩
-cosinus      k(x,x') = ⟨x,x'⟩ / (‖x‖‖x'‖)
-quadratique  k(x,x') = (⟨x,x'⟩ + c)²
-polynomial   k(x,x') = (⟨x,x'⟩ + c)^q
-gaussien (Σ) k(x,x') = exp(−½ (x−x')ᵀ Σ⁻¹ (x−x'))
-gaussien/RBF k(x,x') = exp(−‖x−x'‖² / 2σ²) = exp(−γ‖x−x'‖²),  γ = 1/(2σ²)
-dual         max Σαᵢ − ½ ΣΣ αᵢαⱼ yᵢyⱼ k(xᵢ,xⱼ),  0 ≤ αᵢ ≤ C
-b̂ = yᵢ − Σⱼ α̂ⱼ yⱼ k(xⱼ,xᵢ)  pour 0 &lt; α̂ᵢ &lt; C
-classifieur  f(x) = sign( Σ α̂ᵢ yᵢ k(xᵢ,x) + b̂ )</div>
+<div class="math">\[\begin{aligned}
+\text{linéaire} &:\ k(x,x')=\langle x,x'\rangle\\
+\text{cosinus} &:\ k(x,x')=\frac{\langle x,x'\rangle}{\|x\|\,\|x'\|}\\
+\text{quadratique} &:\ k(x,x')=(\langle x,x'\rangle+c)^2\\
+\text{polynomial} &:\ k(x,x')=(\langle x,x'\rangle+c)^q\\
+\text{gaussien }(\Sigma) &:\ k(x,x')=\exp\big(-\tfrac12(x-x')^\top\Sigma^{-1}(x-x')\big)\\
+\text{gaussien / RBF} &:\ k(x,x')=\exp\Big(-\frac{\|x-x'\|^2}{2\sigma^2}\Big)=e^{-\gamma\|x-x'\|^2},\quad \gamma=\frac1{2\sigma^2}
+\end{aligned}\]</div><div class="math">\[\begin{aligned}
+&\text{dual : }\max_\alpha\ \sum_i\alpha_i-\tfrac12\sum_{i,j}\alpha_i\alpha_jy_iy_j\,k(x_i,x_j),\quad 0\le\alpha_i\le C\\
+&\hat b=y_i-\textstyle\sum_j\hat\alpha_jy_j\,k(x_j,x_i)\quad\text{pour } 0\lt\hat\alpha_i\lt C\\
+&\text{classifieur : } f(x)=\operatorname{sign}\big(\textstyle\sum_i\hat\alpha_iy_i\,k(x_i,x)+\hat b\big)
+\end{aligned}\]</div>
 <ul>
   <li>Hyperparamètres : <b>C, le noyau, ses paramètres</b> (γ ou σ ; degré q et c).</li>
   <li>RBF : <span class="key">γ grand (σ petit) → frontière très locale, « îlots » autour des points → variance ↑</span> ; γ petit (σ grand) → frontière lisse, presque linéaire → biais ↑.</li>
@@ -627,7 +668,7 @@ classifieur  f(x) = sign( Σ α̂ᵢ yᵢ k(xᵢ,x) + b̂ )</div>
 </ul>
 <div class="tp"><b>TP5 :</b> <code>svm(y~., kernel="linear", cost=C, scale=FALSE)</code> (e1071). La marge 1/‖w‖ diminue quand C augmente. <code>tune(..., ranges=list(cost=...))</code> fait la validation croisée. Calculer φ à la main est plus lent que le noyau polynomial quand d grandit. Piège : <code>svm()</code> standardise par défaut (<code>scale=TRUE</code>). Avec γ = 0,01 et C = 10, les données standardisées donnent une frontière où la classe majoritaire est prédite partout. Sur données brutes (<code>scale=FALSE</code>), les distances sont plus grandes, donc à γ fixé la frontière est plus locale.</div>`,
 
-clust: `
+clust: String.raw`
 <ul>
   <li><b>But</b> : séparer des données non étiquetées en groupes <b>homogènes</b> (points proches dans le même cluster) et <b>séparés</b> (clusters distincts). C'est une analyse exploratoire.</li>
   <li><b>Distance</b> : symétrie, séparation, inégalité triangulaire. Euclidienne, Manhattan, Minkowski, Chebyshev, Mahalanobis ; χ² et Jaccard pour le qualitatif ; Gower (ne satisfait pas l'inégalité triangulaire, donc pas une vraie distance).</li>
@@ -636,36 +677,37 @@ clust: `
   <li>Nombre de partitions possibles : nombre de Bell B_n = (1/e) Σ_{k≥1} kⁿ/k!, énorme (B₅₀ ≥ 10⁴⁷). On ne peut pas tout explorer → algorithmes itératifs : hiérarchiques (agglomératifs ou divisifs), par partitionnement (K-moyennes), probabilistes (modèles de mélange).</li>
 </ul>
 <h3>Critères de qualité</h3>
-<div class="f">centroïde        μ_k = 1/|C_k| Σ_{x∈C_k} x
-homogénéité      T_k = 1/|C_k| Σ d(x, μ_k)         T = moyenne des T_k   (petit)
-séparabilité     S_kl = d(μ_k, μ_l)                S = 2/(K(K−1)) ΣΣ S_kl (grand)
-Davies-Bouldin   D_k = max_{l≠k} (T_k + T_l)/S_kl   D = moyenne des D_k   → MINIMISER
-silhouette       s(x) = (b(x) − a(x)) / max(a(x), b(x)) ∈ [−1,1] → MAXIMISER la moyenne
-  a(x) = distance moyenne aux autres points de son cluster
-  b(x) = plus petite distance moyenne à un autre cluster</div>
+<div class="math">\[\begin{aligned}
+\text{centroïde} &:\ \mu_k=\frac1{|C_k|}\sum_{x\in C_k}x\\
+\text{homogénéité} &:\ T_k=\frac1{|C_k|}\sum_{x\in C_k}d(x,\mu_k),\qquad T=\frac1K\sum_k T_k \quad(\text{petit})\\
+\text{séparabilité} &:\ S_{kl}=d(\mu_k,\mu_l),\qquad S=\frac{2}{K(K-1)}\sum_{k=1}^K\sum_{l=k+1}^K S_{kl} \quad(\text{grand})\\
+\text{Davies-Bouldin} &:\ D_k=\max_{l\ne k}\frac{T_k+T_l}{S_{kl}},\qquad D=\frac1K\sum_k D_k \quad(\text{à minimiser})\\
+\text{silhouette} &:\ s(x)=\frac{b(x)-a(x)}{\max\big(a(x),b(x)\big)}\in[-1,1] \quad(\text{moyenne à maximiser})\\
+&\ \ a(x)=\frac{1}{|C_{k(x)}|-1}\sum_{y\in C_{k(x)},\,y\ne x}d(x,y),\qquad b(x)=\min_{l\ne k(x)}\frac1{|C_l|}\sum_{y\in C_l}d(x,y)
+\end{aligned}\]</div><p class="math-note">a(x) : distance moyenne aux autres points de son cluster. b(x) : plus petite distance moyenne à un autre cluster.</p>
 <ul>
   <li>s(x) proche de 1 : bien assigné. <b>s(x) &lt; 0</b> : x est en moyenne plus proche d'un autre cluster que du sien, donc probablement mal assigné.</li>
 </ul>
+<figure class="viz" data-viz="silhouette"></figure>
 <h3>Inertie</h3>
-<div class="f">I = Σ‖xᵢ − μ‖² = I_W + I_B
-I_W = Σ_k Σ_{i∈C_k} ‖xᵢ − μ_k‖²     intra-classes : homogénéité (petit)
-I_B = Σ_k |C_k| ‖μ_k − μ‖²        inter-classes : séparation (grand)</div>
+<div class="math">\[\begin{aligned}
+I&=\sum_{i=1}^n\|x_i-\mu\|^2=I_W+I_B\\
+I_W&=\sum_{k=1}^K\sum_{x_i\in C_k}\|x_i-\mu_k\|^2 && \text{intra-classes : homogénéité (petit)}\\
+I_B&=\sum_{k=1}^K|C_k|\,\|\mu_k-\mu\|^2 && \text{inter-classes : séparation (grand)}
+\end{aligned}\]</div>
 <details class="fold"><summary>Preuve (TP clustering)</summary>
 <p style="margin-top:8px">‖xᵢ−μ‖² = ‖(xᵢ−μ_k)+(μ_k−μ)‖² = ‖xᵢ−μ_k‖² + ‖μ_k−μ‖² + 2⟨xᵢ−μ_k, μ_k−μ⟩. En sommant sur i ∈ C_k, le terme croisé vaut 2⟨Σ(xᵢ−μ_k), μ_k−μ⟩ = 2⟨|C_k|μ_k − |C_k|μ_k, ·⟩ = 0. On somme ensuite sur k.</p></details>
 <h3>Classification ascendante hiérarchique (CAH)</h3>
 <ul>
   <li><b>Agglomératif</b> (CAH) : au départ, chaque point est un cluster. À chaque étape on <b>fusionne les deux clusters les plus proches</b>, jusqu'à n'en avoir plus qu'un. <b>Divisif</b> : on part d'un seul cluster et on coupe en deux à chaque étape. Résultat : un <b>dendrogramme</b> (hauteur = distance de fusion).</li>
   <li>Liens : <b>simple</b> min d(x,y) (effet de chaîne : suit des formes allongées, des anneaux) ; <b>complet</b> max d(x,y) (clusters compacts) ; <b>moyen</b> ; <b>centroïdal</b> d(μ_k,μ_l). Ces liens ne sont pas forcément des distances au sens mathématique (lien complet : d(C,C) ≠ 0 si |C| &gt; 1).</li>
-  <li><b>Ward</b> : |C_k||C_l|/(|C_k|+|C_l|)·‖μ_k−μ_l‖² = hausse de I_W (= perte de I_B) lors de la fusion. Elle maximise l'homogénéité et la séparabilité. Comme f(x,y) = xy/(x+y) est grand quand x et y sont grands et équilibrés, elle crée des groupes équilibrés.</li>
+  <li><b>Ward</b> : \(\dfrac{|C_k|\,|C_l|}{|C_k|+|C_l|}\,\|\mu_k-\mu_l\|^2\) = hausse de I_W (= perte de I_B) lors de la fusion. Elle maximise l'homogénéité et la séparabilité. Comme f(x,y) = xy/(x+y) est grand quand x et y sont grands et équilibrés, elle crée des groupes équilibrés.</li>
   <li><b>Inversions</b> : avec les liens simple, complet, moyen et Ward, les hauteurs de fusion sont croissantes (axiome de la médiane). Avec le lien centroïdal, deux branches peuvent se rejoindre plus bas que leurs descendants : on appelle ça une inversion.</li>
   <li>Choisir le nombre de clusters : couper le dendrogramme avant une grande branche, arrêter les fusions au-delà d'un seuil r (arbitraire, ou r = α·max d(xᵢ,xⱼ) avec α &lt; 1), ou maximiser la silhouette sur les différentes coupes.</li>
   <li>Pas besoin de fixer K à l'avance, mais <span class="key">complexité quadratique : O(dn²) opérations par itération</span>, et stockage des distances.</li>
 </ul>
 <h3>K-moyennes (algorithme de Lloyd)</h3>
-<div class="f">1. Choisir K centroïdes au hasard parmi les points (ou K-means++ : bien dispersés)
-2. Affecter chaque point au centroïde le plus proche (cellules de Voronoï)
-3. Recalculer chaque centroïde = moyenne de son cluster
-4. Répéter 2–3 jusqu'à ce que les affectations ne changent plus</div>
+<ol class="algo"><li>Choisir K centroïdes au hasard parmi les points (ou K-means++ : bien dispersés).</li><li>Affecter chaque point au centroïde le plus proche (cellules de Voronoï) : \(k(x_i)=\operatorname*{arg\,min}_k\|x_i-\mu_k\|^2\).</li><li>Recalculer chaque centroïde : \(\mu_k=\frac1{|C_k|}\sum_{x_i\in C_k}x_i\).</li><li>Répéter 2–3 jusqu'à ce que les affectations ne changent plus.</li></ol>
 <ul>
   <li>I_W diminue à chaque itération → convergence, mais vers un <b>minimum local</b> → relancer avec plusieurs initialisations (<code>nstart</code>) et garder la plus faible I_W.</li>
   <li>Choix de K : I_W diminue toujours quand K augmente → <b>méthode du coude</b> (cassure de pente). Silhouette, Davies-Bouldin.</li>
@@ -695,6 +737,7 @@ function renderFiches(){
     const prev = CH[i-1], next = CH[i+1];
     $('#fiche-body').innerHTML = `<header><span class="tag">Chapitre ${i+1}/${CH.length}</span><h2>${chName(id)}</h2></header>${FICHES[id] || ''}
       <nav class="fiche-nav" aria-label="Chapitres">${prev ? `<button class="btn" data-go-ch="${prev.id}"><small>← Précédent</small>${prev.name}</button>` : ''}${next ? `<button class="btn next" data-go-ch="${next.id}"><small>Suivant →</small>${next.name}</button>` : ''}</nav>`;
+    mountViz($('#fiche-body')); typeset($('#fiche-body'));
   };
   p.querySelector('#fiche-chips').addEventListener('click', e=>{ const b=e.target.closest('.chip'); if(b) show(b.dataset.c); });
   $('#fiche-body').addEventListener('click', e=>{ const b=e.target.closest('[data-go-ch]'); if(!b) return; show(b.dataset.goCh);
@@ -1651,6 +1694,361 @@ function updateDash(){
 function onStore(k){ if (k === 'known' || k === 'qbest:all') updateDash(); }
 document.querySelectorAll('.dash-item[data-go]').forEach(b => b.addEventListener('click', () => openTab(b.dataset.go)));
 updateDash();
+
+/* =====================================================================
+   FORMULES (KaTeX) ET ILLUSTRATIONS INTERACTIVES DES FICHES
+   ===================================================================== */
+function typeset(el){
+  if (!el || !window.renderMathInElement) return;
+  try{ renderMathInElement(el, {delimiters:[{left:'\\[', right:'\\]', display:true},{left:'\\(', right:'\\)', display:false}], throwOnError:false, strict:'ignore'}); }catch(e){}
+}
+document.addEventListener('DOMContentLoaded', ()=>typeset(document.body));
+
+const cssv = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const gauss = r => { let u = 0; for (let k = 0; k < 6; k++) u += r(); return (u - 3) / Math.sqrt(0.5); }; // ≈ N(0,1)
+const clamp = (x, a, b) => Math.max(a, Math.min(b, x));
+
+/* Canevas qui s'adapte à la largeur et au thème. ratio(w) donne la hauteur relative. */
+function vizCanvas(host, ratio, opts={}){
+  const cv = document.createElement('canvas'); cv.className = 'viz-cv';
+  if (opts.drag) cv.style.touchAction = 'none';
+  host.appendChild(cv);
+  const ctx = cv.getContext('2d');
+  const api = {cv, ctx, W:0, H:0, draw:()=>{}};
+  api.fit = () => {
+    const w = Math.max(240, Math.floor(host.clientWidth));
+    const h = Math.round(Math.min(w * ratio(w), 460));
+    const dpr = window.devicePixelRatio || 1;
+    cv.width = Math.round(w * dpr); cv.height = Math.round(h * dpr); cv.style.height = h + 'px';
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0); api.W = w; api.H = h; api.draw();
+  };
+  const onEnv = () => { if (!document.body.contains(cv)) { window.removeEventListener('resize', onEnv); document.removeEventListener('themechange', onEnv); return; } api.fit(); };
+  window.addEventListener('resize', onEnv); document.addEventListener('themechange', onEnv);
+  api.pos = e => { const r = cv.getBoundingClientRect(); return [e.clientX - r.left, e.clientY - r.top]; };
+  return api;
+}
+function vizHead(title, hint){ return `<figcaption><b>${title}</b>${hint ? `<span>${hint}</span>` : ''}</figcaption>`; }
+function dot(ctx, x, y, r, shape, fill, stroke){
+  ctx.beginPath();
+  if (shape === 1) ctx.rect(x - r, y - r, 2*r, 2*r);
+  else if (shape === 2) { ctx.moveTo(x, y - r*1.2); ctx.lineTo(x + r*1.1, y + r*0.9); ctx.lineTo(x - r*1.1, y + r*0.9); ctx.closePath(); }
+  else ctx.arc(x, y, r, 0, 7);
+  ctx.fillStyle = fill; ctx.fill();
+  if (stroke){ ctx.lineWidth = 1.2; ctx.strokeStyle = stroke; ctx.stroke(); }
+}
+function txt(ctx, s, x, y, align='left', color, size=12){
+  ctx.font = `${size}px ${cssv('--f-mono') || 'monospace'}`; ctx.fillStyle = color || cssv('--muted'); ctx.textAlign = align; ctx.textBaseline = 'middle'; ctx.fillText(s, x, y);
+}
+const CLS = () => [cssv('--c1'), cssv('--c2'), cssv('--c3')];
+const CLSNAME = ['A', 'B', 'C'];
+function shade(hex, a){ // couleur → rgba avec alpha (accepte #rgb, #rrggbb ou rgb())
+  if (!hex) return `rgba(128,128,128,${a})`;
+  if (hex[0] === '#'){ let h = hex.slice(1); if (h.length === 3) h = h.split('').map(c=>c+c).join(''); const n = parseInt(h, 16); return `rgba(${n>>16&255},${n>>8&255},${n&255},${a})`; }
+  const m = hex.match(/\d+(\.\d+)?/g); return m ? `rgba(${m[0]},${m[1]},${m[2]},${a})` : hex;
+}
+
+const VIZ = {};
+
+/* ---- KNN : frontière et vote ---- */
+VIZ.knn = el => {
+  el.innerHTML = vizHead('K plus proches voisins', 'Touche le graphique pour placer un nouveau point, puis fais varier K.') +
+    `<div class="viz-ctrl"><label>K = <b data-o="k">5</b> <input type="range" min="1" max="59" step="2" value="5" data-i="k" aria-label="Nombre de voisins K"></label>
+     <label class="chk"><input type="checkbox" data-i="fr" checked> frontière de décision</label></div><div class="viz-stage"></div><p class="viz-out" data-o="out"></p>`;
+  const r = rng(11), pts = [];
+  for (let i = 0; i < 30; i++) pts.push([clamp(0.36 + gauss(r)*0.15, .03, .97), clamp(0.56 + gauss(r)*0.15, .03, .97), 0]);
+  for (let i = 0; i < 30; i++) pts.push([clamp(0.64 + gauss(r)*0.15, .03, .97), clamp(0.44 + gauss(r)*0.15, .03, .97), 1]);
+  let K = 5, q = [0.5, 0.52], grid = null, gridKey = '';
+  const stage = el.querySelector('.viz-stage'), V = vizCanvas(stage, w => w < 500 ? 0.8 : 0.55, {});
+  const pad = 10;
+  const X = x => pad + x * (V.W - 2*pad), Y = y => V.H - pad - y * (V.H - 2*pad);
+  const nn = (x, y, k, skip=-1) => pts.map((p, i) => [(p[0]-x)**2 + (p[1]-y)**2, i]).filter(t => t[1] !== skip).sort((a, b) => a[0] - b[0]).slice(0, k);
+  const vote = nb => { let c = [0, 0]; nb.forEach(t => c[pts[t[1]][2]]++); return c[0] === c[1] ? pts[nb[0][1]][2] : (c[0] > c[1] ? 0 : 1); };
+  const trainErr = () => pts.reduce((s, p) => s + (vote(nn(p[0], p[1], K)) !== p[2]), 0) / pts.length;
+  V.draw = () => {
+    const {ctx, W, H} = V, col = CLS(); ctx.clearRect(0, 0, W, H);
+    if (el.querySelector('[data-i=fr]').checked){
+      const step = 7, key = K + ':' + W + ':' + H;
+      if (gridKey !== key){ grid = []; for (let gy = 0; gy < H; gy += step) for (let gx = 0; gx < W; gx += step){ const x = (gx + step/2 - pad)/(W - 2*pad), y = (H - pad - gy - step/2)/(H - 2*pad); grid.push([gx, gy, vote(nn(x, y, K))]); } gridKey = key; }
+      grid.forEach(([gx, gy, c]) => { ctx.fillStyle = shade(col[c], 0.16); ctx.fillRect(gx, gy, step, step); });
+    }
+    const nb = nn(q[0], q[1], K), pred = vote(nb), rad = Math.sqrt(nb[nb.length-1][0]);
+    ctx.strokeStyle = cssv('--muted'); ctx.setLineDash([4, 4]); ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.ellipse(X(q[0]), Y(q[1]), rad*(W-2*pad), rad*(H-2*pad), 0, 0, 7); ctx.stroke(); ctx.setLineDash([]);
+    nb.forEach(t => { const p = pts[t[1]]; ctx.strokeStyle = shade(col[p[2]], 0.7); ctx.beginPath(); ctx.moveTo(X(q[0]), Y(q[1])); ctx.lineTo(X(p[0]), Y(p[1])); ctx.stroke(); });
+    pts.forEach(p => dot(ctx, X(p[0]), Y(p[1]), 4.2, p[2], col[p[2]], cssv('--paper')));
+    dot(ctx, X(q[0]), Y(q[1]), 8, 2, col[pred], cssv('--ink'));
+    const c = [0, 0]; nb.forEach(t => c[pts[t[1]][2]]++);
+    el.querySelector('[data-o=out]').innerHTML = `Parmi les ${K} voisins : <b>${c[0]}</b> de la classe A (ronds), <b>${c[1]}</b> de la classe B (carrés) → le nouveau point (triangle) est classé <b>${CLSNAME[pred]}</b>. Erreur sur l'apprentissage avec K = ${K} : <b>${fmt(100*trainErr(), 1)} %</b>. ${K === 1 ? 'Avec K = 1, elle est nulle : chaque point est son propre voisin (sur-apprentissage).' : K >= 45 ? 'K très grand : la frontière s\'efface, on prédit presque toujours la même classe (sous-apprentissage).' : ''}`;
+  };
+  el.querySelector('[data-i=k]').oninput = e => { K = +e.target.value; el.querySelector('[data-o=k]').textContent = K; V.draw(); };
+  el.querySelector('[data-i=fr]').onchange = () => V.draw();
+  V.cv.addEventListener('pointerdown', e => { const [x, y] = V.pos(e); q = [clamp((x - pad)/(V.W - 2*pad), 0, 1), clamp((V.H - pad - y)/(V.H - 2*pad), 0, 1)]; V.draw(); });
+  V.fit();
+};
+
+/* ---- Schéma biais-variance ---- */
+VIZ.biasvar = el => {
+  el.innerHTML = vizHead('Sous-apprentissage, sur-apprentissage', 'Schéma : erreur en fonction de la complexité du modèle.') + `<div class="viz-stage"></div><p class="viz-out">Complexité : K petit (KNN), arbre profond, C grand ou γ grand (SVM). Le bon modèle minimise l'erreur sur des données <b>non vues</b> (validation), pas sur l'apprentissage.</p>`;
+  const V = vizCanvas(el.querySelector('.viz-stage'), w => w < 500 ? 0.7 : 0.42);
+  V.draw = () => {
+    const {ctx, W, H} = V, L = 40, R = W - 14, T = 16, B = H - 34;
+    ctx.clearRect(0, 0, W, H);
+    const X = t => L + t*(R - L), Y = e => B - e*(B - T);
+    const tr = t => 0.85*Math.exp(-3.2*t) + 0.04, te = t => 0.85*Math.exp(-3.2*t) + 0.12 + 0.55*t*t;
+    let best = 0, bv = 9; for (let t = 0; t <= 1; t += 0.005) if (te(t) < bv){ bv = te(t); best = t; }
+    ctx.fillStyle = shade(cssv('--c1'), 0.08); ctx.fillRect(L, T, X(best - 0.12) - L, B - T);
+    ctx.fillStyle = shade(cssv('--c2'), 0.08); ctx.fillRect(X(best + 0.12), T, R - X(best + 0.12), B - T);
+    ctx.strokeStyle = cssv('--line'); ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(L, T); ctx.lineTo(L, B); ctx.lineTo(R, B); ctx.stroke();
+    const curve = (f, c, w, dash) => { ctx.strokeStyle = c; ctx.lineWidth = w; ctx.setLineDash(dash || []); ctx.beginPath(); for (let t = 0; t <= 1.0001; t += 0.01) { const x = X(t), y = Y(f(t)); t ? ctx.lineTo(x, y) : ctx.moveTo(x, y); } ctx.stroke(); ctx.setLineDash([]); };
+    curve(tr, cssv('--accent'), 2.5); curve(te, cssv('--red') || cssv('--c2'), 2.5, [6, 4]);
+    ctx.strokeStyle = cssv('--muted'); ctx.setLineDash([2, 3]); ctx.beginPath(); ctx.moveTo(X(best), T); ctx.lineTo(X(best), B); ctx.stroke(); ctx.setLineDash([]);
+    txt(ctx, 'erreur', L - 6, T + 4, 'right'); txt(ctx, 'complexité →', R, B + 20, 'right');
+    txt(ctx, 'sous-apprentissage', L + 6, T + 10, 'left', cssv('--ink')); txt(ctx, 'sur-apprentissage', R - 6, T + 10, 'right', cssv('--ink'));
+    txt(ctx, 'bon compromis', X(best), B + 20, 'center', cssv('--ink'));
+    txt(ctx, 'apprentissage', X(0.78), Y(tr(0.78)) - 12, 'center', cssv('--accent'));
+    txt(ctx, 'validation', X(0.8), Y(te(0.8)) - 14, 'center', cssv('--red') || cssv('--c2'));
+    txt(ctx, 'biais ↑', L + 6, B - 12, 'left'); txt(ctx, 'variance ↑', R - 6, B - 12, 'right');
+  };
+  V.fit();
+};
+
+/* ---- Schéma validation croisée 5-fold ---- */
+VIZ.kfold = el => {
+  el.innerHTML = vizHead('Validation croisée 5-fold', 'Chaque pli sert une fois de validation ; on moyenne les 5 scores.') + `<div class="viz-ctrl"><button class="btn small" data-i="play">Animer</button><span class="viz-out" data-o="o"></span></div><div class="viz-stage"></div>`;
+  let cur = -1, timer = null;
+  const V = vizCanvas(el.querySelector('.viz-stage'), w => w < 500 ? 0.75 : 0.36);
+  V.draw = () => {
+    const {ctx, W, H} = V, L = 64, R = W - 70, T = 8, rowH = (H - T - 24)/5;
+    ctx.clearRect(0, 0, W, H);
+    for (let r = 0; r < 5; r++){
+      const y = T + r*rowH, bw = (R - L)/5;
+      for (let k = 0; k < 5; k++){
+        const isVal = k === r, on = cur < 0 || cur === r;
+        ctx.fillStyle = isVal ? shade(cssv('--c2'), on ? 0.85 : 0.25) : shade(cssv('--accent'), on ? 0.32 : 0.1);
+        ctx.fillRect(L + k*bw + 1.5, y + 3, bw - 3, rowH - 6);
+      }
+      txt(ctx, 'essai ' + (r + 1), L - 8, y + rowH/2, 'right', cssv('--ink'));
+      txt(ctx, 'score ' + (r + 1), R + 8, y + rowH/2, 'left', (cur < 0 || cur >= r) ? cssv('--ink') : cssv('--muted'));
+    }
+    txt(ctx, '■ apprentissage (4 plis)', L, H - 10, 'left', cssv('--accent')); txt(ctx, '■ validation (1 pli)', R, H - 10, 'right', cssv('--c2'));
+  };
+  const say = () => el.querySelector('[data-o=o]').textContent = cur < 0 ? '' : cur < 5 ? `Essai ${cur + 1} : entraîner sur 4 plis, évaluer sur le pli ${cur + 1}.` : 'Score final = moyenne des 5 scores. On recommence pour chaque valeur d\'hyperparamètre et on garde la meilleure.';
+  el.querySelector('[data-i=play]').onclick = () => { clearInterval(timer); cur = 0; say(); V.draw(); timer = setInterval(() => { if (!document.body.contains(V.cv)) return clearInterval(timer); cur++; say(); V.draw(); if (cur >= 5) clearInterval(timer); }, 1100); };
+  V.fit();
+};
+
+/* ---- Sigmoïde et coût logistique ---- */
+VIZ.sigmoid = el => {
+  el.innerHTML = vizHead('Régression logistique en 1D', 'Règle w, b et le seuil α, ou laisse l\'algorithme minimiser le coût.') +
+    `<div class="viz-ctrl"><label>w = <b data-o="w"></b> <input type="range" min="-2" max="6" step="0.1" value="1" data-i="w" aria-label="w"></label>
+     <label>b = <b data-o="b"></b> <input type="range" min="-5" max="5" step="0.1" value="1.5" data-i="b" aria-label="b"></label>
+     <label>α = <b data-o="a"></b> <input type="range" min="0.05" max="0.95" step="0.05" value="0.5" data-i="a" aria-label="seuil alpha"></label>
+     <button class="btn small" data-i="fit">Ajuster (minimiser le coût)</button></div><div class="viz-stage"></div><p class="viz-out" data-o="out"></p>`;
+  const r = rng(5), xs = [];
+  for (let i = 0; i < 16; i++) xs.push([gauss(r)*0.9 - 1.1, -1]);
+  for (let i = 0; i < 16; i++) xs.push([gauss(r)*0.9 + 1.1, 1]);
+  const S = z => 1/(1 + Math.exp(-z)), g = k => +el.querySelector(`[data-i=${k}]`).value;
+  const V = vizCanvas(el.querySelector('.viz-stage'), w => w < 500 ? 0.72 : 0.42);
+  V.draw = () => {
+    const {ctx, W, H} = V, w = g('w'), b = g('b'), a = g('a'), L = 34, R = W - 12, T = 14, B = H - 30, x0 = -4, x1 = 4;
+    ['w','b','a'].forEach(k => el.querySelector(`[data-o=${k}]`).textContent = fmt(g(k), 2));
+    const X = x => L + (x - x0)/(x1 - x0)*(R - L), Y = p => B - p*(B - T);
+    ctx.clearRect(0, 0, W, H);
+    const xs0 = Math.abs(w) > 1e-9 ? (Math.log(a/(1 - a)) - b)/w : null;
+    if (xs0 !== null){ const xp = clamp(X(xs0), L, R); ctx.fillStyle = shade(cssv('--c2'), 0.1); w > 0 ? ctx.fillRect(xp, T, R - xp, B - T) : ctx.fillRect(L, T, xp - L, B - T); }
+    ctx.strokeStyle = cssv('--line'); ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(L, Y(0)); ctx.lineTo(R, Y(0)); ctx.moveTo(L, Y(1)); ctx.lineTo(R, Y(1)); ctx.moveTo(X(0), T); ctx.lineTo(X(0), B); ctx.stroke();
+    ctx.setLineDash([5, 4]); ctx.strokeStyle = cssv('--muted'); ctx.beginPath(); ctx.moveTo(L, Y(a)); ctx.lineTo(R, Y(a)); ctx.stroke();
+    if (xs0 !== null && xs0 > x0 && xs0 < x1){ ctx.beginPath(); ctx.moveTo(X(xs0), T); ctx.lineTo(X(xs0), B); ctx.stroke(); }
+    ctx.setLineDash([]);
+    ctx.strokeStyle = cssv('--accent'); ctx.lineWidth = 2.5; ctx.beginPath();
+    for (let x = x0; x <= x1 + 1e-9; x += 0.02){ const px = X(x), py = Y(S(w*x + b)); x === x0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py); } ctx.stroke();
+    const col = CLS(); let err = 0, loss = 0;
+    xs.forEach(([x, y], i) => { const p = S(w*x + b), yh = p >= a ? 1 : -1; if (yh !== y) err++; loss += Math.log(1 + Math.exp(-y*(w*x + b)));
+      dot(ctx, X(x), Y(y > 0 ? 1 : 0) + (i % 3 - 1)*4, 4.2, y > 0 ? 1 : 0, col[y > 0 ? 1 : 0], yh !== y ? cssv('--ink') : cssv('--paper')); });
+    txt(ctx, '1', L - 6, Y(1), 'right'); txt(ctx, '0', L - 6, Y(0), 'right'); txt(ctx, 'α', R, Y(a) - 8, 'right'); txt(ctx, 'x', R, B + 16, 'right'); txt(ctx, 'σ(wx+b)', L + 4, T + 2, 'left', cssv('--accent'));
+    el.querySelector('[data-o=out]').innerHTML = `Frontière : σ(wx + b) = α ⇔ x = (ln(α/(1−α)) − b)/w ${xs0 === null ? '(w = 0 : pas de frontière)' : '≈ <b>' + fmt(xs0, 2) + '</b>'}. Points mal classés (cerclés) : <b>${err}</b>/${xs.length}. Coût logistique moyen \\( \\tfrac1n\\sum\\log(1+e^{-y_i(wx_i+b)}) \\) = <b>${fmt(loss/xs.length, 3)}</b>. Zone colorée : ŷ = 1.`;
+    typeset(el.querySelector('[data-o=out]'));
+  };
+  ['w','b','a'].forEach(k => el.querySelector(`[data-i=${k}]`).oninput = () => V.draw());
+  el.querySelector('[data-i=fit]').onclick = () => {
+    let w = g('w'), b = g('b');
+    for (let it = 0; it < 4000; it++){ let gw = 0, gb = 0; xs.forEach(([x, y]) => { const s = -y/(1 + Math.exp(y*(w*x + b))); gw += s*x; gb += s; }); w -= 0.5*gw/xs.length; b -= 0.5*gb/xs.length; }
+    el.querySelector('[data-i=w]').value = clamp(w, -2, 6).toFixed(1); el.querySelector('[data-i=b]').value = clamp(b, -5, 5).toFixed(1); V.draw();
+  };
+  V.fit();
+};
+
+/* ---- Seuil, matrice de confusion et ROC ---- */
+VIZ.roc = el => {
+  el.innerHTML = vizHead('Seuil de décision et courbe ROC', 'Déplace le seuil s : chaque seuil donne un point de la courbe ROC.') +
+    `<div class="viz-ctrl"><label>s = <b data-o="s"></b> <input type="range" min="0" max="1" step="0.01" value="0.5" data-i="s" aria-label="seuil s"></label></div><div class="viz-stage"></div><div class="metrics" data-o="m"></div>`;
+  const r = rng(21), neg = [], pos = [];
+  for (let i = 0; i < 60; i++) neg.push(clamp(0.38 + gauss(r)*0.14, 0.01, 0.99));
+  for (let i = 0; i < 40; i++) pos.push(clamp(0.63 + gauss(r)*0.14, 0.01, 0.99));
+  const ths = [1.01, ...[...neg, ...pos].sort((a, b) => b - a), -0.01];
+  const rates = s => [neg.filter(v => v >= s).length/neg.length, pos.filter(v => v >= s).length/pos.length];
+  const curve = ths.map(rates); let auc = 0; for (let i = 1; i < curve.length; i++) auc += (curve[i][0] - curve[i-1][0])*(curve[i][1] + curve[i-1][1])/2;
+  const V = vizCanvas(el.querySelector('.viz-stage'), w => w < 560 ? 1.25 : 0.46);
+  V.draw = () => {
+    const {ctx, W, H} = V, s = +el.querySelector('[data-i=s]').value, col = CLS(), wide = W >= 560;
+    el.querySelector('[data-o=s]').textContent = fmt(s, 2);
+    ctx.clearRect(0, 0, W, H);
+    const hw = wide ? W*0.58 : W, hh = wide ? H : H*0.5, L = 12, R = hw - 12, mid = hh*0.52, X = v => L + v*(R - L);
+    const bins = 20, bw = (R - L)/bins, hist = arr => { const h = Array(bins).fill(0); arr.forEach(v => h[Math.min(bins - 1, Math.floor(v*bins))]++); return h; };
+    const hp = hist(pos), hn = hist(neg), mx = Math.max(...hp, ...hn), u = (mid - 24)/mx;
+    ctx.fillStyle = shade(cssv('--accent'), 0.07); ctx.fillRect(X(s), 6, R - X(s), hh - 12);
+    hp.forEach((c, i) => { ctx.fillStyle = shade(col[1], (i + 0.5)/bins >= s ? 0.9 : 0.35); ctx.fillRect(L + i*bw + 1, mid - 2 - c*u, bw - 2, c*u); });
+    hn.forEach((c, i) => { ctx.fillStyle = shade(col[0], (i + 0.5)/bins >= s ? 0.9 : 0.35); ctx.fillRect(L + i*bw + 1, mid + 2, bw - 2, c*u); });
+    ctx.strokeStyle = cssv('--ink'); ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(X(s), 6); ctx.lineTo(X(s), hh - 6); ctx.stroke();
+    txt(ctx, 'positifs (y = 1)', L, 14, 'left', col[1]); txt(ctx, 'négatifs (y = 0)', L, hh - 14, 'left', col[0]);
+    txt(ctx, 'prédit 1 →', R, 14, 'right', cssv('--ink')); txt(ctx, 'score', R, mid, 'right');
+    const ox = wide ? hw + 34 : 40, oy = wide ? 14 : hh + 14, side = wide ? Math.min(W - hw - 46, H - 44) : Math.min(W - 60, H - hh - 44);
+    const RX = v => ox + v*side, RY = v => oy + side - v*side;
+    ctx.strokeStyle = cssv('--line'); ctx.lineWidth = 1; ctx.strokeRect(ox, oy, side, side);
+    ctx.setLineDash([4, 4]); ctx.beginPath(); ctx.moveTo(RX(0), RY(0)); ctx.lineTo(RX(1), RY(1)); ctx.stroke(); ctx.setLineDash([]);
+    ctx.strokeStyle = cssv('--accent'); ctx.lineWidth = 2.2; ctx.beginPath(); curve.forEach((p, i) => i ? ctx.lineTo(RX(p[0]), RY(p[1])) : ctx.moveTo(RX(p[0]), RY(p[1]))); ctx.stroke();
+    const [fpr, tpr] = rates(s); dot(ctx, RX(fpr), RY(tpr), 6, 0, cssv('--ink'), cssv('--paper'));
+    txt(ctx, 'FPR', ox + side, oy + side + 14, 'right'); txt(ctx, 'TPR', ox - 6, oy + 6, 'right'); txt(ctx, 'AUC = ' + fmt(auc, 3), ox + side - 4, oy + side - 12, 'right', cssv('--accent'));
+    const TP = pos.filter(v => v >= s).length, FN = pos.length - TP, FP = neg.filter(v => v >= s).length, TN = neg.length - FP;
+    const m = [['TP / FN', TP + ' / ' + FN], ['FP / TN', FP + ' / ' + TN], ['Sensibilité (TPR)', fmt(TP/(TP + FN))], ['Spécificité', fmt(TN/(TN + FP))], ['Précision', fmt(TP/(TP + FP))], ['Accuracy', fmt((TP + TN)/100)]];
+    el.querySelector('[data-o=m]').innerHTML = m.map(([k, v]) => `<div class="metric"><span>${k}</span><b>${v}</b></div>`).join('');
+  };
+  el.querySelector('[data-i=s]').oninput = () => V.draw();
+  V.fit();
+};
+
+/* ---- CART : coupures gloutonnes (Gini) ---- */
+VIZ.cart = el => {
+  el.innerHTML = vizHead('Arbre CART en direct', 'Augmente la profondeur : chaque coupure maximise le gain de Gini.') +
+    `<div class="viz-ctrl"><label>profondeur max = <b data-o="d">2</b> <input type="range" min="0" max="7" step="1" value="2" data-i="d" aria-label="profondeur maximale"></label></div><div class="viz-stage"></div><p class="viz-out" data-o="out"></p>`;
+  const r = rng(8), pts = [];
+  const add = (n, cx, cy, sd, c) => { for (let i = 0; i < n; i++) pts.push([clamp(cx + gauss(r)*sd, .02, .98), clamp(cy + gauss(r)*sd, .02, .98), c]); };
+  add(28, 0.27, 0.3, 0.12, 0); add(26, 0.5, 0.75, 0.12, 1); add(24, 0.76, 0.32, 0.11, 2); add(6, 0.5, 0.45, 0.2, 1);
+  const gini = idx => { const c = [0, 0, 0]; idx.forEach(i => c[pts[i][2]]++); const n = idx.length; return n ? 1 - c.reduce((s, x) => s + (x/n)**2, 0) : 0; };
+  const major = idx => { const c = [0, 0, 0]; idx.forEach(i => c[pts[i][2]]++); return c.indexOf(Math.max(...c)); };
+  function build(idx, box, depth, maxD){
+    const node = {idx, box, cls: major(idx)}, g0 = gini(idx);
+    if (depth >= maxD || g0 === 0 || idx.length < 2) return node;
+    let best = null;
+    for (const f of [0, 1]){
+      const vals = [...new Set(idx.map(i => pts[i][f]))].sort((a, b) => a - b);
+      for (let k = 1; k < vals.length; k++){
+        const t = (vals[k-1] + vals[k])/2, Lh = idx.filter(i => pts[i][f] < t), Rh = idx.filter(i => pts[i][f] >= t);
+        const gain = g0 - Lh.length/idx.length*gini(Lh) - Rh.length/idx.length*gini(Rh);
+        if (!best || gain > best.gain + 1e-12) best = {f, t, gain, Lh, Rh};
+      }
+    }
+    if (!best || best.gain <= 1e-12) return node;
+    const bl = box.slice(), br = box.slice(); if (best.f === 0){ bl[2] = best.t; br[0] = best.t; } else { bl[3] = best.t; br[1] = best.t; }
+    Object.assign(node, {f: best.f, t: best.t, gain: best.gain, l: build(best.Lh, bl, depth + 1, maxD), r: build(best.Rh, br, depth + 1, maxD)});
+    return node;
+  }
+  const V = vizCanvas(el.querySelector('.viz-stage'), w => w < 500 ? 0.85 : 0.58);
+  V.draw = () => {
+    const {ctx, W, H} = V, col = CLS(), pad = 10, D = +el.querySelector('[data-i=d]').value;
+    el.querySelector('[data-o=d]').textContent = D;
+    const X = x => pad + x*(W - 2*pad), Y = y => H - pad - y*(H - 2*pad);
+    ctx.clearRect(0, 0, W, H);
+    const root = build(pts.map((p, i) => i), [0, 0, 1, 1], 0, D);
+    const leaves = [], splits = [];
+    (function walk(n){ if (n.l){ splits.push(n); walk(n.l); walk(n.r); } else leaves.push(n); })(root);
+    leaves.forEach(n => { const [x0, y0, x1, y1] = n.box; ctx.fillStyle = shade(col[n.cls], 0.16); ctx.fillRect(X(x0), Y(y1), X(x1) - X(x0), Y(y0) - Y(y1)); });
+    ctx.strokeStyle = cssv('--ink'); ctx.lineWidth = 1.6;
+    splits.forEach(n => { const [x0, y0, x1, y1] = n.box; ctx.beginPath(); if (n.f === 0){ ctx.moveTo(X(n.t), Y(y0)); ctx.lineTo(X(n.t), Y(y1)); } else { ctx.moveTo(X(x0), Y(n.t)); ctx.lineTo(X(x1), Y(n.t)); } ctx.stroke(); });
+    pts.forEach(p => dot(ctx, X(p[0]), Y(p[1]), 4, p[2], col[p[2]], cssv('--paper')));
+    const err = leaves.reduce((s, n) => s + n.idx.filter(i => pts[i][2] !== n.cls).length, 0);
+    const rootTxt = root.l ? `Racine : x${root.f === 0 ? '₁' : '₂'} &lt; ${fmt(root.t, 2)} (gain de Gini ${fmt(root.gain, 3)}). ` : 'Profondeur 0 : une seule feuille, on prédit la classe majoritaire. ';
+    el.querySelector('[data-o=out]').innerHTML = rootTxt + `<b>${leaves.length}</b> feuille(s) = ${leaves.length} région(s). Erreur sur l'apprentissage : <b>${fmt(100*err/pts.length, 1)} %</b>. ${D >= 6 ? 'Arbre très profond : il isole les points mélangés, ce qui ressemble à du sur-apprentissage.' : ''}`;
+  };
+  el.querySelector('[data-i=d]').oninput = () => V.draw();
+  V.fit();
+};
+
+/* ---- SVM linéaire à marge souple ---- */
+VIZ.svm = el => {
+  el.innerHTML = vizHead('SVM à marge souple : le rôle de C', 'Fais varier C : la marge, les vecteurs de support et les ξ changent.') +
+    `<div class="viz-ctrl"><label>C = <b data-o="c"></b> <input type="range" min="-2" max="2" step="0.1" value="0" data-i="c" aria-label="log10 de C"></label></div><div class="viz-stage"></div><p class="viz-out" data-o="out"></p>`;
+  const r = rng(4), pts = [];
+  for (let i = 0; i < 26; i++) pts.push([-0.9 + gauss(r)*0.6, -0.7 + gauss(r)*0.6, 1]);
+  for (let i = 0; i < 26; i++) pts.push([0.9 + gauss(r)*0.6, 0.7 + gauss(r)*0.6, -1]);
+  const cache = {};
+  function train(C){ // coordonnée duale (Hsieh et al.) avec biais via une variable constante
+    if (cache[C]) return cache[C];
+    const B = 2.5, n = pts.length, a = new Float64Array(n), w = [0, 0, 0], Xa = pts.map(p => [p[0], p[1], B]);
+    for (let ep = 0; ep < 400; ep++){
+      let mx = 0;
+      for (let i = 0; i < n; i++){
+        const x = Xa[i], y = pts[i][2], G = y*(w[0]*x[0] + w[1]*x[1] + w[2]*x[2]) - 1, Q = x[0]*x[0] + x[1]*x[1] + x[2]*x[2];
+        const na = Math.min(Math.max(a[i] - G/Q, 0), C), d = (na - a[i])*y; if (Math.abs(na - a[i]) > mx) mx = Math.abs(na - a[i]);
+        a[i] = na; w[0] += d*x[0]; w[1] += d*x[1]; w[2] += d*x[2];
+      }
+      if (mx < 1e-7) break;
+    }
+    return cache[C] = {w: [w[0], w[1]], b: w[2]*B, a};
+  }
+  const V = vizCanvas(el.querySelector('.viz-stage'), w => w < 500 ? 0.85 : 0.58);
+  V.draw = () => {
+    const {ctx, W, H} = V, col = CLS(), lc = +el.querySelector('[data-i=c]').value, C = +Math.pow(10, lc).toPrecision(3);
+    el.querySelector('[data-o=c]').textContent = fmt(C, C < 1 ? 2 : 1);
+    const {w, b, a} = train(C), s = 2.6, u = (H/2 - 10)/s, X = x => W/2 + x*u, Y = y => H/2 - y*u;
+    ctx.clearRect(0, 0, W, H);
+    const step = 8; for (let gy = 0; gy < H; gy += step) for (let gx = 0; gx < W; gx += step){
+      const x = (gx + step/2 - W/2)/u, y = (H/2 - gy - step/2)/u, f = w[0]*x + w[1]*y + b;
+      ctx.fillStyle = shade(f >= 0 ? col[0] : col[1], 0.1); ctx.fillRect(gx, gy, step, step); }
+    const line = (v, dash, lw) => { // ⟨w,x⟩ + b = v
+      ctx.setLineDash(dash); ctx.lineWidth = lw; ctx.strokeStyle = cssv('--ink'); ctx.beginPath();
+      if (Math.abs(w[1]) > Math.abs(w[0])) { const xa = -W/u, xb = W/u; ctx.moveTo(X(xa), Y((v - b - w[0]*xa)/w[1])); ctx.lineTo(X(xb), Y((v - b - w[0]*xb)/w[1])); }
+      else { const ya = -H/u, yb = H/u; ctx.moveTo(X((v - b - w[1]*ya)/w[0]), Y(ya)); ctx.lineTo(X((v - b - w[1]*yb)/w[0]), Y(yb)); }
+      ctx.stroke(); ctx.setLineDash([]); };
+    line(0, [], 2); line(1, [6, 4], 1.2); line(-1, [6, 4], 1.2);
+    let nsv = 0, inm = 0, mis = 0;
+    pts.forEach((p, i) => {
+      const m = p[2]*(w[0]*p[0] + w[1]*p[1] + b); if (a[i] > 1e-6) nsv++; if (m < 1 - 1e-6) inm++; if (m < 0) mis++;
+      dot(ctx, X(p[0]), Y(p[1]), 4.4, p[2] > 0 ? 0 : 1, col[p[2] > 0 ? 0 : 1], cssv('--paper'));
+      if (a[i] > 1e-6){ ctx.beginPath(); ctx.arc(X(p[0]), Y(p[1]), 8, 0, 7); ctx.lineWidth = 1.4; ctx.strokeStyle = cssv('--ink'); ctx.stroke(); }
+    });
+    txt(ctx, 'H', 8, 12, 'left', cssv('--ink')); txt(ctx, 'tirets : H⁺ et H⁻ (⟨w,x⟩+b = ±1)', W - 8, H - 10, 'right');
+    const nw = Math.hypot(w[0], w[1]);
+    el.querySelector('[data-o=out]').innerHTML = `Marge 1/‖w‖ = <b>${fmt(1/nw, 3)}</b>. Points cerclés = α̂ᵢ &gt; 0 (vecteurs de support et outliers) : <b>${nsv}</b>. Dans la marge ou mal classés (ξᵢ &gt; 0) : <b>${inm}</b>, dont mal classés (ξᵢ &gt; 1) : <b>${mis}</b>. ${C <= 0.05 ? 'C petit : marge large, beaucoup de points dans la marge (biais ↑).' : C >= 20 ? 'C grand : on pénalise fort les ξᵢ, marge étroite (variance ↑).' : ''}`;
+  };
+  el.querySelector('[data-i=c]').oninput = () => V.draw();
+  V.fit();
+};
+
+/* ---- Silhouette d'un point ---- */
+VIZ.silhouette = el => {
+  el.innerHTML = vizHead('Coefficient de silhouette d\'un point', 'Fais glisser le point entouré vers un autre groupe : s(x) devient négatif. Touche un autre point pour le sélectionner.') + `<div class="viz-stage"></div><p class="viz-out" data-o="out"></p>`;
+  const r = rng(9), pts = [];
+  [[0.22, 0.68], [0.55, 0.28], [0.8, 0.72]].forEach((c, k) => { for (let i = 0; i < 11; i++) pts.push([clamp(c[0] + gauss(r)*0.06, .03, .97), clamp(c[1] + gauss(r)*0.07, .03, .97), k]); });
+  let sel = 3, drag = false;
+  const V = vizCanvas(el.querySelector('.viz-stage'), w => w < 500 ? 0.8 : 0.52, {drag: true});
+  const pad = 12, X = x => pad + x*(V.W - 2*pad), Y = y => V.H - pad - y*(V.H - 2*pad);
+  const d = (p, q) => Math.hypot((p[0] - q[0])*V.W, (p[1] - q[1])*V.H)/Math.max(V.W, V.H)*10; // distance sur le dessin
+  const sil = i => { const p = pts[i], own = pts.filter((q, j) => j !== i && q[2] === p[2]); const a = own.reduce((s, q) => s + d(p, q), 0)/own.length;
+    let b = Infinity, bk = -1; [0, 1, 2].filter(k => k !== p[2]).forEach(k => { const o = pts.filter(q => q[2] === k); const m = o.reduce((s, q) => s + d(p, q), 0)/o.length; if (m < b){ b = m; bk = k; } });
+    return {a, b, bk, s: (b - a)/Math.max(a, b)}; };
+  V.draw = () => {
+    const {ctx, W, H} = V, col = CLS(), p = pts[sel], S = sil(sel);
+    ctx.clearRect(0, 0, W, H);
+    pts.forEach((q, j) => { if (j === sel) return; if (q[2] === p[2] || q[2] === S.bk){ ctx.setLineDash(q[2] === p[2] ? [] : [4, 4]); ctx.strokeStyle = shade(col[q[2]], 0.55); ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(X(p[0]), Y(p[1])); ctx.lineTo(X(q[0]), Y(q[1])); ctx.stroke(); } });
+    ctx.setLineDash([]);
+    pts.forEach(q => dot(ctx, X(q[0]), Y(q[1]), 4.6, q[2], col[q[2]], cssv('--paper')));
+    ctx.beginPath(); ctx.arc(X(p[0]), Y(p[1]), 10, 0, 7); ctx.lineWidth = 2; ctx.strokeStyle = cssv('--ink'); ctx.stroke();
+    txt(ctx, 'x', X(p[0]) + 14, Y(p[1]) - 10, 'left', cssv('--ink'), 13);
+    const all = pts.map((q, j) => sil(j).s), glob = all.reduce((s, v) => s + v, 0)/all.length;
+    el.querySelector('[data-o=out]').innerHTML = `x appartient au cluster <b>${CLSNAME[p[2]]}</b>. a(x) = distance moyenne à son cluster (traits pleins) = <b>${fmt(S.a, 2)}</b> ; b(x) = distance moyenne au cluster voisin le plus proche, <b>${CLSNAME[S.bk]}</b> (pointillés) = <b>${fmt(S.b, 2)}</b>. s(x) = (b − a)/max(a, b) = <b style="color:${S.s < 0 ? cssv('--red') || 'inherit' : 'inherit'}">${fmt(S.s, 3)}</b>${S.s < 0 ? ' &lt; 0 : x est plus proche d\'un autre cluster que du sien, il est probablement mal assigné.' : S.s > 0.5 ? ' : x est bien assigné.' : ''} Silhouette globale de la partition : ${fmt(glob, 3)}.`;
+  };
+  const pick = e => { const [x, y] = V.pos(e); return [clamp((x - pad)/(V.W - 2*pad), 0, 1), clamp((V.H - pad - y)/(V.H - 2*pad), 0, 1)]; };
+  V.cv.addEventListener('pointerdown', e => { const [x, y] = pick(e); let bi = -1, bd = Infinity; pts.forEach((q, j) => { const dd = (q[0] - x)**2 + (q[1] - y)**2; if (dd < bd){ bd = dd; bi = j; } });
+    if (bi === sel || Math.sqrt(bd) > 0.06){ drag = true; pts[sel][0] = x; pts[sel][1] = y; V.cv.setPointerCapture(e.pointerId); } else sel = bi; V.draw(); });
+  V.cv.addEventListener('pointermove', e => { if (!drag) return; const [x, y] = pick(e); pts[sel][0] = x; pts[sel][1] = y; V.draw(); });
+  V.cv.addEventListener('pointerup', () => drag = false); V.cv.addEventListener('pointercancel', () => drag = false);
+  V.fit();
+};
+
+function mountViz(root){
+  root.querySelectorAll('[data-viz]').forEach(el => { const f = VIZ[el.dataset.viz]; if (f && !el.dataset.ready){ el.dataset.ready = '1'; try{ f(el); }catch(e){ el.textContent = ''; console.error(e); } } });
+}
 
 const RENDER = {fiches:renderFiches, flash:renderFlash, quiz:renderQuiz, outils:renderOutils, annales:renderAnnales, tp:renderTP};
 const done = {};
