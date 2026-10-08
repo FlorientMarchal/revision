@@ -337,6 +337,7 @@ ol.sub{margin:6px 0 0; padding-left:24px; display:grid; gap:4px}
 .katex-display{overflow-x:auto; overflow-y:hidden; max-width:100%; padding:2px 0}
 @media (max-width:560px){ .math .katex, .katex-display .katex{font-size:.9em} .todo-proof h3 .katex{font-size:1em} }
 .qn ol, .qn ul{max-width:100%; box-sizing:border-box; margin-right:0} .qn li{min-width:0; overflow-wrap:anywhere}
+.dash{grid-template-columns:minmax(0,1fr) !important}
 </style>
 </head>
 <body>
@@ -357,8 +358,6 @@ ol.sub{margin:6px 0 0; padding-left:24px; display:grid; gap:4px}
     <p class="sub">KNN<span>/</span>régression logistique<span>/</span>arbres CART<span>/</span>SVM<span>/</span>clustering</p>
     <div class="dash">
       <div class="countdown" id="countdown"><b id="cd-days">–</b><span>jours avant le contrôle terminal<br>lundi 12 octobre · 1h30 · 70 % de la note</span></div>
-      <button type="button" class="dash-item" data-go="flash"><span class="dash-k">Flashcards sues <em id="d-known-pct"></em></span><b id="d-known">–</b><span class="meter" aria-hidden="true"><i id="d-known-bar"></i></span></button>
-      <button type="button" class="dash-item" data-go="quiz"><span class="dash-k"><span>Meilleur QCM<span class="hide-sm"> · tout le cours</span></span></span><b id="d-qbest">–</b><span class="meter" aria-hidden="true"><i id="d-qbest-bar"></i></span></button>
     </div>
   </header>
 
@@ -1740,16 +1739,7 @@ QUIZ.push(
  ['reglog','Un fichier de soumission Kaggle ne contient que des 0/1. La courbe ROC calculée par Kaggle…',['est une courbe en escalier avec un point par observation','n\'a que 3 points : (0,0), (FPR,TPR), (1,1)','est la diagonale','ne peut pas être calculée'],1,'Avec deux valeurs prédites, un seul seuil sépare les prédictions : deux segments de droite, AUC = (sensibilité + spécificité)/2.']
 );
 
-function updateDash(){
-  const known = store.get('known', {}) || {};
-  const total = CARDS.length, k = Object.keys(known).filter(i => known[i] && +i < total).length;
-  $('#d-known').innerHTML = `${k}<small> / ${total}</small>`;
-  $('#d-known-pct').textContent = total ? Math.round(100*k/total) + ' %' : '';
-  $('#d-known-bar').style.width = (total ? 100*k/total : 0) + '%';
-  const best = store.get('qbest:all', null);
-  $('#d-qbest').innerHTML = (best === null) ? `–<small class="hide-sm"> pas encore fait</small>` : `${best}<small> %</small>`;
-  $('#d-qbest-bar').style.width = (best || 0) + '%';
-}
+function updateDash(){}
 function onStore(k){ if (k === 'known' || k === 'qbest:all') updateDash(); }
 document.querySelectorAll('.dash-item[data-go]').forEach(b => b.addEventListener('click', () => openTab(b.dataset.go)));
 updateDash();
