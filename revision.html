@@ -1,0 +1,1667 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<title>Révision Classif M1</title>
+<script>
+/* Thème appliqué avant le premier rendu (évite le flash) : 'light' | 'dark' ; sinon on suit le système */
+/* le thème suit l'appareil (prefers-color-scheme) */
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Identité « cahier de maths » : papier quadrillé, encre bleue, marge rouge, fiches bristol.
+   Mode nuit « ardoise » : fond vert-gris, craie claire, couleurs recalibrées (pas une inversion). */
+:root{
+  --bg:#eef1f4; --grid:#dfe5ec; --paper:#ffffff; --paper-2:#f6f8fb; --field:#f8fafc;
+  --ink:#172033; --ink-2:#2d3749; --muted:#525d6f; --line:#d3d9e2; --line-strong:#aeb8c6;
+  --accent:#1f4fb5; --accent-hover:#183f93; --accent-ink:#ffffff; --accent-soft:#e8eef9; --accent-line:#b7c8ec;
+  --red:#b83226; --red-soft:#fbeae7; --margin:#e3786e;
+  --hl:#ffe47a; --good:#16703d; --good-soft:#e3f2e9; --good-line:#9ccfb1; --warn:#955700; --warn-soft:#fcf0dc;
+  --f-bg:#f7f9fd; --f-grid:#e8edf5; --rule:#cbd8ef;
+  --nav-bg:rgba(238,241,244,.9);
+  --shadow:0 1px 2px rgba(23,32,51,.06), 0 1px 1px rgba(23,32,51,.03);
+  --shadow-lift:0 10px 28px -14px rgba(23,32,51,.35);
+  /* palette catégorielle des données (K-means, logo) */
+  --c0:#8a94a3; --c1:#2459d1; --c2:#cf4a32; --c3:#1d8a52; --c4:#b37516; --c5:#0e8584; --c6:#a33b83;
+  --f-display:"Source Serif 4", "Iowan Old Style", "Palatino Linotype", Georgia, serif;
+  --f-body:"IBM Plex Sans", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  --f-mono:"JetBrains Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#0f1514; --grid:#172120; --paper:#161e1d; --paper-2:#1b2523; --field:#121918;
+  --ink:#e6ebe7; --ink-2:#cdd5d0; --muted:#9eaba5; --line:#2a3633; --line-strong:#43524e;
+  --accent:#8fb2ff; --accent-hover:#aac5ff; --accent-ink:#0c1322; --accent-soft:#1b2639; --accent-line:#344d7a;
+  --red:#ff9384; --red-soft:#2f1d1b; --margin:#9c4840;
+  --hl:#655613; --good:#74d7a2; --good-soft:#13271d; --good-line:#2c5a42; --warn:#f0b85c; --warn-soft:#2c2313;
+  --f-bg:#121a19; --f-grid:#1a2523; --rule:#23343a;
+  --nav-bg:rgba(15,21,20,.88);
+  --shadow:0 1px 2px rgba(0,0,0,.35);
+  --shadow-lift:0 12px 30px -14px rgba(0,0,0,.7);
+  --c0:#6f7c77; --c1:#86aaff; --c2:#ff8c74; --c3:#62d397; --c4:#efb650; --c5:#4fd0cf; --c6:#e690cb;
+  color-scheme:dark; } }
+:root[data-theme="dark"]{
+  --bg:#0f1514; --grid:#172120; --paper:#161e1d; --paper-2:#1b2523; --field:#121918;
+  --ink:#e6ebe7; --ink-2:#cdd5d0; --muted:#9eaba5; --line:#2a3633; --line-strong:#43524e;
+  --accent:#8fb2ff; --accent-hover:#aac5ff; --accent-ink:#0c1322; --accent-soft:#1b2639; --accent-line:#344d7a;
+  --red:#ff9384; --red-soft:#2f1d1b; --margin:#9c4840;
+  --hl:#655613; --good:#74d7a2; --good-soft:#13271d; --good-line:#2c5a42; --warn:#f0b85c; --warn-soft:#2c2313;
+  --f-bg:#121a19; --f-grid:#1a2523; --rule:#23343a;
+  --nav-bg:rgba(15,21,20,.88);
+  --shadow:0 1px 2px rgba(0,0,0,.35);
+  --shadow-lift:0 12px 30px -14px rgba(0,0,0,.7);
+  --c0:#6f7c77; --c1:#86aaff; --c2:#ff8c74; --c3:#62d397; --c4:#efb650; --c5:#4fd0cf; --c6:#e690cb;
+  color-scheme:dark; }
+
+*{box-sizing:border-box}
+[hidden]{display:none !important}
+html{-webkit-text-size-adjust:100%; text-size-adjust:100%; background:var(--bg)}
+.card, h2{scroll-margin-top:72px}
+body{margin:0; background-color:var(--bg); color:var(--ink); font:16px/1.6 var(--f-body);
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size:24px 24px; background-attachment:fixed;
+  -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility}
+::selection{background:var(--accent-soft); color:var(--ink)}
+.wrap{max-width:1060px; margin:0 auto; padding-inline:16px; padding-block:0 56px}
+h1,h2,h3,h4{text-wrap:balance; margin:0}
+h1,h2{font-family:var(--f-display); font-weight:700; letter-spacing:-.01em}
+h1{font-size:clamp(28px,4.6vw,44px); line-height:1.06; max-width:24ch}
+h2{font-size:clamp(20px,2.4vw,24px); line-height:1.22}
+h3{font:600 17px/1.35 var(--f-body); letter-spacing:-.005em}
+h4{font:600 14px/1.4 var(--f-body)}
+p{margin:0}
+b, strong{font-weight:600}
+code,.mono{font-family:var(--f-mono); font-size:.86em}
+code{background:var(--paper-2); border:1px solid var(--line); border-radius:4px; padding:.05em .35em}
+button{font:inherit; color:inherit}
+a{color:var(--accent)}
+:focus-visible{outline:2px solid var(--accent); outline-offset:2px}
+button, .chip, .btn, .opt, summary, input, select, textarea{transition:background-color .15s, border-color .15s, color .15s, box-shadow .15s, transform .1s}
+
+/* ---------- en-tête ---------- */
+header.top{padding-block:20px 18px; display:grid; gap:14px}
+.top-bar{display:flex; flex-wrap:wrap; gap:10px 16px; align-items:center; justify-content:space-between}
+.brand{display:flex; align-items:center; gap:10px; min-width:0}
+.mark{width:30px; height:30px; flex:none; border:1px solid var(--line); border-radius:6px; background:var(--paper)}
+.eyebrow{font:600 12px/1.2 var(--f-mono); letter-spacing:.08em; text-transform:uppercase; color:var(--muted)}
+.sub{font:500 13px/1.5 var(--f-mono); color:var(--muted)}
+.sub span{color:var(--line-strong); padding-inline:4px}
+
+
+.dash{display:grid; grid-template-columns:repeat(auto-fit,minmax(min(210px,100%),1fr)); gap:10px; margin-top:6px}
+.countdown, .dash-item{display:flex; gap:12px; align-items:center; background:var(--paper); border:1px solid var(--line); border-radius:8px; padding:10px 14px; box-shadow:var(--shadow); min-width:0}
+.countdown{border-left:3px solid var(--red)}
+.countdown b{font:700 32px/1 var(--f-display); color:var(--red); font-variant-numeric:tabular-nums; min-width:1.2ch; text-align:center}
+.countdown span{font-size:13px; color:var(--muted); line-height:1.35}
+.dash-item{cursor:pointer; text-align:left; flex-direction:column; align-items:stretch; gap:4px}
+.dash-item:hover{border-color:var(--accent-line)}
+.dash-k{font:600 11px/1.2 var(--f-mono); letter-spacing:.07em; text-transform:uppercase; color:var(--muted); display:flex; justify-content:space-between; gap:8px}
+.dash-k em{font-style:normal; color:var(--accent); letter-spacing:0; text-transform:none}
+.dash-item b{font:600 20px/1.15 var(--f-mono); font-variant-numeric:tabular-nums; color:var(--ink)}
+.dash-item b small{font-size:13px; color:var(--muted); font-weight:400}
+.meter{display:block; height:4px; background:var(--line); border-radius:2px; overflow:hidden}
+.meter > i{display:block; height:100%; width:0; background:var(--good); transition:width .4s}
+
+/* ---------- onglets (nav) ---------- */
+nav.tabs{position:sticky; top:env(safe-area-inset-top,0px); z-index:5; background:var(--nav-bg); -webkit-backdrop-filter:blur(10px); backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--line); display:flex; gap:2px; overflow-x:auto; margin:0 -16px 24px; padding:0 16px; scrollbar-width:none;
+  -webkit-mask-image:linear-gradient(90deg,#000 calc(100% - 28px),transparent); mask-image:linear-gradient(90deg,#000 calc(100% - 28px),transparent)}
+nav.tabs::-webkit-scrollbar{display:none}
+nav.tabs button{flex:none; display:inline-flex; align-items:baseline; gap:7px; border:0; border-bottom:2px solid transparent; background:none; padding:13px 12px 11px; cursor:pointer; white-space:nowrap; font-weight:600; font-size:15px; color:var(--muted)}
+nav.tabs button .ix{font:600 11px var(--f-mono); color:var(--line-strong); letter-spacing:.02em}
+nav.tabs button:hover{color:var(--ink)}
+nav.tabs button:hover .ix{color:var(--muted)}
+nav.tabs button[aria-selected="true"]{color:var(--ink); border-bottom-color:var(--accent)}
+nav.tabs button[aria-selected="true"] .ix{color:var(--accent)}
+nav.tabs button:focus-visible{outline-offset:-3px; border-radius:6px}
+nav.tabs button:last-child{margin-right:24px}
+
+/* ---------- composants ---------- */
+.panel{display:flex; flex-direction:column; gap:20px}
+.panel:not([hidden]){animation:enter .22s ease-out}
+@keyframes enter{from{opacity:0; transform:translateY(4px)}to{opacity:1; transform:none}}
+.card{background:var(--paper); border:1px solid var(--line); border-radius:10px; padding:24px; box-shadow:var(--shadow); min-width:0}
+.lead{color:var(--muted); max-width:70ch}
+.chips{display:flex; flex-wrap:wrap; gap:6px}
+.chip{border:1px solid var(--line); background:var(--paper); border-radius:999px; padding:5px 13px; font-size:14px; cursor:pointer; font-weight:600; color:var(--muted); display:inline-flex; align-items:center; gap:7px}
+.chip:hover{color:var(--ink); border-color:var(--line-strong)}
+.chip[aria-pressed="true"]{background:var(--ink); color:var(--paper); border-color:var(--ink)}
+#fiche-chips{counter-reset:ch}
+#fiche-chips .chip::before{counter-increment:ch; content:counter(ch); font:600 11px/1 var(--f-mono); color:var(--accent); opacity:.9}
+#fiche-chips .chip[aria-pressed="true"]::before{color:inherit; opacity:.7}
+.btn{border:1px solid var(--line-strong); background:var(--paper); border-radius:6px; padding:8px 15px; cursor:pointer; font-weight:600; font-size:15px; line-height:1.3}
+.btn:hover{border-color:var(--accent); color:var(--accent)}
+.btn:active, .chip:active, .opt:active:not(:disabled){transform:translateY(1px)}
+.btn.primary{background:var(--accent); border-color:var(--accent); color:var(--accent-ink)}
+.btn.primary:hover{background:var(--accent-hover); border-color:var(--accent-hover); color:var(--accent-ink)}
+.btn.small{padding:5px 11px; font-size:13px}
+.row{display:flex; flex-wrap:wrap; gap:10px; align-items:center}
+kbd{font:600 11px var(--f-mono); border:1px solid var(--line-strong); border-bottom-width:2px; border-radius:4px; padding:1px 5px; background:var(--paper-2); color:var(--ink-2)}
+
+/* ---------- fiches (et fiches TP) ---------- */
+.fiche{display:grid; gap:14px; position:relative; padding:28px 28px 28px 52px}
+.fiche::before{content:""; position:absolute; top:0; bottom:0; left:34px; width:1px; background:var(--margin); opacity:.75}
+.fiche > header{display:grid; gap:6px; padding-bottom:14px; border-bottom:1px solid var(--line); margin-bottom:4px}
+.fiche > header h2{font-size:clamp(24px,3vw,30px)}
+.fiche .tag{font:600 12px var(--f-mono); color:var(--red); letter-spacing:.08em; text-transform:uppercase}
+.fiche > ul, .fiche > p, .fiche > .lead, .fiche details > p{max-width:70ch}
+.fiche ul{margin:0; padding-left:20px; display:grid; gap:7px}
+.fiche li{padding-left:2px}
+.fiche li::marker{color:var(--accent); content:"– "}
+.fiche h3{display:flex; align-items:center; gap:10px; color:var(--ink)}
+.fiche h3::before{content:""; flex:none; width:14px; height:2px; background:var(--red)}
+.fiche > h3{margin-top:10px}
+.fiche h3 + *{margin-top:10px}
+.fiche h3[style] + *{margin-top:0}
+.f{font-family:var(--f-mono); font-size:14px; line-height:1.65; color:var(--ink);
+  background-color:var(--f-bg); background-image:linear-gradient(var(--f-grid) 1px,transparent 1px),linear-gradient(90deg,var(--f-grid) 1px,transparent 1px); background-size:12px 12px;
+  border:1px solid var(--line); border-left:3px solid var(--accent); border-radius:2px 6px 6px 2px; padding:12px 16px; overflow-x:auto; white-space:pre; tab-size:4; max-width:100%}
+.key{background:linear-gradient(transparent 56%, var(--hl) 56%, var(--hl) 94%, transparent 94%); padding:0 2px; -webkit-box-decoration-break:clone; box-decoration-break:clone}
+.tp{border:1px solid var(--line); border-left:3px solid var(--red); background:var(--red-soft); border-radius:2px 6px 6px 2px; padding:12px 16px; font-size:15px; max-width:78ch}
+.tp > b:first-child{font:600 12px var(--f-mono); letter-spacing:.06em; text-transform:uppercase; color:var(--red); margin-right:4px}
+.tp b{color:var(--red)}
+.grid2{display:grid; grid-template-columns:repeat(auto-fit,minmax(min(280px,100%),1fr)); gap:18px}
+.fiche li, .fiche code, .answer, .q-item .qn{overflow-wrap:anywhere}
+.grid2 > *{min-width:0}
+table.t{border-collapse:collapse; font-size:14px; font-variant-numeric:tabular-nums; background:var(--paper)}
+table.t th, table.t td{border:1px solid var(--line); padding:6px 11px; text-align:center}
+table.t th{background:var(--paper-2); font-weight:600; color:var(--ink-2)}
+table.t tr:first-child th{border-bottom-color:var(--line-strong)}
+.scroll{overflow-x:auto; max-width:100%}
+details.fold{border-top:1px dashed var(--line-strong); padding-top:12px}
+details.fold summary{cursor:pointer; font-weight:600; color:var(--accent); list-style:none; display:flex; gap:8px; align-items:baseline; min-height:28px}
+details.fold summary::-webkit-details-marker{display:none}
+details.fold summary::before{content:"+"; font:600 14px var(--f-mono); width:18px; height:18px; display:inline-grid; place-items:center; border:1px solid var(--accent-line); border-radius:4px; flex:none; transform:translateY(2px)}
+details.fold[open] summary::before{content:"−"}
+details.fold summary:hover{text-decoration:underline; text-underline-offset:3px}
+.fiche-nav{display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap; border-top:1px solid var(--line); padding-top:16px; margin-top:6px}
+.fiche-nav .btn{display:inline-flex; flex-direction:column; align-items:flex-start; gap:1px; max-width:100%}
+.fiche-nav .btn small{font:600 11px var(--f-mono); letter-spacing:.06em; text-transform:uppercase; color:var(--muted)}
+.fiche-nav .next{margin-left:auto; align-items:flex-end; text-align:right}
+
+/* ---------- flashcards : fiche bristol ---------- */
+.fc-stage{display:grid; place-items:center; gap:14px}
+.flash{width:100%; max-width:680px; min-height:270px; perspective:1400px; cursor:pointer; border-radius:6px}
+.flash-inner{position:relative; width:100%; min-height:270px; transition:transform .5s cubic-bezier(.3,.7,.2,1); transform-style:preserve-3d}
+.flash.flipped .flash-inner{transform:rotateY(180deg)}
+.face{position:absolute; inset:0; backface-visibility:hidden; -webkit-backface-visibility:hidden; background-color:var(--paper); border:1px solid var(--line); border-radius:6px; padding:24px 26px; display:flex; flex-direction:column; justify-content:safe center; gap:10px; overflow:auto; box-shadow:var(--shadow-lift)}
+.face.front{justify-content:flex-start; gap:0; padding-top:0;
+  background-image:linear-gradient(var(--margin),var(--margin)), repeating-linear-gradient(to bottom, transparent 0 27px, var(--rule) 27px 28px);
+  background-size:100% 1px, 100% 100%; background-position:0 52px, 0 52px; background-repeat:no-repeat, no-repeat}
+.face.front #fc-ch{height:52px; display:flex; align-items:center; flex:none}
+.face .q{font:600 20px/28px var(--f-display); letter-spacing:-.005em}
+.face.front small:last-child{margin-top:auto; padding-top:12px}
+.face.back{transform:rotateY(180deg); border-color:var(--accent-line); border-top:3px solid var(--accent); font-size:16px; line-height:1.6}
+.face small{font:600 11px var(--f-mono); color:var(--muted); letter-spacing:.08em; text-transform:uppercase}
+.flash:hover .face{border-color:var(--line-strong)}
+.flash:hover .face.back{border-color:var(--accent-line); border-top-color:var(--accent)}
+.flash:focus-visible{outline-offset:4px}
+.bar{height:6px; background:var(--line); border-radius:3px; overflow:hidden; width:100%; max-width:680px}
+.bar > i{display:block; height:100%; background:var(--good); width:0; transition:width .3s}
+.bar.thin{height:3px; max-width:none; margin-top:12px}
+.bar.thin > i{background:var(--accent)}
+.stat{font-size:13px; color:var(--muted); font-variant-numeric:tabular-nums}
+#fc-good{background:var(--good); border-color:var(--good); color:var(--paper)}
+#fc-good:hover{filter:brightness(1.08); color:var(--paper)}
+#fc-bad{border-color:var(--red)}
+#fc-bad:hover{background:var(--red-soft); color:var(--red)}
+.fc-keys{font-size:12px; color:var(--muted); display:flex; gap:14px; flex-wrap:wrap; justify-content:center}
+
+/* ---------- QCM ---------- */
+.opts{counter-reset:opt; display:grid; gap:8px; margin-top:16px}
+.opt{display:flex; gap:12px; align-items:flex-start; width:100%; text-align:left; border:1px solid var(--line); background:var(--paper); border-radius:8px; padding:11px 14px; cursor:pointer; margin:0; line-height:1.45}
+.opt::before{counter-increment:opt; content:counter(opt, upper-alpha); flex:none; width:24px; height:24px; display:inline-grid; place-items:center; border:1px solid var(--line-strong); border-radius:50%; font:600 12px/1 var(--f-mono); color:var(--muted); margin-top:-1px}
+.opt:hover:not(:disabled){border-color:var(--accent); background:var(--accent-soft)}
+.opt:hover:not(:disabled)::before{border-color:var(--accent); color:var(--accent)}
+.opt:disabled{cursor:default; color:var(--muted); opacity:1}
+.opt.ok{background:var(--good-soft); border-color:var(--good); color:var(--ink)}
+.opt.ok::before{content:"✓"; background:var(--good); border-color:var(--good); color:var(--paper)}
+.opt.ko{background:var(--red-soft); border-color:var(--red); color:var(--ink)}
+.opt.ko::before{content:"✗"; background:var(--red); border-color:var(--red); color:var(--paper)}
+.exp{margin-top:14px; padding:12px 16px; border-radius:2px 6px 6px 2px; background:var(--accent-soft); border-left:3px solid var(--accent); font-size:15px; max-width:75ch}
+.qz-q{margin-top:12px; font:600 clamp(18px,2.2vw,21px)/1.4 var(--f-display); max-width:60ch}
+.qz-score{font:700 clamp(36px,6vw,52px)/1 var(--f-display); margin-top:6px}
+
+/* ---------- outils ---------- */
+label.l{font-size:13px; font-weight:600; color:var(--muted); display:block; margin-bottom:4px}
+input[type=text], input[type=number], textarea, select{font:14px var(--f-mono); color:var(--ink); background:var(--field); border:1px solid var(--line-strong); border-radius:6px; padding:7px 9px; width:100%}
+input[type=text]:hover, input[type=number]:hover, textarea:hover, select:hover{border-color:var(--muted)}
+input:focus-visible, textarea:focus-visible, select:focus-visible{outline:2px solid var(--accent); outline-offset:0; border-color:var(--accent)}
+input[type=checkbox], input[type=range]{accent-color:var(--accent)}
+select{font-family:var(--f-body)}
+textarea{resize:vertical; min-height:46px; line-height:1.5}
+input.cell{width:60px; text-align:center; padding:4px}
+#tool-chips .chip{border-radius:6px}
+.metrics{display:grid; grid-template-columns:repeat(auto-fill,minmax(140px,1fr)); gap:8px; align-content:start}
+.metric{border:1px solid var(--line); background:var(--paper-2); border-radius:6px; padding:9px 12px; display:grid; gap:2px; min-width:0}
+.metric > span:first-child{font:600 11px/1.3 var(--f-mono); letter-spacing:.06em; text-transform:uppercase; color:var(--muted)}
+.metric b{display:block; font:600 22px/1.2 var(--f-mono); font-variant-numeric:tabular-nums; color:var(--ink)}
+.metric span{font-size:12px; color:var(--muted); overflow-wrap:anywhere}
+.steps{display:grid; grid-template-columns:minmax(0,1fr); gap:10px}
+.step{border:1px solid var(--line); border-left:3px solid var(--accent-line); border-radius:2px 6px 6px 2px; padding:10px 12px; background:var(--paper)}
+.step h4{margin:0 0 8px; font-size:14px}
+td.min{background:var(--hl); font-weight:700; color:var(--ink)}
+svg text{fill:var(--ink); font-family:var(--f-mono); font-size:12px}
+canvas{display:block; max-width:100%; height:auto; border:1px solid var(--line); border-radius:8px; background:var(--paper); touch-action:none}
+
+/* ---------- annales ---------- */
+.exo{counter-reset:q}
+.exo > h2{padding-bottom:12px; border-bottom:1px solid var(--line)}
+.q-item{counter-increment:q; position:relative; border-top:1px dashed var(--line); padding:14px 0 0 50px; display:grid; gap:10px}
+.exo > h2 + .q-item{border-top:0; padding-top:2px}
+.q-item::before{content:"Q" counter(q); position:absolute; left:0; top:14px; font:600 12px/1 var(--f-mono); color:var(--accent); background:var(--accent-soft); border:1px solid var(--accent-line); border-radius:4px; padding:5px 6px; min-width:36px; text-align:center}
+.exo > h2 + .q-item::before{top:2px}
+.q-item .qn{font-weight:500; color:var(--ink); max-width:75ch}
+.q-item details > summary{list-style:none; display:inline-flex !important; align-items:center; gap:8px; cursor:pointer}
+.q-item details > summary::-webkit-details-marker{display:none}
+.q-item details > summary::before{content:""; width:7px; height:7px; border-right:2px solid currentColor; border-bottom:2px solid currentColor; transform:rotate(-45deg); transition:transform .15s; margin-right:2px}
+.q-item details[open] > summary{background:var(--good-soft); border-color:var(--good-line); color:var(--good)}
+.q-item details[open] > summary::before{transform:rotate(45deg) translate(-2px,-2px)}
+.answer{background:var(--good-soft); border:1px solid var(--good-line); border-left:3px solid var(--good); border-radius:2px 6px 6px 2px; padding:12px 16px; font-size:15px; max-width:80ch}
+.answer::before{content:"Correction"; display:block; font:600 11px var(--f-mono); letter-spacing:.08em; text-transform:uppercase; color:var(--good); margin-bottom:4px}
+.answer ul{margin:4px 0 0; padding-left:18px}
+.answer .f{margin:8px 0}
+.pill{display:inline-block; font:600 11px var(--f-mono); padding:2px 8px; border-radius:99px; background:var(--accent-soft); color:var(--accent); letter-spacing:.04em; vertical-align:2px}
+.pill.fig{background:var(--red-soft); color:var(--red); border:1px solid currentColor}
+
+footer{color:var(--muted); font-size:13px; margin-top:32px; padding-top:16px; border-top:1px solid var(--line); max-width:80ch; line-height:1.55}
+
+@media (prefers-reduced-motion: reduce){
+  *, *::before, *::after{transition:none !important; animation:none !important; scroll-behavior:auto !important} }
+@media (max-width:560px){
+  .card{padding:18px 16px}
+  .fiche{padding:20px 16px 22px 30px}
+  .fiche::before{left:18px}
+  .face{padding:20px 18px}
+  .face.front{padding-top:0}
+  .face .q{font-size:18px}
+  .q-item{padding-left:0}
+  .q-item::before{position:static; justify-self:start}
+  .exo > h2 + .q-item::before{top:auto}
+  .countdown b{font-size:28px}
+  .dash{grid-template-columns:1fr 1fr; gap:8px} .countdown{grid-column:1/-1} .dash-item{padding:9px 12px} .dash-item b{font-size:18px} .dash-item b small{font-size:12px} .hide-sm, .dash-k em{display:none}
+  header.top{gap:12px; padding-top:16px}
+  input[type=text], input[type=number], textarea, select{font-size:16px} }
+@media (pointer:coarse){
+  .chip, .btn, details summary.btn, nav.tabs button, .dash-item, .opt{min-height:44px}
+  .chip{padding:8px 14px} details.fold summary{min-height:44px; align-items:center}
+  input.cell{height:40px} input[type=checkbox]{width:20px; height:20px} }
+
+/* colonnes de grille : ne jamais s'élargir à la taille d'un tableau interne */
+.card.exo, .q-item, .card[style*="grid"], .answer{grid-template-columns:minmax(0,1fr); min-width:0}
+.q-item > *, .card > *{min-width:0}
+table.t{display:block; max-width:100%; overflow-x:auto; width:max-content}
+.f{max-width:100%}
+.fiche > *, .fiche li{min-width:0}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="top-bar">
+      <div class="brand">
+        <svg class="mark" viewBox="0 0 30 30" aria-hidden="true">
+          <path d="M5 24 L25 6" stroke="var(--line-strong)" stroke-width="1" stroke-dasharray="2 2"/>
+          <circle cx="8" cy="9" r="2.2" fill="var(--c1)"/><circle cx="12" cy="6.5" r="2.2" fill="var(--c1)"/><circle cx="11.5" cy="12" r="2.2" fill="var(--c1)"/>
+          <circle cx="19" cy="21" r="2.2" fill="var(--c2)"/><circle cx="23" cy="18" r="2.2" fill="var(--c2)"/><circle cx="22.5" cy="24" r="2.2" fill="var(--c2)"/>
+        </svg>
+        <span class="eyebrow">M1 MIASHS · TW132MI</span>
+      </div>
+      
+    </div>
+    <h1>Classification supervisée et non supervisée</h1>
+    <p class="sub">KNN<span>/</span>régression logistique<span>/</span>arbres CART<span>/</span>SVM<span>/</span>clustering</p>
+    <div class="dash">
+      <div class="countdown" id="countdown"><b id="cd-days">–</b><span>jours avant le contrôle terminal<br>lundi 12 octobre · 1h30 · 70 % de la note</span></div>
+      <button type="button" class="dash-item" data-go="flash"><span class="dash-k">Flashcards sues <em id="d-known-pct"></em></span><b id="d-known">–</b><span class="meter" aria-hidden="true"><i id="d-known-bar"></i></span></button>
+      <button type="button" class="dash-item" data-go="quiz"><span class="dash-k"><span>Meilleur QCM<span class="hide-sm"> · tout le cours</span></span></span><b id="d-qbest">–</b><span class="meter" aria-hidden="true"><i id="d-qbest-bar"></i></span></button>
+    </div>
+  </header>
+
+  <nav class="tabs" role="tablist" id="tabs" aria-label="Sections">
+    <button role="tab" data-tab="fiches"><span class="ix" aria-hidden="true">01</span>Fiches</button>
+    <button role="tab" data-tab="flash"><span class="ix" aria-hidden="true">02</span>Flashcards</button>
+    <button role="tab" data-tab="quiz"><span class="ix" aria-hidden="true">03</span>QCM</button>
+    <button role="tab" data-tab="outils"><span class="ix" aria-hidden="true">04</span>Exercices interactifs</button>
+    <button role="tab" data-tab="annales"><span class="ix" aria-hidden="true">05</span>Annales corrigées</button>
+    <button role="tab" data-tab="tp"><span class="ix" aria-hidden="true">06</span>TP en R</button>
+  </nav>
+
+  <main>
+    <section class="panel" id="p-fiches" hidden></section>
+    <section class="panel" id="p-flash" hidden></section>
+    <section class="panel" id="p-quiz" hidden></section>
+    <section class="panel" id="p-outils" hidden></section>
+    <section class="panel" id="p-annales" hidden></section>
+    <section class="panel" id="p-tp" hidden></section>
+  </main>
+
+  <footer>Construit à partir des 5 cours (Intro/KNN, régression logistique, arbres CART, SVM, clustering), des 3 sujets d'examen (2024 S1, 2024 S2, 2025 S1) et des 6 TP. Les questions qui dépendent d'une figure sont signalées : la correction donne la méthode et une lecture de la figure, à vérifier sur ton sujet. Ta progression est gardée dans ce navigateur.</footer>
+</div>
+
+<script>
+/* ---------- utilitaires ---------- */
+const $ = (s, r=document) => r.querySelector(s);
+const store = {
+  get(k, d){ try{ const v = localStorage.getItem('classif:'+k); return v===null ? d : JSON.parse(v); }catch(e){ return d; } },
+  set(k, v){ try{ localStorage.setItem('classif:'+k, JSON.stringify(v)); }catch(e){} if (typeof onStore === 'function') onStore(k); }
+};
+const fmt = (x, d=3) => (x===null || !isFinite(x)) ? '—' : (+x.toFixed(d)).toString().replace('.', ',');
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function rng(seed){ return function(){ seed |= 0; seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+
+/* ---------- thème : suit le réglage clair/sombre de l'appareil ---------- */
+(function(){
+  try{ localStorage.removeItem('classif:theme'); }catch(e){}
+  document.documentElement.removeAttribute('data-theme');
+  try{ matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => document.dispatchEvent(new CustomEvent('themechange'))); }catch(e){}
+})();
+
+/* ---------- compte à rebours ---------- */
+(function(){
+  const exam = new Date(2026, 9, 12);
+  const now = new Date(); now.setHours(0,0,0,0);
+  const d = Math.round((exam - now) / 86400000);
+  $('#cd-days').textContent = d > 0 ? d : (d === 0 ? "J" : "✓");
+  if (d === 1) $('#countdown span').innerHTML = "jour avant le contrôle terminal<br>lundi 12 octobre · 1h30 · 70 % de la note";
+  if (d === 0) $('#countdown span').innerHTML = "C'est aujourd'hui : bon courage !<br>contrôle terminal · 1h30";
+  if (d < 0) $('#countdown span').innerHTML = "Contrôle terminal passé<br>(lundi 12 octobre)";
+})();
+
+const CH = [
+  {id:'intro', name:'Cadre & KNN'},
+  {id:'eval', name:'Évaluer & sélectionner'},
+  {id:'reglog', name:'Régression logistique'},
+  {id:'cart', name:'Arbres CART'},
+  {id:'svm', name:'SVM'},
+  {id:'clust', name:'Clustering'}
+];
+const chName = id => (CH.find(c => c.id === id) || {}).name;
+
+/* =====================================================================
+   FICHES
+   ===================================================================== */
+const FICHES = {
+intro: `
+<ul>
+  <li><b>Supervisé</b> : on observe x<sub>1</sub>,…,x<sub>n</sub> <i>et</i> leurs étiquettes y<sub>1</sub>,…,y<sub>n</sub> ; on apprend f telle que f(x) ≈ y pour un nouvel x.</li>
+  <li><b>Non supervisé</b> : pas d'étiquettes. <b>Clustering</b> : trouver des groupes. <b>Réduction de dimension</b> : représenter les données dans un espace de plus petite dimension, pour calculer plus vite, visualiser ou améliorer un modèle supervisé entraîné ensuite. <b>Estimation de densité</b> : estimer la loi ℙ dont x₁,…,xₙ sont des réalisations i.i.d. (ex. un histogramme).</li>
+  <li>Nature de 𝒴 : <span class="key">𝒴 ⊂ ℝ non fini → régression</span> ; Card(𝒴)=2 → classification binaire ; Card(𝒴)=C&gt;2 → multiclasse.</li>
+  <li>Piège d'examen : « prédire la <i>probabilité</i> de … » est une <b>régression</b> (sortie continue dans [0,1]).</li>
+</ul>
+<div class="grid2">
+  <div><h3>Fonction de coût, risque</h3>
+  <div class="f">ℓ(y,y)=0   et   ℓ(y,y')&gt;0 si y≠y'
+R(f) = E[ ℓ(Y, f(X)) ]          (risque)
+f* = argmin R(f)               (règle optimale)
+R̂ₙ(f) = 1/n Σ ℓ(yᵢ, f(xᵢ))      (risque empirique, ERM)</div></div>
+  <div><h3>Règles optimales à connaître</h3>
+  <div class="f">coût quadratique  →  f*(x) = E[Y | X=x]
+coût absolu       →  f*(x) = médiane(Y | X=x)
+coût 0/1          →  f*(x) = argmax_k P(Y=k | X=x)
+                     (classifieur de Bayes)</div></div>
+</div>
+<details class="fold"><summary>Démonstration : f*(x) = E[Y | X=x] pour le coût quadratique</summary>
+<p style="margin-top:8px">On suppose que ℙ_{X,Y} a une densité, avec E[Y²] &lt; ∞ et E[f(X)²] &lt; ∞. Alors R(f) = E[(Y−f(X))²] = E_X[ E_{Y|X}[(Y−f(X))² | X] ] = ∫ p(x) ∫ (y−f(x))² p(y|x) dy dx.<br>
+Il suffit de minimiser, pour chaque x, g_x(c) = ∫(y−c)² p(y|x) dy, c'est-à-dire c² − 2c ∫ y p(y|x) dy à une constante près. g'_x(c) = 0 ⇔ c = ∫ y p(y|x) dy = E[Y|X=x], et g''_x(c) = 2 &gt; 0 : c'est un minimum global.</p></details>
+<ul>
+  <li><b>Biais inductif</b> : on cherche f dans un sous-ensemble ℱ plutôt que dans toutes les fonctions mesurables. Exemple : ℱ = {x ↦ φ(⟨w,x⟩+b)} (classes d'hypothèses) ; avec φ = identité, c'est la régression linéaire.</li>
+</ul>
+<h3>K plus proches voisins</h3>
+<div class="f">Classification :  f(x) = argmax_k  Σ_{i : xᵢ ∈ N_K(x)} 1{yᵢ = k}
+Régression     :  f(x) = 1/K  Σ_{i : xᵢ ∈ N_K(x)} yᵢ</div>
+<ul>
+  <li>Hyperparamètres : <b>K</b> (choisi par validation croisée) et la <b>distance</b> (souvent euclidienne).</li>
+  <li>Méthode <b>non paramétrique</b>, simple, mais coûteuse : n distances en O(nd) puis tri O(n log n). Souffre du <b>fléau de la dimension</b>.</li>
+  <li><span class="key">K=1 : erreur nulle sur l'apprentissage → sur-apprentissage.</span> K = n : on prédit toujours la classe majoritaire → sous-apprentissage.</li>
+  <li>K ↓ : variance ↑, biais ↓. K ↑ : biais ↑, variance ↓.</li>
+  <li>Variante pondérée (exam 2025) : poids exp(−d<sub>i</sub>(x)²/h) → les voisins proches comptent plus. h grand ≈ KNN classique ; h petit ≈ 1-NN.</li>
+  <li>Il faut <b>standardiser</b> les variables (sinon la variable à grande échelle domine la distance).</li>
+</ul>
+<div class="tp"><b>TP1-2 :</b> taux d'erreur nul avec K=1 évalué sur les données d'apprentissage, non nul sur des données mises de côté. Normalisation min-max (x−min)/(max−min) sur iris. Avec K = taille de l'apprentissage, toutes les prédictions = espèce majoritaire.</div>`,
+
+eval: `
+<div class="grid2">
+<div><h3>Matrice de confusion (convention du cours)</h3>
+<div class="scroll"><table class="t">
+<tr><th></th><th>réel 0</th><th>réel 1</th></tr>
+<tr><th>prédit 0</th><td>TN</td><td>FN</td></tr>
+<tr><th>prédit 1</th><td>FP</td><td>TP</td></tr></table></div>
+<p class="lead" style="margin-top:6px;font-size:13px">Lignes = classe prédite, colonnes = classe réelle (comme <code>table(pred, réel)</code> en R ; l'ordre des arguments de <code>table()</code> décide de l'orientation).</p>
+<p class="lead" style="margin-top:6px;font-size:13px">Attention : en multiclasse, le texte de la diapo 45 définit M<sub>i,j</sub> = nombre d'exemples de la classe i prédits j (lignes = réel), alors que sa figure met le prédit en lignes. À l'examen, <b>écris l'orientation en tête de ta matrice</b>. Précision de k = M[k,k] / nb de prédictions k ; sensibilité de k = M[k,k] / nb de vrais k.</p></div>
+<div><h3>Métriques</h3>
+<div class="f">Accuracy    = (TP+TN) / total
+Sensibilité = rappel = TP / (TP+FN)   (taux de vrais positifs)
+Précision   = TP / (TP+FP)
+Spécificité = TN / (TN+FP)            (taux de vrais négatifs)
+F1 = 2·P·R/(P+R) = 2TP / (2TP+FP+FN)
+FPR = FP/(FP+TN) = 1 − spécificité</div></div>
+</div>
+<ul>
+  <li>Accuracy trompeuse si classes <b>déséquilibrées</b> : prédire toujours la classe majoritaire donne une bonne accuracy et une sensibilité nulle.</li>
+  <li>Sensibilité facile à maximiser en prédisant tout positif → regarder aussi précision / spécificité.</li>
+  <li>Sensibilité prioritaire quand rater un positif coûte cher : dépistage d'une maladie, fraude.</li>
+  <li><b>Multiclasse</b> : one-versus-all par classe, puis on combine :
+    <ul><li><b>macro-average</b> = moyenne simple des scores par classe → ne néglige pas les classes rares ;</li>
+    <li><b>weighted-average</b> = pondérée par le support (effectif) ;</li>
+    <li><b>micro-average</b> = on somme les TP, FP… de toutes les classes ; pour la précision, ça revient à l'<b>accuracy</b>.</li></ul></li>
+  <li>Régression : MSE = 1/n Σ(yᵢ − f(xᵢ))², RMSE = √MSE.</li>
+</ul>
+<h3>Sur-apprentissage, biais-variance</h3>
+<ul>
+  <li><b>Généralisation</b> : bien prédire sur des données qui n'ont pas servi à construire le modèle.</li>
+  <li><b>Sur-apprentissage</b> : modèle trop complexe, capture le bruit (variance forte). <b>Sous-apprentissage</b> : modèle trop simple, mauvais même sur l'apprentissage (biais fort).</li>
+  <li><b>Biais</b> : à quel point f(x) vise à côté de la vraie étiquette. <b>Variance</b> : à quel point f change quand les données d'apprentissage changent.</li>
+</ul>
+<h3>Sélection de modèle</h3>
+<div class="scroll"><table class="t">
+<tr><th>Apprentissage</th><th>Validation</th><th>Test</th></tr>
+<tr><td>apprendre les paramètres</td><td>comparer les modèles → choisir les hyperparamètres</td><td>évaluer la performance finale du modèle choisi, sur des données jamais vues</td></tr></table></div>
+<ul>
+  <li><b>Validation croisée K-fold</b> : découper en K parties ; pour chaque partie k, entraîner sur les K−1 autres et évaluer sur k ; moyenner les K scores. Répéter pour chaque valeur d'hyperparamètre, garder la meilleure, réentraîner sur tout.</li>
+  <li>Les noms « validation » et « test » sont parfois inversés dans la littérature. Ce qui compte : le troisième jeu sert à évaluer le modèle <i>sélectionné</i>. Avec seulement deux jeux, c'est le jeu de test qui sert à sélectionner.</li>
+  <li><b>Holdout</b> : un seul découpage (test trop petit → estimation très variable ; trop grand → le modèle voit trop peu de données). <b>Leave-p-out</b> : C(n,p) tests ; leave-one-out : n tests.</li>
+</ul>
+<details class="fold"><summary>Exercice du cours : précision macro vs micro</summary>
+<p style="margin-top:8px">Situation 1 (TP/FP) : A 1/1, B 10/90, C 1/1, D 1/1 → précisions 0,5 ; 0,1 ; 0,5 ; 0,5. <b>Macro = 0,4</b> ; <b>micro = 13/106 ≈ 0,123</b>.<br>
+Situation 2 : A 0/2, B 90/10, C 0/2, D 0/2 → 0 ; 0,9 ; 0 ; 0. <b>Macro = 0,225</b> ; <b>micro = 90/106 ≈ 0,849</b>.<br>
+Le micro-average est dominé par la classe B, très représentée. Le macro-average révèle les mauvaises performances sur les classes rares.</p></details>`,
+
+reglog: `
+<ul>
+  <li><b>Classifieur linéaire</b> : la frontière de décision est un <span class="key">hyperplan</span> (une droite en dimension 2). Il est composé d'une fonction affine h(x)=⟨w,x⟩+b, qui fixe l'hyperplan, et d'une fonction φ qui transforme la position par rapport à l'hyperplan en étiquette.</li>
+  <li>Linéaires : régression logistique, SVM (marge rigide/souple). Non linéaires : KNN, CART, SVM à noyau.</li>
+  <li>À utiliser si les données semblent (à peu près) linéairement séparables.</li>
+</ul>
+<div class="grid2">
+<div><h3>Classifieur des demi-espaces</h3>
+<div class="f">f(x) = sign(⟨w,x⟩ + b)   ∈ {−1, 1}
+coût 0/1 : minimise le nombre d'erreurs
+→ n'importe quel hyperplan séparateur convient</div></div>
+<div><h3>Régression logistique</h3>
+<div class="f">σ(z) = 1 / (1 + exp(−z))  ∈ ]0,1[
+P̂(Y=1|x) = σ(⟨w,x⟩ + b)
+(ŵ,b̂) = argmin 1/n Σ log(1 + exp(−yᵢ(⟨w,xᵢ⟩+b)))
+ŷ = 1  si σ(⟨ŵ,x⟩+b̂) ≥ α, sinon ŷ = −1
+(α = 0,5 souvent ; le cours note le seuil α, les sujets s)</div></div>
+</div>
+<ul>
+  <li>Dans ce chapitre, 𝒴 = {−1, 1} « sans perte de généralité ».</li>
+  <li>σ(0) = 1/2 : un point sur l'hyperplan a une probabilité 1/2. Loin de l'hyperplan, σ ≈ 0 ou 1. σ(⟨w,x⟩+b) s'interprète comme la probabilité que l'étiquette de x soit 1.</li>
+  <li><b>Pourquoi ce coût ?</b> On veut pénaliser un point mal classé (y(⟨w,x⟩+b) &lt; 0), d'autant plus qu'il est loin de l'hyperplan, et un peu un point bien classé mais proche de l'hyperplan. 1 + exp(−y(⟨w,x⟩+b)) a ce comportement, et on prend le log (croissant).</li>
+  <li>Le coût 0/1 des demi-espaces est difficile à minimiser et ne pénalise <i>que</i> les erreurs : la droite peut frôler les points → <b>risque de sur-apprentissage</b>. La logistique évite mieux cet écueil et donne une probabilité.</li>
+  <li>Seuil α &lt; 0,5 : plus de positifs prédits → sensibilité ↑. Ça a du sens quand rater un positif est grave (ex. prédire une maladie).</li>
+</ul>
+<h3>Courbe ROC et AUC</h3>
+<ul>
+  <li>Pour chaque seuil s de 0 à 1 : on classe, on calcule <b>FPR</b> (abscisse) et <b>TPR = sensibilité</b> (ordonnée). La courbe relie ces points.</li>
+  <li>s = 0 → tout positif : point (1,1). s &gt; score maximal → tout négatif : point (0,0). Pour la logistique, s = 1 suffit car σ &lt; 1.</li>
+  <li><b>Procédure du cours (à la main)</b> : trier les observations de validation par score décroissant. Partir de (0,0). Parcourir les points dans cet ordre : un vrai positif fait monter de 1/P (pas vertical), un vrai négatif fait avancer de 1/N (pas horizontal). On arrive en (1,1).</li>
+  <li>Classifieur parfait : passe par (0,1), AUC = 1. Classifieur aléatoire : diagonale, AUC = 0,5.</li>
+  <li>L'AUC sur l'échantillon de validation sert à comparer des modèles (ex. choix des variables). La courbe ROC aide à choisir le seuil.</li>
+  <li>Pour un KNN ou un arbre, le score est la <b>proportion de voisins (ou d'observations de la feuille) de classe 1</b>.</li>
+</ul>
+<h3>Multiclasse</h3>
+<div class="scroll"><table class="t">
+<tr><th></th><th>One-versus-all</th><th>One-versus-one</th></tr>
+<tr><th>nb de classifieurs</th><td>C</td><td>C(C−1)/2</td></tr>
+<tr><th>données utilisées</th><td>toutes (classe k = positifs, reste = négatifs)</td><td>seulement les 2 classes de la paire</td></tr>
+<tr><th>prédiction</th><td>classe de score σ max</td><td>vote majoritaire</td></tr></table></div>
+<p>Alternative : régression softmax (un seul modèle global).</p>
+<div class="tp"><b>TP3 (prostate, 53 patients) :</b> <code>glm(lymph ~ ..., family="binomial")</code> ; on passe <code>acid</code> au log (loi très dissymétrique). Avec s = 1/2 : 3/33 faux positifs et 6/20 faux négatifs. Meilleur modèle selon l'AUC sur validation : log(acid) + taille.</div>`,
+
+cart: `
+<ul>
+  <li><b>Arbre de décision</b> : chaque nœud teste une condition sur <b>une seule variable</b> ; les feuilles portent une étiquette. Modèle hiérarchique : chaque test dépend des précédents.</li>
+  <li>Atouts : variables qualitatives sans encodage (apprentissage non métrique), données hétérogènes, multiclasse direct, classes multimodales, <b>interprétable</b>.</li>
+  <li><b>CART</b> : partitionnement glouton, récursif, divisif ; arbre <b>binaire</b> ; frontières <span class="key">orthogonales aux axes</span>. Plusieurs séparateurs linéaires donnent une frontière globale non linéaire.</li>
+  <li>Nombre de régions = nombre de feuilles. Feuille : vote majoritaire (classification) ou moyenne (régression).</li>
+</ul>
+<h3>Choix d'une coupure</h3>
+<div class="f">IG(R_l, R_m) = I(R) − (n_l/n)·I(R_l) − (n_m/n)·I(R_m)     (n = effectif du nœud R)
+  « gain d'information » : on choisit la variable séparatrice x^j et le seuil
+  (s si continue, ensemble S de modalités si qualitative) qui le maximisent
+
+Gini      I(R) = Σ_k p_k (1 − p_k) = 1 − Σ p_k²
+Entropie  I(R) = − Σ_k p_k log₂ p_k
+Erreur    I(R) = 1 − max_k p_k
+Régression : minimiser n_L·MSE(R_L) + n_R·MSE(R_R)</div>
+<ul>
+  <li>Gini = Σ_{k≠k'} p_k p_k' : probabilité de mal étiqueter un exemple tiré au hasard dans R si on l'étiquetait au hasard selon la distribution des classes de R. Minimiser l'entropie revient à maximiser le gain d'information.</li>
+  <li>Exemple du cours : nœud [27, 18] → Gini = 1 − 0,6² − 0,4² = <b>0,48</b>. Feuille pure → 0.</li>
+  <li>Entropie maximale (1 bit) pour 50&nbsp;% / 50&nbsp;%.</li>
+</ul>
+<h3>Coupures selon le type de variable</h3>
+<div class="scroll"><table class="t">
+<tr><th>Variable x^j</th><th>Régions R_l / R_m</th></tr>
+<tr><td>binaire</td><td>x^j = 1 / x^j = 0</td></tr>
+<tr><td>qualitative nominale</td><td>x^j ∈ S / x^j ∉ S (souvent Card(S) = 1)</td></tr>
+<tr><td>quantitative continue</td><td>x^j &lt; s / x^j ≥ s</td></tr>
+<tr><td>qualitative ordinale</td><td>par seuil (en respectant l'ordre) ou par regroupement de modalités</td></tr>
+<tr><td>quantitative discrète</td><td>par seuil en général ; regroupement si peu de valeurs (on perd l'ordre)</td></tr></table></div>
+<p>À comparer avec les KNN et la logistique : ils ont besoin d'une représentation numérique des variables, et la logistique passe par OvA ou OvO en multiclasse.</p>
+<h3>Taille de l'arbre</h3>
+<ul>
+  <li>Arbre peu profond → sous-apprentissage ; trop profond → sur-apprentissage.</li>
+  <li>Stratégie 1 : profondeur max, nb de feuilles max, effectif min par feuille, choisis par validation croisée. Profondeur ↑ : biais ↓, variance ↑.</li>
+  <li>Stratégie 2 : <b>élagage</b>. On construit l'arbre maximal (feuilles pures), puis on garde le sous-arbre minimisant
+  <div class="f" style="margin-top:6px">C_λ(T) = Σ_{l=1}^{|T|} n_l · I(R_l) + λ|T|</div>
+  λ choisi sur la validation. <span class="key">λ ↑ → arbre plus petit → biais ↑, variance ↓.</span></li>
+  <li>|T| = 1 : on prédit la classe majoritaire, erreur d'apprentissage = proportion des autres classes. Arbre maximal : erreur d'apprentissage = 0.</li>
+  <li>Les arbres sont des <b>apprenants faibles</b> → méthodes ensemblistes (bagging, forêts aléatoires, boosting).</li>
+</ul>
+<div class="tp"><b>TP4 :</b> <code>rpart</code> utilise Gini par défaut. <code>cp</code> joue le rôle de λ : <code>printcp</code>/<code>plotcp</code>, on garde le cp qui minimise <code>xerror</code> (erreur de validation croisée 10-fold par défaut), puis <code>prune(tree, cp=bestcp)</code>. Sur un nœud de <code>rpart.plot</code>, la correction lit : classe majoritaire, « indice d'impureté » (en pratique, la proportion de la classe 1 dans le nœud), % des individus.</div>`,
+
+svm: `
+<ul>
+  <li><b>Linéairement séparable</b> : il existe un hyperplan avec tous les positifs d'un côté et tous les négatifs de l'autre. Il en existe alors une infinité.</li>
+  <li>SVM : on choisit celui qui <b>maximise la marge</b> γ = distance de l'hyperplan au point le plus proche. C'est robuste aux petites perturbations.</li>
+  <li>Distance d'un point à l'hyperplan : d(x,H) = |⟨w,x⟩+b| / ‖w‖. Avec la normalisation des contraintes, <span class="key">γ = 1/‖w‖</span>.</li>
+  <li><b>Vecteurs de support</b> (marge rigide) : points sur H<sup>+</sup> : ⟨w,x⟩+b = 1 et H<sup>−</sup> : ⟨w,x⟩+b = −1. Seuls eux définissent l'hyperplan. La zone entre H<sup>+</sup> et H<sup>−</sup> est la zone d'indécision ; en marge rigide, elle ne contient aucune observation.</li>
+</ul>
+<div class="grid2">
+<div><h3>Marge rigide (primal)</h3>
+<div class="f">min ½‖w‖²
+s.c. yᵢ(⟨w,xᵢ⟩ + b) ≥ 1   ∀i
+classifieur : sign(⟨ŵ,x⟩ + b̂)</div></div>
+<div><h3>Dual (marge rigide)</h3>
+<div class="f">max Σαᵢ − ½ ΣΣ αᵢαⱼ yᵢyⱼ ⟨xᵢ,xⱼ⟩
+s.c. Σαᵢyᵢ = 0,  αᵢ ≥ 0
+ŵ = Σ α̂ᵢ yᵢ xᵢ
+b̂ = 1 − min_{i : yᵢ=1} ⟨ŵ,xᵢ⟩
+classifieur : sign(Σ α̂ᵢ yᵢ ⟨xᵢ,x⟩ + b̂)</div></div>
+</div>
+<ul>
+  <li>Problème convexe et quadratique. Le primal est en dimension d+1, le dual en n : peu de données et beaucoup de variables → dual.</li>
+  <li>Lagrangien : L(w,b,α) = ½‖w‖² + Σ αᵢ(1 − yᵢ(⟨w,xᵢ⟩+b)), αᵢ ≥ 0. Primal = min_{w,b} max_α L ; dual = max_α min_{w,b} L. Dualité faible : d* ≤ p*. Problème convexe à contraintes affines → <b>condition de Slater</b> → saut de dualité nul (d* = p*).</li>
+  <li>KKT, écart complémentaire : α̂ᵢ [yᵢ(⟨ŵ,xᵢ⟩+b̂) − 1] = 0. Deux cas : un point hors de H<sup>±</sup> a α̂ᵢ = 0 ; si α̂ᵢ &gt; 0, le point est sur H<sup>±</sup> (vecteur de support). Le dual identifie des vecteurs de support (pas forcément tous).</li>
+</ul>
+<h3>Marge souple</h3>
+<div class="f">min ½‖w‖² + C Σ ξᵢ
+s.c. yᵢ(⟨w,xᵢ⟩ + b) ≥ 1 − ξᵢ,  ξᵢ ≥ 0
+⇔ min 1/(2Cn)‖w‖² + 1/n Σ ℓ_hinge   avec ℓ_hinge = max(0, 1 − yᵢ(⟨w,xᵢ⟩+b))
+  → minimisation du risque empirique RÉGULARISÉ ; la régularisation ‖w‖²/(2Cn)
+    évite le sur-apprentissage</div>
+<div class="scroll"><table class="t">
+<tr><th>ξᵢ = 0</th><th>0 &lt; ξᵢ &lt; 1</th><th>ξᵢ = 1</th><th>ξᵢ &gt; 1</th></tr>
+<tr><td>bien classé, hors de la zone d'indécision (ou sur H<sup>±</sup>)</td><td>bien classé mais dans la zone d'indécision</td><td>sur l'hyperplan H</td><td><b>mal classé</b></td></tr></table></div>
+<div class="f">Dual souple : même problème avec 0 ≤ αᵢ ≤ C
+b̂ = yᵢ − Σⱼ α̂ⱼ yⱼ ⟨xⱼ,xᵢ⟩   pour un i tel que 0 &lt; α̂ᵢ &lt; C
+KKT : α̂ᵢ [yᵢ(⟨ŵ,xᵢ⟩+b̂) − 1 + ξᵢ] = 0
+α̂ᵢ &gt; 0 et ξᵢ = 0 ⇒ vecteur de support (sur H±) ;  α̂ᵢ &gt; 0 et ξᵢ &gt; 0 ⇒ outlier</div>
+<ul>
+  <li>En marge souple, le classifieur n'utilise que les points tels que α̂ᵢ &gt; 0 : vecteurs de support et outliers (points dans la marge ou mal classés).</li>
+  <li>Paramètres : w, b (et les ξᵢ). <b>Hyperparamètre : C</b>.</li>
+  <li><span class="key">C grand</span> → on préfère minimiser le nombre d'outliers : marge étroite, peu de points dans la marge → biais ↓, variance ↑. C → ∞ redonne la marge rigide.</li>
+  <li><span class="key">C petit</span> → on accorde moins d'importance aux outliers : marge large, beaucoup de points dans la marge → biais ↑, variance ↓.</li>
+  <li>Même sur des données séparables, la marge souple peut mieux généraliser.</li>
+</ul>
+<h3>SVM à noyau</h3>
+<ul>
+  <li>Utile quand les données ne sont <b>pas séparables linéairement, même à quelques points près</b>. On les envoie par φ dans un espace où elles le deviennent.</li>
+  <li><b>Astuce du noyau</b> : φ n'apparaît que via ⟨φ(xᵢ),φ(xⱼ)⟩ dans le dual et le classifieur. On calcule directement k(xᵢ,xⱼ) sans calculer φ, ce qui est moins coûteux. Pas besoin de connaître φ.</li>
+  <li>L'astuce du noyau intervient dans le problème <b>dual</b>. Le noyau k est un hyperparamètre.</li>
+  <li>Exemple du cours : φ(x) = (1, x₁…x_d, x₁x₁, x₁x₂, …, x_d x_d) donne ⟨φ(x),φ(x̃)⟩ = 1 + ⟨x,x̃⟩ + ⟨x,x̃⟩². Le calcul direct coûte O(d²), la formule de droite O(d).</li>
+  <li>k valide si <b>symétrique</b> (k(x,x̃) = k(x̃,x)) et <b>semi-défini positif</b> : ∀N, ∀x₁…x_N, ∀a₁…a_N ∈ ℝ, ΣΣ aᵢaⱼ k(xᵢ,xⱼ) ≥ 0. Alors il existe φ telle que k(x,x̃) = ⟨φ(x),φ(x̃)⟩ (théorème de Moore-Aronszajn). Matrice de Gram K<sub>ij</sub> = k(xᵢ,xⱼ).</li>
+</ul>
+<div class="f">linéaire     k(x,x') = ⟨x,x'⟩
+cosinus      k(x,x') = ⟨x,x'⟩ / (‖x‖‖x'‖)
+quadratique  k(x,x') = (⟨x,x'⟩ + c)²
+polynomial   k(x,x') = (⟨x,x'⟩ + c)^q
+gaussien (Σ) k(x,x') = exp(−½ (x−x')ᵀ Σ⁻¹ (x−x'))
+gaussien/RBF k(x,x') = exp(−‖x−x'‖² / 2σ²) = exp(−γ‖x−x'‖²),  γ = 1/(2σ²)
+dual         max Σαᵢ − ½ ΣΣ αᵢαⱼ yᵢyⱼ k(xᵢ,xⱼ),  0 ≤ αᵢ ≤ C
+b̂ = yᵢ − Σⱼ α̂ⱼ yⱼ k(xⱼ,xᵢ)  pour 0 &lt; α̂ᵢ &lt; C
+classifieur  f(x) = sign( Σ α̂ᵢ yᵢ k(xᵢ,x) + b̂ )</div>
+<ul>
+  <li>Hyperparamètres : <b>C, le noyau, ses paramètres</b> (γ ou σ ; degré q et c).</li>
+  <li>RBF : <span class="key">γ grand (σ petit) → frontière très locale, « îlots » autour des points → variance ↑</span> ; γ petit (σ grand) → frontière lisse, presque linéaire → biais ↑.</li>
+  <li>Exemple : (⟨x,x'⟩+c)² = ⟨φ(x),φ(x')⟩ avec φ(z) = (c, √(2c) z₁…z_d, √2 z_i z_j (i&lt;j), z₁²…z_d²).</li>
+</ul>
+<div class="tp"><b>TP5 :</b> <code>svm(y~., kernel="linear", cost=C, scale=FALSE)</code> (e1071). La marge 1/‖w‖ diminue quand C augmente. <code>tune(..., ranges=list(cost=...))</code> fait la validation croisée. Calculer φ à la main est plus lent que le noyau polynomial quand d grandit. Piège : <code>svm()</code> standardise par défaut (<code>scale=TRUE</code>). Avec γ = 0,01 et C = 10, les données standardisées donnent une frontière où la classe majoritaire est prédite partout. Sur données brutes (<code>scale=FALSE</code>), les distances sont plus grandes, donc à γ fixé la frontière est plus locale.</div>`,
+
+clust: `
+<ul>
+  <li><b>But</b> : séparer des données non étiquetées en groupes <b>homogènes</b> (points proches dans le même cluster) et <b>séparés</b> (clusters distincts). C'est une analyse exploratoire.</li>
+  <li><b>Distance</b> : symétrie, séparation, inégalité triangulaire. Euclidienne, Manhattan, Minkowski, Chebyshev, Mahalanobis ; χ² et Jaccard pour le qualitatif ; Gower (ne satisfait pas l'inégalité triangulaire, donc pas une vraie distance).</li>
+  <li>Variables mixtes : rendre les quantitatives qualitatives (découpage en classes), ou les qualitatives quantitatives (one-hot), ou tout rendre qualitatif puis faire une ACM et utiliser les coordonnées.</li>
+  <li>Deux stratégies : « ne pas séparer des points proches » (ex. CAH lien simple) contre « ne pas mettre des points trop éloignés dans un même cluster » (ex. 2-moyennes).</li>
+  <li>Nombre de partitions possibles : nombre de Bell B_n = (1/e) Σ_{k≥1} kⁿ/k!, énorme (B₅₀ ≥ 10⁴⁷). On ne peut pas tout explorer → algorithmes itératifs : hiérarchiques (agglomératifs ou divisifs), par partitionnement (K-moyennes), probabilistes (modèles de mélange).</li>
+</ul>
+<h3>Critères de qualité</h3>
+<div class="f">centroïde        μ_k = 1/|C_k| Σ_{x∈C_k} x
+homogénéité      T_k = 1/|C_k| Σ d(x, μ_k)         T = moyenne des T_k   (petit)
+séparabilité     S_kl = d(μ_k, μ_l)                S = 2/(K(K−1)) ΣΣ S_kl (grand)
+Davies-Bouldin   D_k = max_{l≠k} (T_k + T_l)/S_kl   D = moyenne des D_k   → MINIMISER
+silhouette       s(x) = (b(x) − a(x)) / max(a(x), b(x)) ∈ [−1,1] → MAXIMISER la moyenne
+  a(x) = distance moyenne aux autres points de son cluster
+  b(x) = plus petite distance moyenne à un autre cluster</div>
+<ul>
+  <li>s(x) proche de 1 : bien assigné. <b>s(x) &lt; 0</b> : x est en moyenne plus proche d'un autre cluster que du sien, donc probablement mal assigné.</li>
+</ul>
+<h3>Inertie</h3>
+<div class="f">I = Σ‖xᵢ − μ‖² = I_W + I_B
+I_W = Σ_k Σ_{i∈C_k} ‖xᵢ − μ_k‖²     intra-classes : homogénéité (petit)
+I_B = Σ_k |C_k| ‖μ_k − μ‖²        inter-classes : séparation (grand)</div>
+<details class="fold"><summary>Preuve (TP clustering)</summary>
+<p style="margin-top:8px">‖xᵢ−μ‖² = ‖(xᵢ−μ_k)+(μ_k−μ)‖² = ‖xᵢ−μ_k‖² + ‖μ_k−μ‖² + 2⟨xᵢ−μ_k, μ_k−μ⟩. En sommant sur i ∈ C_k, le terme croisé vaut 2⟨Σ(xᵢ−μ_k), μ_k−μ⟩ = 2⟨|C_k|μ_k − |C_k|μ_k, ·⟩ = 0. On somme ensuite sur k.</p></details>
+<h3>Classification ascendante hiérarchique (CAH)</h3>
+<ul>
+  <li><b>Agglomératif</b> (CAH) : au départ, chaque point est un cluster. À chaque étape on <b>fusionne les deux clusters les plus proches</b>, jusqu'à n'en avoir plus qu'un. <b>Divisif</b> : on part d'un seul cluster et on coupe en deux à chaque étape. Résultat : un <b>dendrogramme</b> (hauteur = distance de fusion).</li>
+  <li>Liens : <b>simple</b> min d(x,y) (effet de chaîne : suit des formes allongées, des anneaux) ; <b>complet</b> max d(x,y) (clusters compacts) ; <b>moyen</b> ; <b>centroïdal</b> d(μ_k,μ_l). Ces liens ne sont pas forcément des distances au sens mathématique (lien complet : d(C,C) ≠ 0 si |C| &gt; 1).</li>
+  <li><b>Ward</b> : |C_k||C_l|/(|C_k|+|C_l|)·‖μ_k−μ_l‖² = hausse de I_W (= perte de I_B) lors de la fusion. Elle maximise l'homogénéité et la séparabilité. Comme f(x,y) = xy/(x+y) est grand quand x et y sont grands et équilibrés, elle crée des groupes équilibrés.</li>
+  <li><b>Inversions</b> : avec les liens simple, complet, moyen et Ward, les hauteurs de fusion sont croissantes (axiome de la médiane). Avec le lien centroïdal, deux branches peuvent se rejoindre plus bas que leurs descendants : on appelle ça une inversion.</li>
+  <li>Choisir le nombre de clusters : couper le dendrogramme avant une grande branche, arrêter les fusions au-delà d'un seuil r (arbitraire, ou r = α·max d(xᵢ,xⱼ) avec α &lt; 1), ou maximiser la silhouette sur les différentes coupes.</li>
+  <li>Pas besoin de fixer K à l'avance, mais <span class="key">complexité quadratique : O(dn²) opérations par itération</span>, et stockage des distances.</li>
+</ul>
+<h3>K-moyennes (algorithme de Lloyd)</h3>
+<div class="f">1. Choisir K centroïdes au hasard parmi les points (ou K-means++ : bien dispersés)
+2. Affecter chaque point au centroïde le plus proche (cellules de Voronoï)
+3. Recalculer chaque centroïde = moyenne de son cluster
+4. Répéter 2–3 jusqu'à ce que les affectations ne changent plus</div>
+<ul>
+  <li>I_W diminue à chaque itération → convergence, mais vers un <b>minimum local</b> → relancer avec plusieurs initialisations (<code>nstart</code>) et garder la plus faible I_W.</li>
+  <li>Choix de K : I_W diminue toujours quand K augmente → <b>méthode du coude</b> (cassure de pente). Silhouette, Davies-Bouldin.</li>
+  <li><b>Complexité</b> : K·n distances par itération → O(nKdT), <b>linéaire en n</b>. On remplace les n−1 distances d'un point aux autres points (CAH) par K distances aux centroïdes.</li>
+  <li>On peut <b>combiner</b> les deux : un K-means avec K grand (une fraction importante de n), puis une CAH sur les centroïdes obtenus.</li>
+  <li>Clusters <b>convexes</b> (Voronoï) : échoue sur anneaux ou lunes. Solutions : astuce du noyau appliquée à l'algorithme de Lloyd / transformation φ(x,y) = (x, y, x²+y²), ou CAH lien simple.</li>
+  <li>Sensible aux valeurs aberrantes : elles finissent seules dans un cluster, ce qui permet aussi de les détecter. Les <b>K-médoïdes</b> sont plus robustes. Le médoïde d'une classe est le point de la classe dont la dissimilarité moyenne aux autres points de la classe est minimale (l'observation la plus centrale).</li>
+  <li><b>Compression d'image</b> : chaque pixel est un point (R,G,B). On fait un K-means et on remplace chaque pixel par la couleur de son centroïde → K couleurs. K = 1 → image unie de couleur moyenne. La CAH serait trop coûteuse avec des millions de pixels.</li>
+</ul>
+<h3>Évaluer un clustering</h3>
+<ul><li>Pas de vérité terrain : il faut des critères qui ne dépendent pas d'étiquettes connues.</li>
+<li><b>Stabilité</b> : collecter plus de données, perturber ou supprimer quelques observations, ou changer l'initialisation ne doit pas changer complètement les conclusions.</li>
+<li><b>Évaluation externe</b> : a posteriori, un expert juge si les groupes ont du sens ; a priori, avec des données (partiellement) étiquetées, on vérifie si on retrouve les classes (indice de Rand).</li>
+<li><b>Évaluation interne</b> : Davies-Bouldin global, silhouette globale (homogénéité et séparabilité).</li></ul>
+<div class="tp"><b>TP clustering :</b> anneaux concentriques → lien simple OK, K-means échoue ; avec φ(x,y)=(x,y,x²+y²) le K-means réussit. Avec φ = (x,y,x²,y²) et nstart = 20, les anneaux ne sont plus séparés : la « bonne » partition n'est pas celle qui minimise I_W. Iris standardisé : coude à K=3 ; Ward suggère 3 clusters ; la silhouette suggère 2 (setosa contre le reste).</div>`
+};
+
+function renderFiches(){
+  const p = $('#p-fiches');
+  const cur = store.get('ficheCh', 'intro');
+  p.innerHTML = `<div class="chips" id="fiche-chips">${CH.map(c=>`<button class="chip" data-c="${c.id}" aria-pressed="${c.id===cur}">${c.name}</button>`).join('')}</div>
+  <article class="card fiche" id="fiche-body"></article>`;
+  const show = id => {
+    store.set('ficheCh', id);
+    p.querySelectorAll('#fiche-chips .chip').forEach(b=>b.setAttribute('aria-pressed', b.dataset.c===id));
+    const i = CH.findIndex(c=>c.id===id);
+    const prev = CH[i-1], next = CH[i+1];
+    $('#fiche-body').innerHTML = `<header><span class="tag">Chapitre ${i+1}/${CH.length}</span><h2>${chName(id)}</h2></header>${FICHES[id] || ''}
+      <nav class="fiche-nav" aria-label="Chapitres">${prev ? `<button class="btn" data-go-ch="${prev.id}"><small>← Précédent</small>${prev.name}</button>` : ''}${next ? `<button class="btn next" data-go-ch="${next.id}"><small>Suivant →</small>${next.name}</button>` : ''}</nav>`;
+  };
+  p.querySelector('#fiche-chips').addEventListener('click', e=>{ const b=e.target.closest('.chip'); if(b) show(b.dataset.c); });
+  $('#fiche-body').addEventListener('click', e=>{ const b=e.target.closest('[data-go-ch]'); if(!b) return; show(b.dataset.goCh);
+    const body=$('#fiche-body'); if(body.getBoundingClientRect().top < 0) body.scrollIntoView({block:'start'}); });
+  show(cur);
+}
+
+/* =====================================================================
+   FLASHCARDS
+   ===================================================================== */
+const CARDS = [
+ ['intro','Différence entre apprentissage supervisé et non supervisé ?','Supervisé : on dispose des étiquettes yᵢ et on apprend f(x) ≈ y. Non supervisé : pas d\'étiquettes ; on cherche une structure (clusters, dimension réduite, densité).'],
+ ['intro','Quand parle-t-on de régression, de classification binaire, de multiclasse ?','Selon 𝒴 : 𝒴 ⊂ ℝ non fini → régression ; Card(𝒴)=2 → binaire ; Card(𝒴)=C>2 → multiclasse.'],
+ ['intro','Règle de décision optimale pour le coût 0/1 ?','Le classifieur de Bayes : f*(x) = argmax_k P(Y=k | X=x).'],
+ ['intro','Règle optimale pour le coût quadratique ? et pour le coût absolu ?','Quadratique : E[Y | X=x]. Absolu : médiane de Y | X=x.'],
+ ['intro','Qu\'est-ce que le risque empirique ?','R̂ₙ(f) = 1/n Σ ℓ(yᵢ, f(xᵢ)) : estimation du risque E[ℓ(Y,f(X))] à partir des données. Le paradigme ERM le minimise.'],
+ ['intro','Qu\'est-ce qu\'un biais inductif ?','Le choix a priori de restreindre la recherche de f à un sous-ensemble ℱ (ex. classifieurs linéaires).'],
+ ['intro','Écrire le classifieur des K plus proches voisins.','f(x) = argmax_k Σ_{i : xᵢ∈N_K(x)} 1{yᵢ=k} : la classe majoritaire parmi les K plus proches voisins.'],
+ ['intro','Hyperparamètres des KNN ?','Le nombre de voisins K (par validation croisée) et la distance (souvent euclidienne).'],
+ ['intro','Accuracy d\'un 1-NN sur son propre jeu d\'apprentissage ?','100 % (erreur nulle) : chaque point est son propre plus proche voisin. C\'est du sur-apprentissage (sauf points identiques d\'étiquettes différentes).'],
+ ['intro','Que prédit un KNN avec K = n ?','Toujours la classe majoritaire de l\'apprentissage : sous-apprentissage.'],
+ ['intro','Effet de K sur le biais et la variance ?','K ↓ : variance ↑, biais ↓. K ↑ : biais ↑, variance ↓.'],
+ ['intro','Pourquoi standardiser avant un KNN ?','La distance est dominée par les variables de grande échelle. Min-max ou centrage-réduction remet les variables à égalité.'],
+ ['eval','Sensibilité (rappel) ?','TP / (TP + FN) : proportion de positifs correctement détectés (taux de vrais positifs).'],
+ ['eval','Précision ?','TP / (TP + FP) : proportion de prédictions positives correctes.'],
+ ['eval','Spécificité ?','TN / (TN + FP) : taux de vrais négatifs.'],
+ ['eval','F1-score ?','Moyenne harmonique de la précision et du rappel : 2PR/(P+R) = 2TP/(2TP+FP+FN).'],
+ ['eval','Pourquoi l\'accuracy pose problème avec des classes déséquilibrées ?','Prédire toujours la classe majoritaire donne une bonne accuracy et une sensibilité nulle sur la classe rare, qui est souvent la plus importante.'],
+ ['eval','Macro-average vs micro-average ?','Macro : moyenne simple des scores par classe (ne néglige pas les classes rares). Micro : on agrège TP/FP de toutes les classes ; pour la précision, c\'est l\'accuracy.'],
+ ['eval','Exemple où la macro-average est préférable ?','Diagnostic de plusieurs maladies dont certaines rares ; reconnaissance d\'espèces rares. On veut que les petites classes comptent autant.'],
+ ['eval','Rôle des jeux d\'apprentissage, de validation et de test ?','Apprentissage : ajuster les paramètres. Validation : comparer les modèles et choisir les hyperparamètres. Test : évaluer le modèle final sur des données jamais vues.'],
+ ['eval','Décrire la validation croisée 5-fold pour choisir K.','Découper en 5 parties. Pour chaque K candidat et chaque partie : entraîner sur 4, évaluer sur la 5ᵉ. Moyenner les 5 erreurs, garder le K de meilleure moyenne, réentraîner sur tout.'],
+ ['eval','Sur-apprentissage vs sous-apprentissage ?','Sur : modèle trop complexe, qui colle au bruit ; très bon sur l\'apprentissage, mauvais sur de nouvelles données. Sous : modèle trop simple, mauvais partout.'],
+ ['eval','Qu\'est-ce que la variance d\'un classifieur ?','Sa sensibilité aux données d\'apprentissage : si on change l\'échantillon, f change beaucoup. Variance très grande → sur-apprentissage, mauvaise généralisation.'],
+ ['reglog','Qu\'est-ce qu\'un classifieur linéaire (sans formule) ?','Un classifieur dont la frontière de décision est un hyperplan : d\'un côté une classe, de l\'autre l\'autre.'],
+ ['reglog','Fonction sigmoïde et σ(0) ?','σ(z) = 1/(1+e^{−z}) ∈ ]0,1[, croissante ; σ(0) = 1/2.'],
+ ['reglog','Coût minimisé par la régression logistique ?','1/n Σ log(1 + exp(−yᵢ(⟨w,xᵢ⟩+b))) avec yᵢ ∈ {−1,1}.'],
+ ['reglog','Demi-espaces vs régression logistique ?','Demi-espaces : coût 0/1, seulement le côté de l\'hyperplan compte. Logistique : la distance à l\'hyperplan compte, on obtient une probabilité et une solution plus robuste.'],
+ ['reglog','Comment construire une courbe ROC ?','Pour chaque seuil s ∈ [0,1], classer ŷ=1 si score ≥ s, puis tracer (FPR, TPR). Aléatoire : diagonale (AUC 0,5) ; parfait : AUC 1.'],
+ ['reglog','Score d\'un KNN (K=20) pour une courbe ROC ?','La proportion de voisins de classe 1 parmi les 20 plus proches voisins.'],
+ ['reglog','One-vs-all vs one-vs-one : combien de classifieurs ?','OvA : C classifieurs, chacun sur toutes les données. OvO : C(C−1)/2, chacun sur les données des 2 classes concernées.'],
+ ['cart','Comment CART choisit-il une coupure ?','Il teste toutes les variables et tous les seuils, et garde celui qui maximise le gain d\'impureté I(R) − n_L/n·I(R_L) − n_R/n·I(R_R).'],
+ ['cart','Gini, entropie, erreur de classification ?','Gini Σp_k(1−p_k) ; entropie −Σp_k log₂ p_k ; erreur 1 − max p_k.'],
+ ['cart','Forme des frontières d\'un arbre CART ?','Morceaux de droites orthogonales aux axes (une variable par nœud) : frontière en escalier, non linéaire.'],
+ ['cart','Coût en complexité de l\'élagage ?','C_λ(T) = Σ n_l·I(R_l) + λ|T|. λ ↑ → arbre plus petit → biais ↑, variance ↓.'],
+ ['cart','Erreur d\'apprentissage avec |T| = 1 ? avec l\'arbre maximal ?','|T|=1 : proportion des classes non majoritaires (on prédit la majoritaire). Arbre maximal : 0 (feuilles pures).'],
+ ['svm','Qu\'est-ce que la marge ? les vecteurs de support ?','Marge : distance de l\'hyperplan au point le plus proche (1/‖w‖). Vecteurs de support en marge rigide : les points sur H⁺/H⁻, qui seuls déterminent l\'hyperplan. En marge souple, le classifieur utilise tous les points avec αᵢ > 0 : sur H⁺/H⁻, dans la marge ou mal classés (outliers).'],
+ ['svm','Problème primal de la SVM à marge souple ?','min ½‖w‖² + CΣξᵢ  s.c. yᵢ(⟨w,xᵢ⟩+b) ≥ 1−ξᵢ, ξᵢ ≥ 0.'],
+ ['svm','Où est un point selon ξᵢ ?','ξ = 0 : bien classé, hors de la marge. 0 < ξ < 1 : bien classé, dans la marge. ξ = 1 : sur l\'hyperplan. ξ > 1 : mal classé.'],
+ ['svm','Rôle de C ?','Arbitrage entre marge large et peu d\'erreurs. C grand : marge étroite, variance ↑. C petit : marge large, biais ↑. C→∞ : marge rigide.'],
+ ['svm','Paramètres et hyperparamètres d\'une SVM à noyau ?','Paramètres : w (ou αᵢ) et b. Hyperparamètres : C, le noyau, ses paramètres (γ/σ, degré, c).'],
+ ['svm','Astuce du noyau ?','Le dual ne fait intervenir φ que via ⟨φ(xᵢ),φ(xⱼ)⟩ = k(xᵢ,xⱼ) : on calcule k directement, sans φ, ce qui est moins coûteux.'],
+ ['svm','Condition pour qu\'une fonction k soit un noyau ?','Symétrique et semi-définie positive (Moore-Aronszajn).'],
+ ['svm','Effet de γ (noyau RBF) ?','γ grand : frontière très locale, îlots autour des points → variance ↑. γ petit : frontière lisse → biais ↑.'],
+ ['clust','Que cherche-t-on en clustering ?','Regrouper des données non étiquetées en clusters homogènes (points similaires ensemble) et bien séparés entre eux.'],
+ ['clust','Coefficient de silhouette : formule et interprétation ?','s(x) = (b−a)/max(a,b) ∈ [−1,1]. a = distance moyenne à son cluster, b = plus petite distance moyenne à un autre cluster. On choisit la partition qui maximise la moyenne.'],
+ ['clust','Que signifie s(x) < 0 ?','x est en moyenne plus proche d\'un autre cluster que du sien : il est probablement mal assigné.'],
+ ['clust','Indice de Davies-Bouldin ?','D = moyenne des max_{l≠k} (T_k+T_l)/S_kl. Plus petit = mieux (homogène et séparé).'],
+ ['clust','I_W et I_B ?','I_W : inertie intra-classes (homogénéité, à minimiser). I_B : inertie inter-classes (séparation, à maximiser). I = I_W + I_B est constante : elle ne dépend pas de la partition.'],
+ ['clust','Lien simple vs lien complet ?','Simple : min des distances, effet de chaîne, suit des formes allongées/anneaux. Complet : max, clusters compacts et sphériques.'],
+ ['clust','Étapes de l\'algorithme de Lloyd ?','1) K centroïdes initiaux ; 2) affecter chaque point au centroïde le plus proche ; 3) recalculer les centroïdes (moyennes) ; 4) répéter jusqu\'à stabilité.'],
+ ['clust','I_W diminue à chaque itération du K-means : quel problème ?','Convergence vers un minimum local qui dépend de l\'initialisation → relancer plusieurs fois (nstart) et/ou K-means++.'],
+ ['clust','Complexité K-means vs CAH ?','K-means : K·n distances par itération, linéaire en n. CAH : distances deux à deux, O(n²) par étape (n(n−1)/2 au départ). La CAH est plus coûteuse.'],
+ ['clust','Comment choisir le nombre de clusters ?','Coude de I_W(K), maximum de silhouette, minimum de Davies-Bouldin, coupe du dendrogramme avant une grande branche, seuil de distance.'],
+ ['clust','Pourquoi le K-means échoue-t-il sur des anneaux ?','Ses clusters sont convexes (cellules de Voronoï). Solution : noyau / φ(x,y)=(x,y,x²+y²), ou CAH lien simple.'],
+ ['clust','Qu\'est-ce qu\'une inversion en CAH ?','Deux branches qui se rejoignent à une hauteur plus petite que celle de leurs descendants : les hauteurs ne sont plus croissantes. Ça peut arriver avec le lien centroïdal, pas avec les liens simple, complet, moyen ou Ward (axiome de la médiane).'],
+ ['clust','Qu\'est-ce qu\'un médoïde ?','Le point de la classe dont la dissimilarité moyenne aux autres points de la classe est minimale (l\'observation la plus centrale). Les K-médoïdes sont plus robustes aux valeurs aberrantes que les K-moyennes.'],
+ ['clust','Comment contourner le coût de la CAH sur beaucoup de données ?','Faire d\'abord un K-means avec K grand (une fraction importante de n), puis une CAH sur les centroïdes obtenus.'],
+ ['intro','TP1 : pourquoi le K optimal trouvé sur l\'apprentissage (K=1, erreur 0) est-il trompeur ?','Sur les 30 % de données mis de côté, l\'erreur du 1-NN n\'est plus nulle : il faut évaluer sur des données qui n\'ont pas servi à l\'apprentissage.'],
+ ['reglog','TP3 (seuil 1/2) : 3/33 faux positifs et 6/20 faux négatifs. Sensibilité, spécificité, accuracy ?','33 négatifs, 20 positifs, donc TP = 14 et TN = 30. Sensibilité = 14/20 = 0,70 ; spécificité = 30/33 ≈ 0,91 ; accuracy = 44/53 ≈ 0,83 ; précision = 14/17 ≈ 0,82.'],
+ ['cart','TP4 : comment choisir cp dans rpart ?','printcp / plotcp, puis garder le cp qui minimise xerror (erreur de validation croisée, 10-fold par défaut) et élaguer avec prune(tree, cp = bestcp). cp joue le rôle de λ.'],
+ ['svm','TP5 : que fait scale par défaut dans e1071::svm et pourquoi ça compte pour le noyau RBF ?','scale = TRUE par défaut : les variables sont standardisées. Or k(x,x\') = exp(−γ‖x−x\'‖²) dépend de l\'échelle des distances : un même γ ne donne pas la même frontière sur données brutes et standardisées. Avec γ = 0,01 et C = 10 standardisé, la classe majoritaire est prédite partout.'],
+ ['svm','TP5 : montrer que (⟨z,z̃⟩+c)² = ⟨φ(z),φ(z̃)⟩ pour z ∈ ℝ³.','φ(z) = (c, √(2c)z₁, √(2c)z₂, √(2c)z₃, √2 z₁z₂, √2 z₁z₃, √2 z₂z₃, z₁², z₂², z₃²). On développe (Σzᵢz̃ᵢ + c)² = c² + 2c Σzᵢz̃ᵢ + Σzᵢ²z̃ᵢ² + 2Σ_{i<j} zᵢzⱼz̃ᵢz̃ⱼ, ce qui est exactement le produit scalaire terme à terme.'],
+ ['svm','TP5 (caret) : hyperparamètres de svmPoly et de svmRadial ?','svmPoly : degree, scale, C. svmRadial : sigma, C. On utilise les mêmes plis (createFolds, k = 10) pour comparer équitablement les deux noyaux.'],
+ ['clust','TP clustering : avec φ = (x,y,x²,y²) et nstart = 20, les anneaux ne sont plus séparés. Pourquoi ?','nstart garde la partition de plus petite inertie intra-classes. La partition qui sépare les anneaux n\'est donc pas celle qui minimise I_W dans cet espace. Avec φ = (x,y,x²+y²), elle l\'est.'],
+ ['clust','TP clustering : pourquoi la boucle sur la silhouette commence-t-elle à K = 2 ?','Le coefficient de silhouette n\'est défini que pour 2 ≤ K ≤ n−1 : avec un seul cluster, b(x) n\'existe pas.']
+];
+
+function renderFlash(){
+  const p = $('#p-flash');
+  let known = store.get('known', {});
+  let filter = store.get('fcFilter', 'all');
+  let onlyTodo = store.get('fcTodo', false);
+  let deck = [], idx = 0;
+  p.innerHTML = `<div class="row" style="justify-content:space-between">
+    <div class="chips" id="fc-chips"><button class="chip" data-c="all">Tout</button>${CH.map(c=>`<button class="chip" data-c="${c.id}">${c.name}</button>`).join('')}</div>
+    <label class="row stat" style="gap:6px"><input type="checkbox" id="fc-todo"> seulement « à revoir »</label></div>
+  <div class="fc-stage">
+    <div class="bar"><i id="fc-bar"></i></div>
+    <div class="stat" id="fc-stat"></div>
+    <div class="flash" id="fc-card" tabindex="0" role="button" aria-label="Retourner la carte">
+      <div class="flash-inner"><div class="face front"><small id="fc-ch"></small><div class="q" id="fc-q"></div><small style="margin-top:auto">touche la carte (ou espace) pour la retourner</small></div>
+      <div class="face back"><small>Réponse</small><div id="fc-a"></div></div></div></div>
+    <div class="row" style="justify-content:center">
+      <button class="btn" id="fc-prev">← Précédente</button>
+      <button class="btn" id="fc-bad" style="color:var(--red)">À revoir</button>
+      <button class="btn primary" id="fc-good">Je sais</button>
+      <button class="btn" id="fc-next">Suivante →</button>
+      <button class="btn" id="fc-shuffle">Mélanger</button>
+    </div>
+    <div class="fc-keys" aria-hidden="true"><span><kbd>Espace</kbd> retourner</span><span><kbd>←</kbd> <kbd>→</kbd> naviguer</span></div></div>`;
+  const card = $('#fc-card');
+  function build(){
+    deck = CARDS.map((c,i)=>i).filter(i => (filter==='all' || CARDS[i][0]===filter) && (!onlyTodo || !known[i]));
+    idx = Math.min(idx, Math.max(0, deck.length-1));
+    p.querySelectorAll('#fc-chips .chip').forEach(b=>b.setAttribute('aria-pressed', b.dataset.c===filter));
+    $('#fc-todo').checked = onlyTodo;
+    show();
+  }
+  function show(){
+    card.classList.remove('flipped');
+    const scope = CARDS.map((c,i)=>i).filter(i => filter==='all' || CARDS[i][0]===filter);
+    const k = scope.filter(i=>known[i]).length;
+    $('#fc-bar').style.width = (scope.length ? 100*k/scope.length : 0) + '%';
+    if (!deck.length){ $('#fc-q').textContent = onlyTodo ? 'Tout est su dans ce chapitre.' : 'Aucune carte.'; $('#fc-a').textContent=''; $('#fc-ch').textContent=''; $('#fc-stat').textContent = `${k}/${scope.length} cartes sues`; return; }
+    const c = CARDS[deck[idx]];
+    $('#fc-ch').textContent = chName(c[0]) + (known[deck[idx]] ? ' · su' : '');
+    $('#fc-q').textContent = c[1];
+    setTimeout(()=>{ $('#fc-a').textContent = c[2]; }, 150);
+    $('#fc-stat').textContent = `Carte ${idx+1}/${deck.length} · ${k}/${scope.length} sues`;
+  }
+  const flip = () => card.classList.toggle('flipped');
+  card.addEventListener('click', flip);
+  card.addEventListener('keydown', e=>{ if(e.key===' '||e.key==='Enter'){ e.preventDefault(); flip(); } });
+  const move = d => { if(deck.length){ idx = (idx + d + deck.length) % deck.length; show(); } };
+  $('#fc-prev').onclick = ()=>move(-1);
+  $('#fc-next').onclick = ()=>move(1);
+  const mark = v => { if(!deck.length) return; known[deck[idx]] = v; if(!v) delete known[deck[idx]]; store.set('known', known);
+    if (onlyTodo && v){ build(); } else move(1); };
+  $('#fc-good').onclick = ()=>mark(true);
+  $('#fc-bad').onclick = ()=>mark(false);
+  $('#fc-shuffle').onclick = ()=>{ for(let i=deck.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [deck[i],deck[j]]=[deck[j],deck[i]]; } idx=0; show(); };
+  $('#fc-chips').onclick = e=>{ const b=e.target.closest('.chip'); if(!b) return; filter=b.dataset.c; store.set('fcFilter',filter); idx=0; build(); };
+  $('#fc-todo').onchange = e=>{ onlyTodo=e.target.checked; store.set('fcTodo',onlyTodo); idx=0; build(); };
+  document.addEventListener('keydown', e=>{ if($('#p-flash').hidden || e.target.tagName==='INPUT') return; if(e.key==='ArrowRight') move(1); if(e.key==='ArrowLeft') move(-1); });
+  build();
+}
+
+/* =====================================================================
+   QCM
+   ===================================================================== */
+const QUIZ = [
+ ['intro','« Prédire le prix d\'un logement à partir de ses caractéristiques » est un problème de…',['clustering','régression','classification binaire','classification multiclasse'],1,'Le prix est une valeur réelle non finie.'],
+ ['intro','« Prédire la probabilité de défaut d\'un nouveau prêt » est un problème de…',['classification binaire','clustering','régression','classification multiclasse'],2,'On prédit un nombre dans [0,1] : c\'est une régression. Prédire « risqué / non risqué » serait une classification binaire.'],
+ ['intro','« Détecter la langue d\'un texte » est un problème de…',['classification binaire','classification multiclasse','régression','clustering'],1,'Plus de 2 étiquettes possibles, fixées à l\'avance.'],
+ ['intro','« Compresser une image » relève…',['de la classification supervisée','de la régression','du clustering','de la classification binaire'],2,'K-means sur les couleurs des pixels : apprentissage non supervisé.'],
+ ['intro','Pour le coût 0/1, la règle de décision optimale est…',['E[Y|X=x]','la médiane de Y|X=x','argmax_k P(Y=k|X=x)','le KNN'],2,'C\'est le classifieur de Bayes.'],
+ ['intro','Pour le coût quadratique, f*(x) vaut…',['E[Y|X=x]','médiane(Y|X=x)','argmax P(Y=k|X=x)','0'],0,'On minimise E[(Y−c)²|X=x] : la dérivée s\'annule en c = E[Y|X=x].'],
+ ['intro','Quand K augmente dans un KNN…',['le biais diminue, la variance augmente','le biais augmente, la variance diminue','les deux diminuent','rien ne change'],1,'Plus de voisins → prédiction lissée, moins sensible au bruit, mais moins fine.'],
+ ['intro','Training : 53 étiquettes 0 et 47 étiquettes 1. Un KNN avec K = 100 prédit…',['toujours 1','toujours 0','au hasard','comme le 1-NN'],1,'K = n : tous les points sont voisins → classe majoritaire 0. Sensibilité = 0.'],
+ ['eval','La sensibilité vaut…',['TP/(TP+FP)','TN/(TN+FP)','TP/(TP+FN)','(TP+TN)/total'],2,'C\'est le taux de vrais positifs (rappel).'],
+ ['eval','La précision vaut…',['TP/(TP+FP)','TP/(TP+FN)','TN/(TN+FN)','FP/(FP+TN)'],0,'Proportion de prédictions positives correctes.'],
+ ['eval','La stratégie micro-average, pour la précision multiclasse, revient à…',['la moyenne simple par classe','l\'accuracy','la sensibilité de la plus grande classe','le F1'],1,'On somme les TP et FP de toutes les classes : ΣTP/total = accuracy.'],
+ ['eval','À quoi sert le jeu de test (troisième jeu) ?',['ajuster les paramètres','choisir les hyperparamètres','évaluer la performance du modèle finalement choisi','normaliser les données'],2,'Le jeu de validation a déjà servi à choisir : il n\'est plus indépendant.'],
+ ['eval','Leave-one-out sur n données : combien d\'entraînements ?',['1','K','n','C(n,2)'],2,'Chaque observation sert une fois de test.'],
+ ['eval','Un modèle très bon sur l\'apprentissage mais mauvais sur la validation…',['sous-apprend','sur-apprend','a un biais fort','est optimal'],1,'Il a capturé le bruit : variance forte.'],
+ ['reglog','σ(0) vaut…',['0','1/2','1','e'],1,'1/(1+e⁰) = 1/2 : point sur l\'hyperplan.'],
+ ['reglog','En abaissant le seuil s de la régression logistique…',['la sensibilité diminue','la sensibilité augmente','la spécificité augmente','rien ne change'],1,'Plus d\'observations classées positives → plus de TP, mais aussi plus de FP.'],
+ ['reglog','La courbe ROC représente…',['précision en fonction du rappel','TPR en fonction de FPR','accuracy en fonction du seuil','erreur en fonction de K'],1,'Abscisse : taux de faux positifs ; ordonnée : taux de vrais positifs.'],
+ ['reglog','AUC d\'un classifieur aléatoire ?',['0','0,5','1','dépend des données'],1,'Sa courbe ROC est la diagonale.'],
+ ['reglog','Combien de classifieurs en one-versus-one avec 4 classes ?',['4','6','12','16'],1,'C(C−1)/2 = 4·3/2 = 6.'],
+ ['cart','Les frontières de décision d\'un arbre CART sont…',['des hyperplans quelconques','orthogonales aux axes','des cercles','toujours linéaires'],1,'Une seule variable par nœud → coupure x_j < s.'],
+ ['cart','Gini d\'un nœud contenant [27, 18] ?',['0,40','0,48','0,50','0,97'],1,'1 − 0,6² − 0,4² = 1 − 0,36 − 0,16 = 0,48.'],
+ ['cart','Quand λ (élagage) augmente…',['l\'arbre grandit','l\'arbre rétrécit, le biais augmente','la variance augmente','l\'erreur d\'apprentissage diminue'],1,'On pénalise plus le nombre de feuilles.'],
+ ['cart','Entropie d\'un nœud 50 % / 50 % (2 classes) ?',['0','0,5','1','2'],2,'−2·0,5·log₂0,5 = 1 bit : impureté maximale.'],
+ ['svm','La marge d\'une SVM à marge rigide vaut…',['‖w‖','1/‖w‖','½‖w‖²','b/‖w‖'],1,'Les vecteurs de support vérifient |⟨w,x⟩+b| = 1.'],
+ ['svm','Un point avec ξᵢ = 1,7 est…',['bien classé hors de la marge','bien classé dans la marge','mal classé','un vecteur de support sur H⁺'],2,'ξ > 1 ⇔ yᵢ(⟨w,xᵢ⟩+b) < 0.'],
+ ['svm','Quand C → +∞ (marge souple)…',['on retrouve la marge rigide','la marge devient infinie','tous les points sont supports','le noyau devient gaussien'],0,'Toute violation est infiniment pénalisée.'],
+ ['svm','Noyau RBF avec γ très grand : on observe…',['une frontière quasi linéaire','des îlots autour des points (sur-apprentissage)','un sous-apprentissage','aucun effet'],1,'exp(−γ‖x−x\'‖²) s\'annule vite : chaque point n\'influence que son voisinage.'],
+ ['svm','Une fonction k est un noyau valide si elle est…',['positive','symétrique et semi-définie positive','continue','bornée'],1,'Théorème de Moore-Aronszajn.'],
+ ['svm','Dans quel cas utiliser une SVM à noyau plutôt qu\'à marge souple linéaire ?',['données séparables','données non séparables, même à quelques points près','toujours','jamais'],1,'Le noyau se justifie quand aucune droite ne sépare les classes, même en tolérant quelques erreurs. Si elles ne sont séparables qu\'à quelques points près, la marge souple linéaire suffit.'],
+ ['clust','Un coefficient de silhouette s(x) < 0 signifie…',['x est bien assigné','x est plus proche (en moyenne) d\'un autre cluster','x est un centroïde','x est isolé'],1,'b(x) < a(x).'],
+ ['clust','L\'indice de Davies-Bouldin…',['se maximise','se minimise','vaut toujours 1','dépend des étiquettes'],1,'Ratio (homogénéités)/(séparabilité) : on le veut petit.'],
+ ['clust','Les clusters obtenus par K-means sont…',['quelconques','convexes','toujours de même taille','emboîtés'],1,'Cellules de Voronoï des centroïdes.'],
+ ['clust','Pour séparer deux anneaux concentriques, quelle CAH convient ?',['lien complet','lien simple','Ward','lien centroïdal'],1,'Le lien simple « chaîne » les points voisins le long de l\'anneau.'],
+ ['clust','Distances calculées à chaque itération de K-means ?',['n(n−1)/2','K·n','K²','n²·K'],1,'Chaque point vers chacun des K centroïdes.'],
+ ['clust','La méthode du coude porte sur…',['l\'inertie intra-classes en fonction de K','l\'AUC','le Gini','la marge'],0,'I_W décroît toujours ; on prend K à la cassure de pente.'],
+ ['clust','La distance de Ward entre deux clusters correspond à…',['la distance min','la hausse d\'inertie intra-classes due à la fusion','la distance max','le nombre de points'],1,'|C_k||C_l|/(|C_k|+|C_l|)·‖μ_k−μ_l‖² ; elle favorise des groupes équilibrés.'],
+ ['eval','L\'accuracy est…',['la proportion de bien classés (1 − taux d\'erreur)','TP/(TP+FP)','TP/(TP+FN)','le F1'],0,'Ne pas confondre avec la précision TP/(TP+FP), comme le rappelle le TP2.'],
+ ['reglog','Dans summary(glm), la p-value d\'un coefficient teste…',['H0 : βⱼ = 0 (test de Wald)','l\'indépendance (χ²)','AUC = 0,5','la normalité des résidus'],0,'TP3 : tests de Wald univariés ; ils retrouvent les liens vus en exploration (log(acid), radio, taille).'],
+ ['cart','Critère d\'impureté par défaut de rpart ?',['Gini','entropie','erreur de classification','MSE'],0,'TP4 : rpart utilise l\'indice de Gini en classification.'],
+ ['svm','(⟨z,z\'⟩ + c)² est le noyau…',['polynomial de degré 2','gaussien','linéaire','cosinus'],0,'Dans e1071 : kernel="polynomial", gamma = 1, coef0 = c, degree = 2 (TP5).'],
+ ['svm','Pour Khan (4 classes), e1071::svm fait du…',['one-versus-one (6 classifieurs)','one-versus-all (4 classifieurs)','softmax','rien : erreur'],0,'svm() traite le multiclasse en one-versus-one : C(C−1)/2 = 6 classifieurs.'],
+ ['clust','Quel lien peut produire des inversions dans le dendrogramme ?',['centroïdal','simple','complet','Ward'],0,'Les liens simple, complet, moyen et Ward vérifient l\'axiome de la médiane : hauteurs croissantes.'],
+ ['clust','Avec φ=(x,y,x²,y²) et nstart=20, le K-means ne sépare plus les anneaux. Pourquoi ?',['la bonne partition n\'est pas celle de I_W minimale','nstart est buggé','K est trop grand','les données ne sont pas standardisées'],0,'nstart garde la partition d\'inertie intra minimale, qui n\'est pas ici celle qui sépare les anneaux (TP clustering).'],
+ ['svm','Un point avec ξᵢ = 1 se trouve…',['sur l\'hyperplan séparateur H','sur H⁺','hors de la marge','mal classé'],0,'yᵢ(⟨w,xᵢ⟩+b) = 1 − ξᵢ = 0 : le point est sur H.']
+];
+
+function renderQuiz(){
+  const p = $('#p-quiz');
+  let filter='all', list=[], i=0, score=0, answered=false;
+  p.innerHTML = `<div class="chips" id="qz-chips"><button class="chip" data-c="all">Tout</button>${CH.map(c=>`<button class="chip" data-c="${c.id}">${c.name}</button>`).join('')}</div>
+  <div class="card" id="qz"></div>`;
+  function start(){
+    list = QUIZ.map((q,k)=>k).filter(k=>filter==='all'||QUIZ[k][0]===filter);
+    for(let a=list.length-1;a>0;a--){ const b=Math.floor(Math.random()*(a+1)); [list[a],list[b]]=[list[b],list[a]]; }
+    i=0; score=0;
+    p.querySelectorAll('#qz-chips .chip').forEach(b=>b.setAttribute('aria-pressed', b.dataset.c===filter));
+    q();
+  }
+  function q(){
+    const box = $('#qz'); answered=false;
+    if (i >= list.length){
+      const best = store.get('qbest:'+filter, 0);
+      const pct = Math.round(100*score/list.length);
+      if (pct > best) store.set('qbest:'+filter, pct);
+      box.innerHTML = `<div class="eyebrow">Terminé</div><div class="qz-score">${score} / ${list.length}</div><h2 style="margin-top:6px">${pct} %</h2><p class="lead" style="margin-top:6px">Meilleur score sur cette sélection : ${Math.max(best,pct)} %.</p><div class="row" style="margin-top:14px"><button class="btn primary" id="qz-again">Recommencer</button></div>`;
+      $('#qz-again').onclick = start; return;
+    }
+    const [c, text, opts, ans, exp] = QUIZ[list[i]];
+    box.innerHTML = `<div class="row" style="justify-content:space-between"><span class="eyebrow" style="margin:0">${chName(c)}</span><span class="stat">Question ${i+1}/${list.length} · score ${score}</span></div>
+    <div class="bar thin" aria-hidden="true"><i style="width:${100*i/list.length}%"></i></div>
+    <h3 class="qz-q">${esc(text)}</h3>
+    <div class="opts">${opts.map((o,k)=>`<button class="opt" data-k="${k}">${esc(o)}</button>`).join('')}</div><div id="qz-exp"></div>`;
+    box.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{
+      if(answered) return; answered=true;
+      const k=+b.dataset.k; if(k===ans) score++;
+      box.querySelectorAll('.opt').forEach(o=>{ o.disabled=true; const kk=+o.dataset.k; if(kk===ans) o.classList.add('ok'); else if(kk===k) o.classList.add('ko'); });
+      $('#qz-exp').innerHTML = `<div class="exp"><b>${k===ans?'Bonne réponse.':'Raté.'}</b> ${esc(exp)}</div><div class="row" style="margin-top:12px"><button class="btn primary" id="qz-next">Question suivante →</button></div>`;
+      $('#qz-next').onclick=()=>{ i++; q(); }; $('#qz-next').focus();
+    });
+  }
+  $('#qz-chips').onclick = e=>{ const b=e.target.closest('.chip'); if(!b) return; filter=b.dataset.c; start(); };
+  start();
+}
+
+/* =====================================================================
+   OUTILS INTERACTIFS
+   ===================================================================== */
+function renderOutils(){
+  const p = $('#p-outils');
+  p.innerHTML = `
+  <p class="lead">Refais les calculs des annales et vérifie tes réponses. Chaque outil est prérempli avec un exemple tiré des examens ou des TP.</p>
+  <div class="chips" id="tool-chips">
+    <button class="chip" data-t="cah">CAH + dendrogramme</button>
+    <button class="chip" data-t="conf">Matrice de confusion</button>
+    <button class="chip" data-t="multi">Macro / micro-average</button>
+    <button class="chip" data-t="imp">Gini / entropie</button>
+    <button class="chip" data-t="roc">Courbe ROC</button>
+    <button class="chip" data-t="km">K-means pas à pas</button>
+  </div>
+  <div id="tool"></div>`;
+  const tools = {cah:toolCAH, conf:toolConf, multi:toolMulti, imp:toolImp, roc:toolROC, km:toolKM};
+  const show = t => { store.set('tool', t); p.querySelectorAll('#tool-chips .chip').forEach(b=>b.setAttribute('aria-pressed', b.dataset.t===t)); $('#tool').innerHTML=''; tools[t]($('#tool')); };
+  $('#tool-chips').onclick = e=>{ const b=e.target.closest('.chip'); if(b) show(b.dataset.t); };
+  show(store.get('tool','cah'));
+}
+
+/* ---- CAH ---- */
+const CAH_PRESETS = {
+  'exam2024': {name:'Examen 2024 S1', m:[[0],[23,0],[10,50,0],[13,33,55,0],[35,24,18,34,0]]},
+  'exam2025': {name:'Examen 2025 S1', m:[[0],[43,0],[9,8,0],[10,39,24,0],[12,19,15,42,0]]},
+  'tp':       {name:'TP clustering', m:[[0],[23,0],[35,21,0],[43,32,11,0],[50,45,25,17,0]]}
+};
+function toolCAH(root){
+  root.innerHTML = `<div class="card" style="display:grid;gap:16px">
+    <div><h2>Classification ascendante hiérarchique</h2><p class="lead" style="margin-top:4px">Saisis la partie basse de la matrice des distances. Les étapes montrent la matrice entre clusters à chaque itération ; la plus petite valeur est surlignée.</p></div>
+    <div class="row">
+      <label class="l" style="margin:0">Exemple</label>
+      <select id="cah-preset" style="width:auto">${Object.entries(CAH_PRESETS).map(([k,v])=>`<option value="${k}">${v.name}</option>`).join('')}</select>
+      <label class="l" style="margin:0">n</label><input type="number" id="cah-n" min="3" max="8" value="5" style="width:70px">
+      <label class="l" style="margin:0">Lien</label>
+      <select id="cah-link" style="width:auto"><option value="single">simple (saut minimum)</option><option value="complete">complet (saut maximum)</option><option value="average">moyen</option></select>
+    </div>
+    <div class="scroll" id="cah-mat"></div>
+    <div class="grid2"><div class="steps" id="cah-steps"></div><div><h3 style="margin-bottom:8px">Dendrogramme</h3><div class="scroll" id="cah-dendro"></div></div></div>
+  </div>`;
+  let M = [];
+  function loadPreset(k){ const m = CAH_PRESETS[k].m; $('#cah-n').value = m.length; M = m.map(r=>r.slice()); drawMat(); run(); }
+  function drawMat(){
+    const n = +$('#cah-n').value;
+    let h = '<table class="t"><tr><th></th>' + Array.from({length:n},(_,j)=>`<th>x${j+1}</th>`).join('') + '</tr>';
+    for(let i=0;i<n;i++){ h += `<tr><th>x${i+1}</th>`; for(let j=0;j<n;j++){
+      if(j<i) h += `<td><input class="cell" type="number" data-i="${i}" data-j="${j}" value="${(M[i]&&M[i][j]!==undefined)?M[i][j]:''}"></td>`;
+      else h += `<td style="color:var(--muted)">${j===i?0:''}</td>`; } h+='</tr>'; }
+    $('#cah-mat').innerHTML = h + '</table>';
+    $('#cah-mat').querySelectorAll('input').forEach(inp=>inp.oninput=()=>{ const i=+inp.dataset.i, j=+inp.dataset.j; M[i]=M[i]||[]; M[i][j]=parseFloat(inp.value); run(); });
+  }
+  function run(){
+    const n = +$('#cah-n').value, link = $('#cah-link').value;
+    const d = (a,b)=>{ const i=Math.max(a,b), j=Math.min(a,b); return i===j?0:(M[i]?M[i][j]:NaN); };
+    for(let i=1;i<n;i++) for(let j=0;j<i;j++) if(!isFinite(d(i,j))){ $('#cah-steps').innerHTML='<p class="lead">Complète toutes les distances.</p>'; $('#cah-dendro').innerHTML=''; return; }
+    let cl = Array.from({length:n},(_,i)=>({m:[i], node:{leaf:i, h:0}}));
+    const lk = (A,B)=>{ const ds=[]; A.m.forEach(a=>B.m.forEach(b=>ds.push(d(a,b)))); return link==='single'?Math.min(...ds):link==='complete'?Math.max(...ds):ds.reduce((s,x)=>s+x,0)/ds.length; };
+    const name = C => '{' + C.m.map(i=>'x'+(i+1)).join(',') + '}';
+    let html = '', step = 1;
+    while(cl.length > 1){
+      let best = [0,1,Infinity];
+      const D = cl.map((A,a)=>cl.map((B,b)=>{ if(b>=a) return null; const v = lk(A,B); if(v<best[2]) best=[b,a,v]; return v; }));
+      let t = '<table class="t"><tr><th></th>' + cl.map(C=>`<th>${name(C)}</th>`).join('') + '</tr>';
+      cl.forEach((A,a)=>{ t += `<tr><th>${name(A)}</th>` + cl.map((B,b)=> b<a ? `<td class="${(a===best[1]&&b===best[0])?'min':''}">${fmt(D[a][b],2)}</td>` : `<td></td>`).join('') + '</tr>'; });
+      t += '</table>';
+      const A = cl[best[0]], B = cl[best[1]];
+      html += `<div class="step"><h4>Étape ${step} : on fusionne ${name(A)} et ${name(B)} à la hauteur ${fmt(best[2],2)}</h4><div class="scroll">${t}</div></div>`;
+      const merged = {m:A.m.concat(B.m), node:{l:A.node, r:B.node, h:best[2]}};
+      cl = cl.filter((_,k)=>k!==best[0]&&k!==best[1]); cl.push(merged); step++;
+    }
+    $('#cah-steps').innerHTML = html;
+    drawDendro(cl[0].node, n);
+  }
+  function drawDendro(root, n){
+    const order=[]; (function walk(nd){ if(nd.leaf!==undefined) order.push(nd); else { walk(nd.l); walk(nd.r); } })(root);
+    const W = Math.max(320, n*64+60), H = 280, top = 20, bot = 40, left = 46;
+    const maxH = root.h || 1;
+    const Y = h => top + (H-top-bot) * (1 - h/maxH);
+    const sp = (W-left-20)/(n);
+    order.forEach((nd,k)=>{ nd.x = left + sp*(k+0.5); });
+    const segs=[], heights=new Set();
+    (function pos(nd){ if(nd.leaf!==undefined) return nd.x; const a=pos(nd.l), b=pos(nd.r); nd.x=(a+b)/2; heights.add(nd.h);
+      segs.push(`M${a},${Y(nd.l.h)}V${Y(nd.h)}H${b}V${Y(nd.r.h)}`); return nd.x; })(root);
+    let s = `<svg viewBox="0 0 ${W} ${H}" width="100%" style="max-width:${W}px;height:auto" role="img" aria-label="Dendrogramme">`;
+    s += `<line x1="${left}" y1="${top}" x2="${left}" y2="${H-bot}" stroke="var(--line)"/>`;
+    [...heights].sort((a,b)=>a-b).forEach(h=>{ s += `<line x1="${left-4}" x2="${W-10}" y1="${Y(h)}" y2="${Y(h)}" stroke="var(--line)" stroke-dasharray="3 3"/><text x="${left-8}" y="${Y(h)+4}" text-anchor="end">${fmt(h,1)}</text>`; });
+    s += `<path d="${segs.join(' ')}" fill="none" stroke="var(--accent)" stroke-width="2"/>`;
+    order.forEach(nd=>{ s += `<text x="${nd.x}" y="${H-bot+20}" text-anchor="middle">x${nd.leaf+1}</text>`; });
+    $('#cah-dendro').innerHTML = s + '</svg>';
+  }
+  $('#cah-preset').onchange = e=>loadPreset(e.target.value);
+  $('#cah-link').onchange = run;
+  $('#cah-n').onchange = ()=>{ drawMat(); run(); };
+  loadPreset('exam2024');
+}
+
+/* ---- Matrice de confusion ---- */
+function toolConf(root){
+  root.innerHTML = `<div class="card" style="display:grid;gap:14px">
+    <div><h2>Matrice de confusion et métriques binaires</h2><p class="lead" style="margin-top:4px">Prérempli avec le tableau 1 de l'examen 2024 S1 (15 observations). Change de modèle ou saisis tes propres 0/1.</p></div>
+    <div class="row"><button class="btn small" data-m="1">Modèle 1 (K=1)</button><button class="btn small" data-m="2">Modèle 2 (K=10)</button><button class="btn small" data-m="3">K=100 (toujours 0)</button></div>
+    <div class="grid2"><div><label class="l" for="cf-y">Étiquettes réelles y</label><textarea id="cf-y"></textarea></div>
+    <div><label class="l" for="cf-p">Prédictions ŷ</label><textarea id="cf-p"></textarea></div></div>
+    <div class="grid2"><div class="scroll" id="cf-mat"></div><div class="metrics" id="cf-met"></div></div>
+  </div>`;
+  const y = '0 0 0 0 0 0 0 1 0 0 0 0 0 1 0';
+  const P = {1:'0 0 1 0 0 0 0 1 0 0 1 0 0 1 0', 2:'0 0 0 0 0 0 0 0 0 0 0 0 0 1 0', 3:'0 0 0 0 0 0 0 0 0 0 0 0 0 0 0'};
+  const parse = s => s.trim().split(/[\s,;]+/).filter(Boolean).map(Number);
+  function calc(){
+    const a = parse($('#cf-y').value), b = parse($('#cf-p').value);
+    if(a.length!==b.length || !a.length){ $('#cf-mat').innerHTML = '<p class="lead">Les deux listes doivent avoir la même longueur.</p>'; $('#cf-met').innerHTML=''; return; }
+    let TP=0,TN=0,FP=0,FN=0; a.forEach((v,i)=>{ const q=b[i]; if(v===1&&q===1)TP++; else if(v===0&&q===0)TN++; else if(v===0&&q===1)FP++; else if(v===1&&q===0)FN++; });
+    const n=a.length;
+    $('#cf-mat').innerHTML = `<table class="t"><tr><th></th><th>réel 0</th><th>réel 1</th></tr><tr><th>prédit 0</th><td>TN = ${TN}</td><td>FN = ${FN}</td></tr><tr><th>prédit 1</th><td>FP = ${FP}</td><td>TP = ${TP}</td></tr></table>`;
+    const m = [['Accuracy',(TP+TN)/n,`(${TP}+${TN})/${n}`],['Sensibilité',TP/(TP+FN),`${TP}/(${TP}+${FN})`],['Spécificité',TN/(TN+FP),`${TN}/(${TN}+${FP})`],['Précision',TP/(TP+FP),`${TP}/(${TP}+${FP})`],['F1',2*TP/(2*TP+FP+FN),`2·${TP}/(2·${TP}+${FP}+${FN})`],['Taux FP',FP/(FP+TN),`${FP}/(${FP}+${TN})`]];
+    $('#cf-met').innerHTML = m.map(([k,v,f])=>`<div class="metric"><span>${k}</span><b>${fmt(v)}</b><span class="mono">${f}</span></div>`).join('');
+  }
+  root.querySelectorAll('[data-m]').forEach(b=>b.onclick=()=>{ $('#cf-y').value=y; $('#cf-p').value=P[b.dataset.m]; calc(); });
+  $('#cf-y').oninput = calc; $('#cf-p').oninput = calc;
+  $('#cf-y').value=y; $('#cf-p').value=P[1]; calc();
+}
+
+/* ---- Macro / micro ---- */
+function toolMulti(root){
+  root.innerHTML = `<div class="card" style="display:grid;gap:14px">
+    <div><h2>Précision multiclasse : macro vs micro</h2><p class="lead" style="margin-top:4px">Exercice de la diapo 47 du cours. Modifie les TP / FP de chaque classe (one-versus-all).</p></div>
+    <div class="row"><button class="btn small" data-s="1">Situation 1</button><button class="btn small" data-s="2">Situation 2</button></div>
+    <div class="grid2"><div class="scroll" id="mc-tab"></div><div class="metrics" id="mc-met"></div></div>
+  </div>`;
+  const S = {1:[['A',1,1],['B',10,90],['C',1,1],['D',1,1]], 2:[['A',0,2],['B',90,10],['C',0,2],['D',0,2]]};
+  let rows = S[1].map(r=>r.slice());
+  function draw(){
+    $('#mc-tab').innerHTML = `<table class="t"><tr><th>Classe</th><th>TP</th><th>FP</th><th>Précision</th></tr>${rows.map((r,i)=>`<tr><th>${r[0]}</th><td><input class="cell" type="number" min="0" data-i="${i}" data-k="1" value="${r[1]}"></td><td><input class="cell" type="number" min="0" data-i="${i}" data-k="2" value="${r[2]}"></td><td id="mc-p${i}"></td></tr>`).join('')}</table>`;
+    $('#mc-tab').querySelectorAll('input').forEach(inp=>inp.oninput=()=>{ rows[+inp.dataset.i][+inp.dataset.k]=+inp.value||0; calc(); });
+    calc();
+  }
+  function calc(){
+    const pr = rows.map(r=> (r[1]+r[2]) ? r[1]/(r[1]+r[2]) : 0);
+    pr.forEach((v,i)=>$('#mc-p'+i).textContent = fmt(v));
+    const macro = pr.reduce((s,x)=>s+x,0)/pr.length;
+    const sTP = rows.reduce((s,r)=>s+r[1],0), sFP = rows.reduce((s,r)=>s+r[2],0);
+    $('#mc-met').innerHTML = `<div class="metric"><span>Macro-average</span><b>${fmt(macro)}</b><span class="mono">moyenne des ${rows.length}</span></div>
+      <div class="metric"><span>Micro-average</span><b>${fmt(sTP/(sTP+sFP))}</b><span class="mono">${sTP}/(${sTP}+${sFP})</span></div>
+      <p class="stat" style="grid-column:1/-1">Le weighted-average du cours pondère chaque classe par son support (nombre d'observations réelles = TP+FN) : il faut les FN, absents de cet exercice.</p>`;
+  }
+  root.querySelectorAll('[data-s]').forEach(b=>b.onclick=()=>{ rows=S[b.dataset.s].map(r=>r.slice()); draw(); });
+  draw();
+}
+
+/* ---- Impuretés ---- */
+function toolImp(root){
+  root.innerHTML = `<div class="card" style="display:grid;gap:14px">
+    <div><h2>Impureté et gain d'une coupure</h2><p class="lead" style="margin-top:4px">Effectifs par classe, séparés par des virgules. Prérempli avec la racine de l'arbre du cours (Informatique ≤ 8,063).</p></div>
+    <div class="grid2"><div><label class="l" for="im-l">Enfant gauche</label><input type="text" id="im-l" value="19, 0"></div><div><label class="l" for="im-r">Enfant droit</label><input type="text" id="im-r" value="8, 18"></div></div>
+    <div class="scroll" id="im-out"></div>
+  </div>`;
+  const parse = s => s.split(/[\s,;]+/).filter(Boolean).map(Number);
+  const gini = c => { const n=c.reduce((a,b)=>a+b,0); return n? 1-c.reduce((s,x)=>s+(x/n)**2,0) : 0; };
+  const ent = c => { const n=c.reduce((a,b)=>a+b,0); return n? -c.reduce((s,x)=>s+(x? (x/n)*Math.log2(x/n):0),0) : 0; };
+  const err = c => { const n=c.reduce((a,b)=>a+b,0); return n? 1-Math.max(...c)/n : 0; };
+  function calc(){
+    const L=parse($('#im-l').value), R=parse($('#im-r').value), k=Math.max(L.length,R.length);
+    while(L.length<k) L.push(0); while(R.length<k) R.push(0);
+    const P=L.map((x,i)=>x+R[i]), nL=L.reduce((a,b)=>a+b,0), nR=R.reduce((a,b)=>a+b,0), n=nL+nR;
+    if(!n){ $('#im-out').innerHTML=''; return; }
+    const row=(f)=>[f(P),f(L),f(R), f(P)-nL/n*f(L)-nR/n*f(R)];
+    const G=row(gini), E=row(ent), Er=row(err);
+    $('#im-out').innerHTML = `<table class="t"><tr><th></th><th>Parent [${P.join(', ')}]</th><th>Gauche [${L.join(', ')}]</th><th>Droit [${R.join(', ')}]</th><th>Gain</th></tr>
+      ${[['Gini',G],['Entropie',E],['Erreur',Er]].map(([k,v])=>`<tr><th>${k}</th>${v.map(x=>`<td>${fmt(x)}</td>`).join('')}</tr>`).join('')}</table>
+      <p class="stat" style="margin-top:8px">Gain = I(parent) − ${nL}/${n}·I(gauche) − ${nR}/${n}·I(droit). CART choisit la coupure (variable, seuil) qui maximise ce gain.</p>`;
+  }
+  $('#im-l').oninput=calc; $('#im-r').oninput=calc; calc();
+}
+
+/* ---- ROC ---- */
+function toolROC(root){
+  root.innerHTML = `<div class="card" style="display:grid;gap:14px">
+    <div><h2>Courbe ROC à partir de scores</h2><p class="lead" style="margin-top:4px">Scores = probabilités prédites (logistique) ou proportion de voisins de classe 1 (KNN). Fais glisser le seuil s pour voir le point correspondant.</p></div>
+    <div class="grid2"><div><label class="l" for="roc-s">Scores</label><textarea id="roc-s">0.95 0.85 0.8 0.7 0.65 0.6 0.55 0.45 0.4 0.3 0.25 0.1</textarea></div>
+    <div><label class="l" for="roc-y">Étiquettes réelles (0/1)</label><textarea id="roc-y">1 1 0 1 1 0 1 0 0 1 0 0</textarea></div></div>
+    <div class="row"><label class="l" for="roc-t" style="margin:0">Seuil s</label><input type="range" id="roc-t" min="0" max="1" step="0.01" value="0.5" style="flex:1;min-width:160px"><b class="mono" id="roc-tv">0,5</b></div>
+    <div class="grid2"><div id="roc-svg"></div><div class="metrics" id="roc-met"></div></div>
+  </div>`;
+  const parse = s => s.trim().split(/[\s,;]+/).filter(Boolean).map(Number);
+  function calc(){
+    const s=parse($('#roc-s').value), y=parse($('#roc-y').value), t=+$('#roc-t').value;
+    $('#roc-tv').textContent = fmt(t,2);
+    if(s.length!==y.length||!s.length){ $('#roc-svg').innerHTML='<p class="lead">Même nombre de scores et d\'étiquettes.</p>'; return; }
+    const P=y.filter(v=>v===1).length, N=y.length-P;
+    const ths=[Infinity, ...[...new Set(s)].sort((a,b)=>b-a), -Infinity];
+    const pts=ths.map(th=>{ let tp=0,fp=0; s.forEach((v,i)=>{ if(v>=th){ if(y[i]===1)tp++; else fp++; } }); return [N?fp/N:0, P?tp/P:0]; });
+    let auc=0; for(let i=1;i<pts.length;i++) auc += (pts[i][0]-pts[i-1][0])*(pts[i][1]+pts[i-1][1])/2;
+    let tp=0,fp=0; s.forEach((v,i)=>{ if(v>=t){ if(y[i]===1)tp++; else fp++; } });
+    const cur=[N?fp/N:0, P?tp/P:0];
+    const W=300, m=40, X=v=>m+v*(W-m-12), Yv=v=>W-m-v*(W-m-12);
+    let g=`<svg viewBox="0 0 ${W} ${W}" width="100%" style="max-width:${W}px" role="img" aria-label="Courbe ROC">`;
+    for(let k=0;k<=4;k++){ const v=k/4; g+=`<line x1="${X(0)}" x2="${X(1)}" y1="${Yv(v)}" y2="${Yv(v)}" stroke="var(--line)"/><text x="${m-6}" y="${Yv(v)+4}" text-anchor="end">${fmt(v,2)}</text><text x="${X(v)}" y="${W-m+16}" text-anchor="middle">${fmt(v,2)}</text>`; }
+    g+=`<line x1="${X(0)}" y1="${Yv(0)}" x2="${X(1)}" y2="${Yv(1)}" stroke="var(--muted)" stroke-dasharray="4 4"/>`;
+    g+=`<polyline points="${pts.map(p=>X(p[0])+','+Yv(p[1])).join(' ')}" fill="none" stroke="var(--accent)" stroke-width="2.5"/>`;
+    g+=`<circle cx="${X(cur[0])}" cy="${Yv(cur[1])}" r="6" fill="var(--red)"/>`;
+    g+=`<text x="${W/2}" y="${W-4}" text-anchor="middle">FPR (1 − spécificité)</text><text x="${X(0)+4}" y="${Yv(1)-2}" text-anchor="start">TPR (sensibilité)</text></svg>`;
+    $('#roc-svg').innerHTML=g;
+    $('#roc-met').innerHTML = `<div class="metric"><span>AUC</span><b>${fmt(auc)}</b><span>aire sous la courbe</span></div>
+      <div class="metric"><span>TPR à s</span><b>${fmt(cur[1])}</b><span class="mono">${tp}/${P}</span></div>
+      <div class="metric"><span>FPR à s</span><b>${fmt(cur[0])}</b><span class="mono">${fp}/${N}</span></div>`;
+  }
+  ['roc-s','roc-y','roc-t'].forEach(id=>$('#'+id).oninput=calc); calc();
+}
+
+/* ---- K-means ---- */
+function toolKM(root){
+  root.innerHTML = `<div class="card" style="display:grid;gap:14px">
+    <div><h2>Algorithme de Lloyd pas à pas</h2><p class="lead" style="margin-top:4px">Alterne affectation et recalcul des centroïdes, et regarde I_W diminuer. Essaie les anneaux du TP : le K-means échoue en 2D, mais réussit après la transformation φ(x,y) = (x, y, x²+y²).</p></div>
+    <div class="row">
+      <label class="l" style="margin:0">Données</label><select id="km-data" style="width:auto"><option value="blobs">3 groupes</option><option value="rings">2 anneaux (TP)</option></select>
+      <label class="l" style="margin:0">K</label><input type="number" id="km-k" min="1" max="6" value="3" style="width:64px">
+      <label class="row stat" style="gap:6px"><input type="checkbox" id="km-phi"> φ(x,y)=(x,y,x²+y²)</label>
+      <label class="row stat" style="gap:6px"><input type="checkbox" id="km-pp"> K-means++</label>
+    </div>
+    <div class="row"><button class="btn" id="km-init">Initialiser</button><button class="btn primary" id="km-step">Étape suivante</button><button class="btn" id="km-run">Jusqu'à convergence</button><span class="stat" id="km-info"></span></div>
+    <canvas id="km-c" width="640" height="420"></canvas>
+  </div>`;
+  const cv=$('#km-c'), ctx=cv.getContext('2d');
+  let pts=[], cent=[], asg=[], phase='assign', seed=7, iter=0;
+  const PAL=['--c1','--c2','--c3','--c4','--c5','--c6'];
+  const cssv = v => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+  const col = i => cssv(PAL[i%PAL.length]);
+  function gen(){
+    const r=rng(42); const g=()=>{ let u=0; for(let k=0;k<6;k++) u+=r(); return u-3; };
+    pts=[];
+    if($('#km-data').value==='blobs'){ [[-3,-1.5],[2.5,-2],[0,2.6]].forEach(([cx,cy])=>{ for(let i=0;i<70;i++) pts.push([cx+g()*0.9, cy+g()*0.9]); }); }
+    else { for(let i=0;i<200;i++){ const th=r()*2*Math.PI; const rad=i<100? Math.abs(1.5+g()*0.5) : Math.abs(5+g()*0.33); pts.push([rad*Math.cos(th), rad*Math.sin(th)]); } }
+  }
+  const feat = p => $('#km-phi').checked ? [p[0],p[1],(p[0]*p[0]+p[1]*p[1])] : [p[0],p[1]];
+  const d2 = (a,b) => a.reduce((s,x,i)=>s+(x-b[i])**2,0);
+  function init(){
+    const K=+$('#km-k').value, r=rng(seed++), F=pts.map(feat);
+    cent=[F[Math.floor(r()*F.length)].slice()];
+    while(cent.length<K){
+      if($('#km-pp').checked){ const D=F.map(f=>Math.min(...cent.map(c=>d2(f,c)))); const tot=D.reduce((a,b)=>a+b,0); let u=r()*tot, k=0; while(u>D[k]&&k<D.length-1){u-=D[k];k++;} cent.push(F[k].slice()); }
+      else cent.push(F[Math.floor(r()*F.length)].slice());
+    }
+    asg=pts.map(()=>-1); phase='assign'; iter=0; draw($('#km-pp').checked ? 'Centroïdes initialisés par K-means++.' : 'Centroïdes tirés au hasard parmi les points.');
+  }
+  function IW(){ const F=pts.map(feat); return F.reduce((s,f,i)=>s+(asg[i]>=0?d2(f,cent[asg[i]]):0),0); }
+  function step(){
+    const F=pts.map(feat);
+    if(phase==='assign'){
+      let changed=0; F.forEach((f,i)=>{ let b=0,bd=Infinity; cent.forEach((c,k)=>{ const v=d2(f,c); if(v<bd){bd=v;b=k;} }); if(asg[i]!==b) changed++; asg[i]=b; });
+      phase='update'; iter++;
+      draw(changed? `Affectation (itération ${iter}) : ${changed} point(s) ont changé de cluster.` : `Convergence : aucune affectation n'a changé.`);
+      return changed;
+    } else {
+      cent = cent.map((c,k)=>{ const m=F.filter((_,i)=>asg[i]===k); if(!m.length) return c; return c.map((_,j)=>m.reduce((s,f)=>s+f[j],0)/m.length); });
+      phase='assign'; draw('Recalcul des centroïdes : moyenne de chaque cluster.'); return 1;
+    }
+  }
+  let lastMsg='';
+  function draw(msg){
+    lastMsg = msg;
+    const W=cv.width,H=cv.height; ctx.clearRect(0,0,W,H);
+    const k = Math.max(1, cv.width / (cv.clientWidth || cv.width));
+    const xs=pts.map(p=>p[0]), ys=pts.map(p=>p[1]);
+    const mx=Math.max(...xs.map(Math.abs),...ys.map(Math.abs))*1.1;
+    const sx=v=>W/2+v/mx*(Math.min(W,H)/2-10), sy=v=>H/2-v/mx*(Math.min(W,H)/2-10);
+    pts.forEach((p,i)=>{ ctx.beginPath(); ctx.arc(sx(p[0]),sy(p[1]),3.6*Math.min(k,2.2),0,7); ctx.fillStyle= asg[i]>=0? col(asg[i]) : cssv('--c0'); ctx.globalAlpha=asg[i]>=0?0.85:0.5; ctx.fill(); });
+    ctx.globalAlpha=1;
+    if(!$('#km-phi').checked) cent.forEach((c,k)=>{ const x=sx(c[0]), y=sy(c[1]); ctx.lineWidth=3; ctx.strokeStyle=cssv('--ink'); ctx.beginPath(); ctx.moveTo(x-9,y-9); ctx.lineTo(x+9,y+9); ctx.moveTo(x+9,y-9); ctx.lineTo(x-9,y+9); ctx.stroke(); ctx.lineWidth=1.5; ctx.strokeStyle=col(k); ctx.beginPath(); ctx.arc(x,y,12,0,7); ctx.stroke(); });
+    $('#km-info').textContent = msg + (asg[0]>=0 ? `  I_W = ${fmt(IW(),1)}` : '') + ($('#km-phi').checked?' (centroïdes en 3D, non dessinés)':'');
+  }
+  $('#km-init').onclick=init;
+  $('#km-step').onclick=()=>{ if(!cent.length) init(); else step(); };
+  $('#km-run').onclick=()=>{ if(!cent.length) init(); let g=0; while(g<200){ const c=step(); if(phase==='update' && !c) break; g++; } };
+  $('#km-data').onchange=()=>{ gen(); if($('#km-data').value==='rings') $('#km-k').value=2; init(); };
+  ['km-k','km-phi','km-pp'].forEach(id=>$('#'+id).onchange=init);
+  const onTheme = ()=>{ if(!document.body.contains(cv)){ document.removeEventListener('themechange', onTheme); return; } draw(lastMsg); };
+  document.addEventListener('themechange', onTheme);
+  gen(); init();
+}
+
+/* =====================================================================
+   ANNALES
+   ===================================================================== */
+const EXAMS = [
+{ id:'e25', title:'Évaluation 1 — 2025-2026', exos:[
+ {t:'Exercice 1 (9 pts) : types de problèmes, KNN pondéré, CART, métriques', qs:[
+  ['Type de problème : (a) patient porteur ou non d\'une maladie ; (b) consommation énergétique d\'un bâtiment ; (c) type de véhicule sur une photo ; (d) concentration d\'un polluant ; (e) regrouper des tweets ; (f) risque de défaillance d\'une pièce.',
+   `<ul><li>(a) classification binaire</li><li>(b) régression</li><li>(c) classification multiclasse</li><li>(d) régression</li><li>(e) clustering</li><li>(f) régression si on prédit un risque (probabilité ou score continu). Si on prédit « défaillance oui/non », c'est une classification binaire : précise ton interprétation.</li></ul>`],
+  ['KNN modifié : f(x) = argmax_k Σ_{i : xᵢ∈N_K(x)} exp(−dᵢ(x)²/h) 1{yᵢ=k}. Qu\'est-ce que ça change ?',
+   `Chaque voisin vote avec un <b>poids décroissant avec sa distance</b> à x, au lieu d'un vote égal. Les voisins proches comptent plus. h règle la décroissance : h grand → poids ≈ 1, on retrouve le KNN classique ; h petit → seul le plus proche compte vraiment (≈ 1-NN). Ça casse aussi les égalités de vote.`],
+  ['(a) À quoi servent les jeux d\'apprentissage, de validation et de test ?',
+   `Apprentissage : construire les arbres (les coupures). Validation : comparer les arbres (profondeur, λ d'élagage…) et choisir les hyperparamètres. Test : estimer la performance du modèle finalement choisi sur des données jamais utilisées.`],
+  ['(b) Arbre final et choix des divisions <span class="pill fig">figure</span>',
+   `Lecture de la figure (pointillés en x₁ = 2 et x₂ = 3) :<div class="f" style="margin:6px 0">x₁ &lt; 2 ?
+├─ non → classe 1
+└─ oui → x₂ &lt; 3 ?
+         ├─ oui → classe 2
+         └─ non → classe 1</div>Les divisions sont choisies de façon gloutonne : à chaque nœud, on teste toutes les variables séparatrices et tous les seuils de séparation, et on garde celui qui <b>maximise le gain d'information</b> IG = I(R) − n_l/n·I(R_l) − n_m/n·I(R_m) (Gini par défaut).`],
+  ['(c)-(d) Matrice de confusion sur l\'apprentissage, précision macro et micro <span class="pill fig">figure</span>',
+   `Lecture de la figure : en bas à gauche, 2 points de classe 2 et 1 de classe 1 ; à droite (x₁ ≥ 2), les points de classe 1 plus 1 point de classe 2 (en (3,3)) et le point de classe 3.<div class="scroll" style="margin:6px 0"><table class="t"><tr><th>prédit \\ réel</th><th>1</th><th>2</th><th>3</th></tr><tr><th>1</th><td>45</td><td>1</td><td>1</td></tr><tr><th>2</th><td>1</td><td>2</td><td>0</td></tr><tr><th>3</th><td>0</td><td>0</td><td>0</td></tr></table></div>Précision classe 1 = 45/47 ≈ 0,957 ; classe 2 = 2/3 ≈ 0,667 ; classe 3 : aucune prédiction (0/0, indéfinie, souvent comptée 0).<br><b>Macro</b> = (0,957 + 0,667 + 0)/3 ≈ <b>0,541</b> (≈ 0,812 si on ignore la classe 3 ; dis quelle convention tu prends). <b>Micro</b> = accuracy = 47/50 = <b>0,94</b>. Le macro révèle que les classes rares sont mal traitées.`],
+  ['(e) Exemple où la macro-average est préférable.',
+   `Diagnostic de plusieurs maladies dont certaines rares, détection de types de fraude, reconnaissance d'espèces menacées : chaque classe, même rare, doit compter autant.`],
+  ['(f) Taux d\'erreur sur l\'apprentissage avec |T| = 1 ? avec l\'arbre maximal ?',
+   `|T| = 1 : une seule feuille → on prédit la classe majoritaire 1 pour tous → erreur = 4/50 = <b>8 %</b>. Arbre maximal : feuilles pures → erreur <b>0 %</b> (sauf points identiques d'étiquettes différentes).`],
+  ['(g) Lequel sous-apprend ? lequel sur-apprend ?',
+   `|T| = 1 sous-apprend : trop simple, il ne détecte jamais les classes 2 et 3 (biais fort). L'arbre maximal sur-apprend : il isole chaque point, y compris le bruit, et généralisera mal (variance forte).`],
+  ['Score entre 0 et 1 d\'un arbre CART pour calculer l\'AUC ?',
+   `La <b>proportion d'observations d'apprentissage de classe 1 dans la feuille</b> où tombe le point. C'est une estimation de P(Y=1 | x ∈ feuille), ce que renvoie <code>predict(..., type="prob")</code>.`]
+ ]},
+ {t:'Exercice 2 (5,5 pts) : clustering', qs:[
+  ['Que cherche-t-on à faire en clustering ?', `Partitionner des données <b>non étiquetées</b> en groupes homogènes (individus similaires ensemble) et bien séparés les uns des autres, pour explorer et comprendre la structure des données.`],
+  ['CAH lien simple et lien complet sur la matrice D (d12=43, d13=9, d23=8, d14=10, d24=39, d34=24, d15=12, d25=19, d35=15, d45=42).',
+   `<b>Lien simple :</b> {x2,x3} à 8 → {x1,x2,x3} à 9 → + x4 à 10 → + x5 à 12.<br><b>Lien complet :</b> {x2,x3} à 8 → {x1,x4} à 10 → {x2,x3,x5} à 19 → fusion finale à 43.<br>Vérifie et dessine les dendrogrammes avec l'outil CAH (exemple « Examen 2025 S1 »).`],
+  ['(a) Que mesurent 1/K Σ_k 1/|C_k| Σ d(x,μ_k) et 2/(K(K−1)) ΣΣ d(μ_k,μ_l) ?',
+   `La première est l'<b>homogénéité globale</b> : moyenne, sur les K clusters, de la distance moyenne des points à leur centroïde ; à minimiser. La seconde est la <b>séparabilité globale</b> : distance moyenne entre centroïdes, à maximiser.`],
+  ['(b) Utiliser 1/K Σ_k max_{l≠k} (T_k + T_l)/d(μ_k,μ_l) ?',
+   `C'est l'<b>indice de Davies-Bouldin</b>. Il compare l'homogénéité de deux clusters à leur séparation, dans le pire cas pour chaque cluster. On choisit la partition qui le <b>minimise</b> : clusters compacts et éloignés.`],
+  ['K-means pour compresser une image ? K = 1 ? Inconvénient de la CAH ?',
+   `Chaque pixel est un point de ℝ³ (R,G,B). On applique un K-means, puis on remplace chaque pixel par la couleur de son centroïde : l'image n'a plus que K couleurs. <b>K = 1</b> : tous les pixels prennent la couleur moyenne, l'image devient unie. <b>CAH</b> : complexité et mémoire quadratiques en le nombre de pixels (souvent des millions) → infaisable ou très lent. Alternative du cours : un K-means avec K grand, puis une CAH sur les centroïdes.`]
+ ]},
+ {t:'Exercice 3 (5,5 pts) : SVM à marge souple', qs:[
+  ['Paramètres et hyperparamètres ?', `Paramètres (appris) : w, b (et les variables d'ajustement ξᵢ). Hyperparamètre : <b>C</b>.`],
+  ['Position d\'un point xᵢ selon ξᵢ ? peut-il être mal classé ?',
+   `<ul><li>ξᵢ = 0 : bien classé, en dehors de la zone d'indécision (ou sur H⁺/H⁻).</li><li>0 &lt; ξᵢ &lt; 1 : bien classé, mais dans la zone d'indécision.</li><li>ξᵢ = 1 : sur l'hyperplan séparateur.</li><li>ξᵢ &gt; 1 : <b>mal classé</b>.</li></ul>`],
+  ['Associer C = 0,1 ; 1 ; 1000 aux figures <span class="pill fig">figure</span>',
+   `Lecture de la figure : <b>C = 1000 → (b)</b>, marge très étroite. C grand : on préfère minimiser le nombre d'outliers. <b>C = 0,1 → (c)</b>, marge la plus large, beaucoup de points dans la zone d'indécision. C petit : on accorde moins d'importance aux outliers. <b>C = 1 → (a)</b>, intermédiaire. (a) et (c) se ressemblent : compare l'écart entre les pointillés.`],
+  ['Biais et variance quand C augmente ?',
+   `C ↑ : on pénalise davantage les erreurs, le modèle colle plus aux données d'apprentissage → <b>biais ↓, variance ↑</b> (risque de sur-apprentissage). C ↓ : marge large, modèle plus rigide → biais ↑, variance ↓.`],
+  ['Quand une SVM à noyau est-elle intéressante ?', `Quand les données ne sont <b>pas séparables linéairement, même à quelques points près</b> (frontière courbe, classes imbriquées) : on les envoie dans un espace où elles le deviennent.`],
+  ['L\'astuce du noyau ?', `Elle intervient dans le problème d'optimisation <b>dual</b>. Dans le dual et dans le classifieur, φ n'intervient que via des produits scalaires ⟨φ(xᵢ),φ(xⱼ)⟩. On les remplace par k(xᵢ,xⱼ), calculé directement sans passer par φ (ex. (⟨x,x'⟩+c)² en O(d) au lieu de O(d²)). Il suffit que k soit symétrique et semi-défini positif pour qu'un tel φ existe.`]
+ ]}
+]},
+{ id:'e24a', title:'Évaluation 1 — 2024-2025', exos:[
+ {t:'Exercice 1 (7 pts) : types de problèmes et métriques', qs:[
+  ['Type : (a) crédit risqué ou non ; (b) langue d\'un texte ; (c) prix d\'un logement ; (d) compresser une image ; (e) probabilité de défaut d\'un prêt ; (f) regrouper des articles.',
+   `<ul><li>(a) classification binaire</li><li>(b) classification multiclasse</li><li>(c) régression</li><li>(d) clustering</li><li>(e) régression</li><li>(f) clustering</li></ul>`],
+  ['(a)-(b) Matrices de confusion, accuracy et sensibilité des deux modèles (Table 1).',
+   `Vraies étiquettes : 2 positifs (obs. 8 et 14), 13 négatifs.<br><b>Modèle 1 (K=1)</b> : TP=2, FN=0, FP=2 (obs. 3 et 11), TN=11 → accuracy = 13/15 ≈ <b>0,867</b> ; sensibilité = 2/2 = <b>1</b>.<br><b>Modèle 2 (K=10)</b> : TP=1, FN=1 (obs. 8), FP=0, TN=13 → accuracy = 14/15 ≈ <b>0,933</b> ; sensibilité = 1/2 = <b>0,5</b>.<br>À vérifier avec l'outil « Matrice de confusion ».`],
+  ['(c) Avec K = 100 ?', `K = n = 100 : tous les points sont voisins → on prédit toujours la classe majoritaire de l'apprentissage, 0 (53 contre 47). Accuracy = 13/15 ≈ <b>0,867</b>, sensibilité = 0/2 = <b>0</b>.`],
+  ['(d) Exemple où privilégier la sensibilité ; quel modèle ?', `Dépistage d'une maladie grave, détection de fraude : rater un positif coûte cher. On choisirait le <b>modèle 1</b> (sensibilité 1 contre 0,5).`],
+  ['(e) Sensibilité d\'un 1-NN multiclasse ?', `Stratégie <b>one-versus-all</b> : pour chaque classe k, on considère k comme positive et les autres comme négatives, et on calcule TP_k/(TP_k+FN_k) sur la validation. On agrège ensuite : macro-average (moyenne simple), pondérée par le support, ou micro-average (ΣTP/Σ(TP+FN), qui donne l'accuracy).`]
+ ]},
+ {t:'Exercice 2 (7,5 pts) : classifieurs linéaires, CART, SVM', qs:[
+  ['Qu\'est-ce qu\'un classifieur linéaire (sans formule) ?', `Un classifieur dont la <b>frontière de décision est un hyperplan</b> (une droite en 2D) : les points d'un côté reçoivent une classe, ceux de l'autre côté l'autre classe.`],
+  ['Arbre CART maximal pour la figure 1 <span class="pill fig">figure</span>', `Lecture de la figure : la classe 1 (orange) est en bas à gauche, la classe 0 (bleu) en haut à droite, plus quelques points bleus tout en bas (x₂ &lt; −1). Un arbre à 4 feuilles pures (seuils approximatifs) :<div class="f" style="margin:6px 0">x₂ &lt; −1 ?
+├─ oui → 0
+└─ non → x₁ &lt; 1,1 ?
+         ├─ oui → 1
+         └─ non → x₂ &lt; 1 ?
+                  ├─ oui → 1
+                  └─ non → 0</div>Méthode : chaque coupure est verticale (x₁ &lt; s) ou horizontale (x₂ &lt; s). On ajoute des coupures jusqu'à ce que toutes les feuilles soient pures, avec le moins de feuilles possible.`],
+  ['Même classification avec la régression logistique ?', `Non : la régression logistique est un <b>classifieur linéaire</b>, sa frontière est une seule droite. Ici, aucune droite ne sépare à la fois les points bleus du haut et ceux du bas des points orange. CART produit une frontière en escalier (plusieurs coupures orthogonales aux axes), non linéaire.`],
+  ['Associer λ₁ &lt; λ₂ &lt; λ₃ &lt; λ₄ aux arbres élagués <span class="pill fig">figure</span>', `C_λ(T) = Σ n_l I(R_l) + λ|T| : plus λ est grand, plus chaque feuille coûte cher → <b>arbre plus petit</b>. Lecture de la figure : <b>λ₁ → (c)</b> (très grand arbre), <b>λ₂ → (b)</b> (≈ 8 feuilles), <b>λ₃ → (d)</b> (≈ 6 feuilles), <b>λ₄ → (a)</b> (2 feuilles).`],
+  ['Biais et variance quand λ augmente ?', `λ ↑ → arbre plus petit, donc modèle plus simple : <b>biais ↑, variance ↓</b>. λ petit → arbre proche de l'arbre maximal, qui colle aux données : biais faible, variance forte.`],
+  ['Erreur d\'apprentissage pour |T| = 1 ? pour |T| = 615 ?', `|T| = 1 : on prédit la classe majoritaire (non diabétique) pour tous → erreur = proportion de la classe minoritaire (diabétiques) dans l'apprentissage. L'énoncé ne donne pas cette valeur. |T| = 615 = n : une feuille par observation → feuilles pures → erreur <b>0</b> (sauf doublons contradictoires).`],
+  ['Demi-espaces vs régression logistique (figure 3) ; lequel privilégier ? <span class="pill fig">figure</span>', `Lecture de la figure : la <b>droite rouge</b>, collée aux points, ne fait (presque) aucune erreur : c'est le <b>classifieur des demi-espaces</b>. Il ne pénalise que les erreurs (coût 0/1) et cherche à toutes les éviter, quitte à frôler les points. La <b>droite verte</b> est la <b>régression logistique</b>. Elle pénalise aussi les points bien classés mais proches de la frontière, donc elle s'éloigne des points, quitte à mal classer les 2 points bleus isolés près des orange. On privilégie la logistique : elle évite mieux l'écueil du <b>sur-apprentissage</b> (ces 2 points sont peut-être du bruit) et donne une probabilité.`],
+  ['Hyperparamètres d\'une SVM à noyau ?', `La constante <b>C</b>, le <b>choix du noyau</b>, et les <b>paramètres du noyau</b> : γ (ou σ) pour le noyau gaussien ; degré q et constante c pour le polynomial.`],
+  ['Procédure pour sélectionner une SVM à noyau.', `<ul><li>Séparer les données en apprentissage/validation d'un côté, test de l'autre.</li><li>Définir une grille : noyaux × valeurs de C × paramètres (γ, degré…).</li><li>Pour chaque combinaison, faire une validation croisée K-fold sur l'apprentissage et calculer le score moyen (accuracy, AUC…).</li><li>Garder la meilleure combinaison et la réentraîner sur tout l'apprentissage.</li><li>Évaluer ce modèle sur le jeu de test.</li></ul>`]
+ ]},
+ {t:'Exercice 3 (5,5 pts) : clustering', qs:[
+  ['But du clustering ?', `Regrouper des données non étiquetées en clusters homogènes et bien séparés.`],
+  ['(a) Valeurs de s ? (b) s(x) &lt; 0 ? (c) s(x) ≥ 0 ? (d) choisir une partition ?', `(a) s ∈ [−1, 1]. (b) b(x) &lt; a(x) : x est en moyenne plus proche des points d'un autre cluster que du sien, donc probablement mal assigné. Dessin : x placé dans le cluster A mais collé au cluster B. (c) a(x) ≤ b(x) : x est plus proche de son cluster que des autres (bien assigné si s ≈ 1). Dessin : x au cœur de son cluster. (d) On calcule s pour chaque partition candidate et on garde celle qui le <b>maximise</b>.`],
+  ['CAH lien simple et complet (d12=23, d13=10, d23=50, d14=13, d24=33, d34=55, d15=35, d25=24, d35=18, d45=34).', `<b>Lien simple :</b> {x1,x3} à 10 → + x4 à 13 → + x5 à 18 → + x2 à 23.<br><b>Lien complet :</b> {x1,x3} à 10 → {x2,x5} à 24 → {x2,x4,x5} à 34 → fusion finale à 55.<br>À vérifier avec l'outil CAH (exemple « Examen 2024 S1 »).`],
+  ['Quelle procédure est la plus complexe : K-means ou CAH ?', `K-means : à chaque itération, <b>K·n distances</b> (chaque point vers chaque centroïde), soit O(nKd) par itération, linéaire en n. CAH : à l'étape où il reste m clusters, on compare <b>m(m−1)/2 paires</b>, et on part de n(n−1)/2 distances entre points → quadratique en n. <b>La CAH est la plus complexe.</b>`]
+ ]}
+]},
+{ id:'e24b', title:'Évaluation 2 — 2024-2025', exos:[
+ {t:'Exercice 1 (9,5 pts) : KNN multiclasse (150 données, 3 classes)', qs:[
+  ['Expression du classifieur pour K = 20.', `f(x) = argmax_{k∈{1,2,3}} Σ_{i : xᵢ∈N₂₀(x)} 1{yᵢ = k}, où N₂₀(x) est l'ensemble des 20 plus proches voisins de x parmi x₁,…,x₁₅₀.`],
+  ['Associer K = 1, 20, 150 aux figures <span class="pill fig">figure</span>', `<b>K = 150 → (a)</b> : une seule couleur de fond, la classe majoritaire 2 (55 points). <b>K = 1 → (b)</b> : îlots autour de chaque point isolé ; les prédictions sur l'apprentissage reproduisent exactement les vraies classes (chaque point est son propre voisin). <b>K = 20 → (c)</b> : frontières lissées, quelques erreurs.`],
+  ['Sous-apprentissage ? sur-apprentissage ?', `K = 1 : <b>sur-apprentissage</b> (colle au bruit, variance forte). K = 150 : <b>sous-apprentissage</b> (ignore x, biais fort). K = 20 est un compromis.`],
+  ['Accuracy sur l\'apprentissage pour K = 1 et K = 150.', `K = 1 : <b>1</b> (100 %). K = 150 : on prédit toujours la classe 2 → 55/150 ≈ <b>0,367</b>.`],
+  ['Sensibilité du modèle K = 20 (3 classes) ?', `One-versus-all : pour chaque classe k, TP_k/(TP_k+FN_k), avec k positive et les deux autres négatives. On agrège ensuite par macro-average (moyenne des 3), pondérée par le support, ou micro-average.`],
+  ['Choisir K par validation croisée 5-fold.', `Découper aléatoirement les 150 données en 5 blocs de 30. Pour chaque K candidat et chaque bloc b : entraîner le KNN sur les 4 autres blocs, prédire le bloc b, calculer l'erreur. Moyenner les 5 erreurs pour chaque K, choisir le K d'erreur moyenne minimale, puis réentraîner sur les 150 données.`],
+  ['Construire la courbe ROC (classes 1 et 3 fusionnées, K = 20).', `Pour chaque point du test, le score est la <b>proportion de ses 20 voisins de la classe positive</b>. Si la classe positive est la classe fusionnée : p̂(x) = (1/20) Σ_{i : xᵢ∈N₂₀(x)} 1{yᵢ ∈ {1,3}}. Les scores sont donc des multiples de 1/20. Pour chaque seuil s, on prédit 1 si p̂(x) ≥ s, et on calcule TPR = TP/(TP+FN) et FPR = FP/(FP+TN). On place les points (FPR, TPR) : (0,0) pour s &gt; score max, (1,1) pour s = 0. <b>À la main (méthode du cours)</b> : trier les 40 points par score décroissant, partir de (0,0) ; un vrai positif fait monter de 1/P, un vrai négatif fait avancer de 1/N. L'AUC est l'aire sous cette courbe.`]
+ ]},
+ {t:'Exercice 2 (3,5 pts) : SVM à noyau radial', qs:[
+  ['Qu\'est-ce que la variance d\'un classifieur ? Que se passe-t-il si elle est très grande ?', `C'est la variabilité du classifieur appris quand l'échantillon d'apprentissage change. Variance très grande : le modèle capture le bruit, change beaucoup d'un échantillon à l'autre, et <b>sur-apprend</b> (bon sur l'apprentissage, mauvais sur de nouvelles données).`],
+  ['Associer γ = 0,05 ; 1 ; 20 ; 50 aux figures <span class="pill fig">figure</span>', `γ ↑ → variance ↑ : la frontière devient de plus en plus irrégulière, avec des îlots autour des points. Lecture de la figure : <b>γ = 0,05 → (a)</b> (frontière si lisse qu'une seule classe est prédite partout : sous-apprentissage) ; <b>γ = 1 → (c)</b> (une grande région lisse) ; <b>γ = 20 → (d)</b> (îlots) ; <b>γ = 50 → (b)</b> (îlots les plus petits et serrés autour des points).`],
+  ['Une SVM à marge souple linéaire aurait-elle suffi ?', `Non : les points noirs sont au milieu, entourés de points rouges des deux côtés. Les classes ne sont <b>pas séparables linéairement, même à quelques points près</b>. Une frontière linéaire ferait beaucoup d'erreurs : il faut un noyau.`]
+ ]},
+ {t:'Exercice 3 (7 pts) : K-means et CAH', qs:[
+  ['Étapes de l\'algorithme de Lloyd (K = 3).', `1) Choisir 3 centroïdes initiaux au hasard parmi les points (ou K-means++). 2) Affecter chaque point au centroïde le plus proche. 3) Recalculer chaque centroïde comme la moyenne de son cluster. 4) Répéter 2-3 jusqu'à ce que les affectations ne changent plus.`],
+  ['I_W diminue à chaque itération : quel problème ? solution ?', `L'algorithme converge vers un <b>minimum local</b> qui dépend de l'initialisation : il peut rester bloqué sur une mauvaise partition. Solution : relancer plusieurs fois avec des initialisations différentes (<code>nstart</code>) et garder la partition de plus petite I_W ; ou utiliser K-means++.`],
+  ['Deux méthodes pour choisir le nombre de clusters en CAH.', `Couper le dendrogramme avant une branche très longue (grand saut de distance), ou fixer un seuil de distance. On peut aussi évaluer chaque coupe avec la silhouette (maximiser) ou Davies-Bouldin (minimiser).`],
+  ['Associer les résultats aux liens simple et complet <span class="pill fig">figure</span>', `<b>4a = lien complet</b> : il coupe le grand anneau extérieur en 3 morceaux compacts, car il refuse de fusionner des clusters dont certains points sont très éloignés (les deux bouts de l'anneau). <b>4b = lien simple</b> : il enchaîne les points proches de proche en proche, donc il garde l'anneau extérieur entier et sépare les deux petits anneaux.`],
+  ['Que représentent I_W et I_B ? choisir le nombre de classes ?', `I_W : inertie intra-classes, l'homogénéité des clusters (à minimiser). I_B : inertie inter-classes, la séparation (à maximiser). I = I_W + I_B ne dépend pas de la partition : minimiser I_W revient à maximiser I_B. I_W diminue toujours avec K : on trace I_W(K) et on choisit K au <b>coude</b>, là où la diminution ralentit nettement.`],
+  ['Le K-means peut-il retrouver la partition de la figure 4b ? Sinon ?', `Non : le K-means produit des cellules de Voronoï, donc des clusters <b>convexes</b>, et l'anneau extérieur ne l'est pas. Solution du cours : appliquer l'<b>astuce du noyau à l'algorithme de Lloyd</b> (K-means à noyau). Autre solution, vue en TP : transformer les données, par exemple φ(x,y) = (x, y, (x−a)²+(y−b)²) avec (a,b) le centre de l'anneau (ici environ (−5, 5)), puis appliquer le K-means dans ce nouvel espace.`]
+ ]}
+]}
+];
+
+function renderAnnales(){
+  const p = $('#p-annales');
+  const cur = store.get('exam','e25');
+  p.innerHTML = `<div class="chips" id="ex-chips">${EXAMS.map(e=>`<button class="chip" data-e="${e.id}">${e.title}</button>`).join('')}</div>
+  <div class="row"><button class="btn small" id="ex-all">Tout révéler</button><button class="btn small" id="ex-none">Tout cacher</button></div>
+  <div id="ex-body" class="panel"></div>`;
+  const show = id => {
+    store.set('exam', id);
+    p.querySelectorAll('#ex-chips .chip').forEach(b=>b.setAttribute('aria-pressed', b.dataset.e===id));
+    const e = EXAMS.find(x=>x.id===id);
+    $('#ex-body').innerHTML = e.exos.map(ex=>`<div class="card exo" style="display:grid;gap:12px"><h2>${ex.t}</h2>${ex.qs.map(([q,a])=>`
+      <div class="q-item"><div class="qn">${q}</div>
+      <details><summary class="btn small" style="display:inline-block;list-style:none">Voir la correction</summary><div class="answer" style="margin-top:8px">${a}</div></details></div>`).join('')}</div>`).join('');
+  };
+  $('#ex-chips').onclick = e=>{ const b=e.target.closest('.chip'); if(b) show(b.dataset.e); };
+  $('#ex-all').onclick = ()=>p.querySelectorAll('#ex-body details').forEach(d=>d.open=true);
+  $('#ex-none').onclick = ()=>p.querySelectorAll('#ex-body details').forEach(d=>d.open=false);
+  show(cur);
+}
+
+/* =====================================================================
+   TP
+   ===================================================================== */
+const TPS = [
+ {t:'TP1 — La main à la pâte avec les KNN', d:'SynthDiabetes2 (mlbench) : prédire le diabète (variable diabetes, 9ᵉ colonne).', fn:['na.omit()','createDataPartition(y, p=0.7)','knn(train, test, cl, k)','mean(y != pred)'],
+  pts:['Q3 : premier KNN avec K = 5, entraîné et évalué sur les mêmes 70 % des données. Métrique : le taux d\'erreur mean(y != pred).','Évaluer le modèle sur les données qui ont servi à l\'entraîner donne un taux d\'erreur trompeur : avec K = 1, il est nul.','Courbe du taux d\'erreur en fonction de K (1 à 100) : sur l\'apprentissage, le meilleur K est 1.','Sur les 30 % mis de côté, l\'erreur du 1-NN n\'est plus nulle : « les performances ont diminué lorsqu\'on évalue le modèle sur un jeu de données qui n\'a pas servi à le construire ».','La courbe d\'erreur sur ces données en fonction de K montre le compromis biais-variance.']},
+ {t:'TP2 — Toujours plus de KNN', d:'Iris (150 fleurs, 3 espèces), airquality (prédire le mois), données simulées à échelles différentes.', fn:['stdize : (x−min)/(max−min), ou scale()','table(réel, prédit) : ici lignes = réel, ordre inverse de la convention du cours','confusionMatrix() ; cm$byClass[, "Pos Pred Value"] (précision), [, "Sensitivity"] (rappel)','trainControl(method="cv", number=20)','train(Month ~ ., method="knn", tuneGrid=expand.grid(k=1:20), preProcess=c("center","scale"))','plot(knnFit), knnFit$bestTune, predict(knnFit, newdata)'],
+  pts:['Iris : classification car 𝒴 est fini ; 3 classes ; versicolor et virginica sont les plus difficiles à séparer.','Normaliser quand les variables ont des échelles très différentes (iris : échelles proches, on le fait quand même). La variable à grande échelle domine la distance.','Accuracy ≠ précision : l\'accuracy est le taux de bien classés (1 − taux d\'erreur) ; la précision est TP/(TP+FP).','1-NN évalué sur l\'apprentissage : 100 %. K = taille de l\'apprentissage : on prédit l\'espèce majoritaire.','Accuracy et F1 macro se comportent pareil car les classes sont équilibrées ; sinon le F1 macro pénaliserait les classes rares.','Un seul découpage dépend du hasard : on répète 100 découpages aléatoires pour K = 1..10 (boxplot des erreurs). Différence avec la validation croisée : en CV, chaque observation est exactement une fois dans le jeu de validation.','airquality : prédire Month (facteur). On retire Day ; les NA de Ozone et Solar.R sont remplacés par la moyenne du mois. Avec caret : CV 20-fold, k = 1..20, centrage-réduction. Puis découpage 75 % / 25 % et évaluation sur le test : mauvaises performances.','Données simulées : x₁ est discriminant (moyennes 2 contre 8), x₂ ne l\'est pas (bimodal 200/800 dans les deux classes) mais il est en centaines. Sans standardisation, la frontière du 5-NN dépend presque seulement de x₂ ; après scale(), elle sépare bien selon x₁.']},
+ {t:'TP3 — La régression logistique', d:'Prostate : 53 patients, prédire l\'atteinte lymphatique (lymph : 20 atteints, 33 non).', fn:['glm(lymph ~ age + log(acid) + radio + gravite + taille, family="binomial")','summary() → tests de Wald (H0 : βⱼ = 0)','table(), chisq.test()','predict(fit, type="response")','prediction(), performance(pred,"tpr","fpr") (ROCR)','performance(pred,"auc")'],
+  pts:['Exploration : boxplots (variables quantitatives) et tests du χ² (qualitatives). acid est très dissymétrique → on utilise log(acid).','Variables liées à lymph : log(acid), radio, taille ; pas gravite ; l\'âge faiblement.','summary(glm) : les tests de Wald retrouvent les liens vus en exploration. Piste d\'amélioration : ajouter des interactions.','Seuil α = 1/2 : 3/33 faux positifs et 6/20 faux négatifs. Donc TP = 14, TN = 30 : sensibilité 0,70, spécificité ≈ 0,91, accuracy ≈ 0,83.','α = 0 → tout le monde est prédit positif. Quand α augmente, on prédit de plus en plus de 0 : des TP deviennent FN, des FP deviennent TN.','AUC calculée sur l\'apprentissage = trop optimiste. On compare les 31 sous-ensembles de variables par l\'AUC sur un découpage 70/30 : meilleur modèle log(acid) + taille, puis log(acid) + radio + taille (les variables significatives au test de Wald).']},
+ {t:'TP4 — Les arbres de décision', d:'Prostate de nouveau (53 observations).', fn:['rpart(lymph ~ ., data)','printcp(), plotcp()','cptable[which.min(cptable[,"xerror"]), "CP"]','prune(tree, cp = bestcp)','predict(type="class" | "prob" | "matrix")','rpart.plot()'],
+  pts:['Critère d\'impureté par défaut de rpart : Gini.','cp (complexity parameter) correspond au λ de l\'élagage. rpart teste plusieurs cp en validation croisée (10-fold par défaut) : on garde celui qui minimise xerror. Ici, le cp optimal est déjà la valeur par défaut 0,01.','Matrice de confusion : table(prédit, réel) ; TN=[1,1], FN=[1,2], FP=[2,1], TP=[2,2]. On en déduit accuracy, précision et rappel.','Les performances sont calculées sur le jeu d\'apprentissage : il faudrait un jeu de test, mais 53 observations c\'est peu.','Sur un nœud de rpart.plot, la correction lit : classe majoritaire ; « indice d\'impureté » (en pratique la proportion de la classe 1 dans le nœud) ; % des individus dans le nœud.']},
+ {t:'TP5 — Les SVM', d:'Données simulées séparables, Khan (63 obs., 2308 gènes, 4 classes), données pour le noyau radial, OJ (ISLR2).', fn:['svm(y ~ ., kernel="linear", cost=C, scale=FALSE)','coef(svmfit) → b et w ; svmfit$rho (= −b), $coefs (αᵢyᵢ), $index (vecteurs de support)','tune(svm, ..., ranges=list(cost=...))','kernel="polynomial", gamma=1, coef0=2, degree=2','kernel="radial", gamma','train(method="svmPoly" / "svmRadial"), createFolds(k=10)'],
+  pts:['Les données simulées sont linéairement séparables. C → +∞ : on retrouve la SVM à marge rigide.','C testés : 0,001 ; 0,01 ; 1 ; 10. Quand C augmente, la marge 1/‖w‖ diminue et le nombre de mal classés aussi : c\'est le compromis biais-variance.','Sur l\'apprentissage, C ≥ 0,01 donne une accuracy de 1 : à égalité, on prend le plus petit C (marge la plus large). La validation croisée (tune) choisit C = 0,01 ; un jeu de validation séparé choisit C = 0,001.','Khan : on calcule φ(z) explicitement (degré 2, c = 2, avec combn) puis une SVM linéaire. C\'est plus lent que le noyau polynomial (⟨z,z\'⟩+c)², et l\'écart grandit avec la dimension : c\'est l\'astuce du noyau. En e1071 le noyau polynomial est (γ⟨u,v⟩ + coef0)^degree.','Le multiclasse avec svm() se fait en one-versus-one (6 classifieurs pour 4 classes).','RBF (γ ∈ {0,01 ; 1 ; 20 ; 50}, C = 10) : γ grand → frontière très irrégulière (variance) ; γ petit → frontière lisse (biais).','Piège : svm() standardise par défaut (scale = TRUE). Avec γ = 0,01, C = 10 et standardisation, la classe majoritaire (150 points contre 50) est prédite partout. Le noyau dépend de l\'échelle des distances : un même γ n\'a pas le même effet sur données brutes et standardisées.','OJ (prédire Purchase) : 800 observations en apprentissage/validation, le reste en test. Mêmes plis (createFolds) pour svmPoly (degree, scale, C) et svmRadial (sigma, C). Le polynomial l\'emporte.']},
+ {t:'TP6 — Le clustering', d:'Preuve de la décomposition de l\'inertie, CAH sur une matrice 5×5, deux lignes de points, anneaux concentriques, iris, compression d\'image.', fn:['dist(), hclust(method= "single", "complete", "average", "centroid", "ward.D")','cutree(h, k), rect.hclust(), h$height','kmeans(x, centers, algorithm="Lloyd", nstart)','$tot.withinss (I_W)','silhouette() (package cluster)','km$centers[km$cluster, ] (compression)'],
+  pts:['Preuve I = I_W + I_B : développer ‖(xᵢ−μ_k)+(μ_k−μ)‖² ; le terme croisé s\'annule car Σ_{i∈C_k}(xᵢ−μ_k) = 0.','Matrice du TP, lien complet : {x3,x4} à 11, {x1,x2} à 23, {x3,x4,x5} à 25, fusion finale à 50 (voir l\'outil CAH).','Deux lignes de points (x = 1..10, y = −1 et y = 4) : le lien simple sépare les deux lignes ; les liens complet, moyen et centroïdal non. Il faudrait augmenter l\'écart entre les lignes. Des branches fusionnent au même niveau car beaucoup de distances sont égales (grille régulière).','Hauteurs de fusion croissantes pour les liens simple, complet, moyen et Ward (axiome de la médiane). Avec le lien centroïdal, il peut y avoir des inversions.','Anneaux : le lien simple trouve les 2 anneaux ; le K-means (K = 2) échoue.','Avec φ = (x,y,x²,y²), le K-means ne sépare les anneaux que pour certaines initialisations. Avec nstart = 20, il garde la partition de plus petite I_W et ne les sépare plus : la « bonne » partition n\'est pas celle qui minimise I_W. Avec φ = (x,y,x²+y²), ça marche.','Iris standardisé : les clusters du K-means (K = 3, nstart = 200) ne collent pas parfaitement aux espèces (sauf setosa). Coude à K = 3 ; Ward suggère 3 ; la silhouette suggère 2. La boucle de silhouette commence à K = 2 car elle n\'est définie que pour 2 ≤ K ≤ n−1.','Compression : pixels → (R,G,B), kmeans pour K = 2, 4, 8 ; chaque pixel prend la couleur de son centroïde.']}
+];
+function renderTP(){
+  $('#p-tp').innerHTML = `<p class="lead">L'essentiel des corrections de TP : ce qu'il faut retenir pour l'examen et les fonctions R à reconnaître.</p>` +
+   TPS.map(t=>`<article class="card fiche"><header><h2>${t.t}</h2></header><p class="lead">${esc(t.d)}</p>
+    <div class="grid2"><div><h3 style="margin-bottom:6px">À retenir</h3><ul>${t.pts.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div>
+    <div><h3 style="margin-bottom:6px">Fonctions R</h3><ul>${t.fn.map(x=>`<li><code>${esc(x)}</code></li>`).join('')}</ul></div></div></article>`).join('');
+}
+
+/* ---------- navigation par onglets ---------- */
+/* ---------- tableau de bord (en-tête) ---------- */
+/* ---------- contenu supplémentaire (sujets blancs, cartes, QCM) ---------- */
+/* =====================================================================
+   AJOUTS DE CONTENU : flashcards, QCM, sujets blancs, matrices CAH
+   Conventions du cours : matrice de confusion lignes = prédit, colonnes = réel.
+   Tous les résultats numériques ont été recalculés par script (check.js).
+   ===================================================================== */
+
+const EXTRA_CARDS = [
+ // ---- intro ----
+ ['intro','Trois situations où l\'apprentissage automatique est utile (cours) ?','1) Problèmes qu\'on sait résoudre sans savoir formaliser comment (reconnaissance d\'images, langage naturel). 2) Problèmes qu\'on ne sait pas résoudre car les données sont complexes et volumineuses (astrophysique, génomique). 3) Problèmes qu\'on sait résoudre mais avec des procédures trop gourmandes en calcul (interactions entre grosses molécules).'],
+ ['intro','Quels sont les trois grands problèmes de l\'apprentissage non supervisé vus en cours ?','Le clustering (partitionnement, « classification non supervisée »), la réduction de dimension et l\'estimation de densité.'],
+ ['intro','Définition d\'une fonction de coût ℓ ?','ℓ : 𝒴 × 𝒴 → ℝ₊ telle que ℓ(y,y) = 0 pour tout y et ℓ(y,y\') > 0 si y ≠ y\'. En pratique, ℓ(y,f(x)) est d\'autant plus grande que f(x) est loin du vrai label y. Exemples : |y−y\'|, (y−y\')², 1{y≠y\'}.'],
+ ['intro','Qu\'est-ce que le risque R(f) d\'une règle de décision f ?','R(f) = E[ℓ(Y, f(X))] sous la loi ℙ_{X,Y} : l\'erreur moyenne de prévision de f sur toutes les valeurs possibles. La règle optimale f* minimise R, mais ℙ_{X,Y} est inconnue, d\'où le risque empirique.'],
+ ['intro','Pourquoi modélise-t-on l\'étiquette par une variable aléatoire Y sachant X ?','Deux individus de même description x peuvent avoir des étiquettes différentes : erreurs d\'acquisition, manque d\'information dans les variables mesurées, phénomène aléatoire par nature.'],
+ ['intro','KNN en régression : quelle prédiction ?','La moyenne des étiquettes des K plus proches voisins : f(x) = 1/K Σ_{i : xᵢ∈N_K(x)} yᵢ.'],
+ ['intro','Coût d\'une prédiction par KNN (version naïve) ? Limite en grande dimension ?','Calcul de n distances en O(nd), puis recherche des K plus petites en O(n log n). Le KNN souffre du fléau de la dimension : quand d est grand, il fonctionne mal.'],
+ ['intro','Qu\'appelle-t-on capacité de généralisation ?','La capacité d\'un modèle à faire des prédictions correctes sur de nouvelles données, qui n\'ont pas servi à le construire. Elle est mauvaise en cas de sur-apprentissage et de sous-apprentissage.'],
+ ['intro','Exemple du cours d\'un algorithme à erreur empirique nulle mais inutile ?','f(x) = yᵢ si x = xᵢ (donnée d\'apprentissage), étiquette tirée au hasard sinon. Erreur nulle sur l\'apprentissage quel que soit le coût, prédictions très mauvaises sur toute nouvelle observation.'],
+ // ---- eval ----
+ ['eval','Où sont TN, FN, FP, TP dans la matrice de confusion du cours ?','Lignes = classe prédite, colonnes = classe réelle. Ligne « prédit 0 » : TN (réel 0) puis FN (réel 1). Ligne « prédit 1 » : FP (réel 0) puis TP (réel 1).'],
+ ['eval','Pourquoi ne pas regarder la précision seule ? la sensibilité seule ?','On a une bonne précision en faisant très peu de prédictions positives (au détriment du rappel). On a une sensibilité de 1 en prédisant tout positif. D\'où le F1, ou le couple sensibilité/spécificité.'],
+ ['eval','Lien entre spécificité et taux de faux positifs (FPR) ?','FPR = FP/(FP+TN) = 1 − spécificité. C\'est l\'abscisse de la courbe ROC.'],
+ ['eval','Weighted-average (multiclasse) ?','Moyenne des scores par classe pondérée par le support (nombre d\'observations réelles de la classe) : Σ_k score_k × support_k / n. Les classes très représentées pèsent beaucoup.'],
+ ['eval','Holdout : risque d\'un jeu de test trop petit ? trop grand ?','Trop petit : la métrique estimée varie beaucoup d\'un échantillon à l\'autre (grande variance). Trop grand : le modèle est appris sur trop peu de données.'],
+ ['eval','Leave-p-out : combien de tests ?','On teste toutes les façons de choisir p observations de test parmi n : C(n,p) tests. Pour p = 1 (leave-one-out), n tests.'],
+ ['eval','Métriques de régression du cours ?','MSE = 1/n Σ (yᵢ − f(xᵢ))² et RMSE = √MSE (même unité que y).'],
+ // ---- reglog ----
+ ['reglog','Équation de la droite ⟨w,x⟩ + b = 0 en dimension 2 : pente et ordonnée à l\'origine ?','Avec w = (w₁,w₂) et w₂ ≠ 0 : x₂ = −(w₁/w₂)x₁ − b/w₂. Pente −w₁/w₂, ordonnée à l\'origine −b/w₂.'],
+ ['reglog','Qu\'est-ce qu\'une classe d\'hypothèses ℱ_φ ?','L\'ensemble des fonctions x ↦ φ(⟨w,x⟩ + b), w ∈ ℝᵈ, b ∈ ℝ, pour une fonction φ fixée. φ = sign : demi-espaces ; φ = σ : régression logistique ; φ = identité : régression linéaire.'],
+ ['reglog','Quand un seuil s < 0,5 a-t-il du sens en régression logistique ?','Quand rater un positif coûte cher (ex. prédire une maladie grave) : on accepte de déclarer ŷ = 1 avec une confiance plus faible. La sensibilité augmente, la spécificité diminue.'],
+ ['reglog','Comment choisir entre des modèles logistiques utilisant 1, 2 ou 3 variables ?','On calcule l\'AUC de chaque modèle sur l\'échantillon de validation et on garde celui qui la maximise (le cours cite aussi l\'AIC, vu en S2).'],
+ ['reglog','Alternative à OvA/OvO pour une logistique multiclasse ?','La régression softmax : on généralise directement la régression logistique au cas multiclasse en optimisant un seul modèle global.'],
+ // ---- cart ----
+ ['cart','Pourquoi dit-on que les arbres font de l\'apprentissage « non métrique » ?','Ils traitent des variables qualitatives (couleur, taille…) sans représentation numérique ni distance. Ils sont donc adaptés aux données hétérogènes (quantitatives et qualitatives).'],
+ ['cart','Pourquoi un arbre gère-t-il bien des classes multimodales ?','Chaque test dépend des tests précédents : une même étiquette peut correspondre à plusieurs régions décrites par des variables différentes (ex. « pomme » = fruit grand et rouge, ou jaune et rond).'],
+ ['cart','Comment CART coupe-t-il selon une variable qualitative nominale ?','On choisit un sous-ensemble S de modalités (souvent une seule) : R_l = {x^j ∈ S}, R_m = {x^j ∉ S}.'],
+ ['cart','Critère de coupure de CART en régression ?','Minimiser n_l·MSE(R_l) + n_m·MSE(R_m), où MSE est calculé par rapport à la moyenne du nœud (la prédiction de la feuille).'],
+ ['cart','Que prédit une feuille de CART ?','En classification : l\'étiquette majoritaire des observations d\'apprentissage de la feuille (vote). En régression : leur moyenne.'],
+ ['cart','Pourquoi parle-t-on d\'apprenants faibles pour les arbres ? Remède ?','Un arbre seul est souvent peu performant et peu robuste aux variations des données. Remède : méthodes ensemblistes (bagging, forêts aléatoires, boosting).'],
+ // ---- svm ----
+ ['svm','Distance d\'un point x à l\'hyperplan ⟨w,x⟩ + b = 0 ?','d(x,H) = |⟨w,x⟩ + b| / ‖w‖. Un vecteur de support vérifie |⟨w,x⟩+b| = 1, d\'où la marge 1/‖w‖ et une zone d\'indécision de largeur 2/‖w‖.'],
+ ['svm','Pourquoi choisir l\'hyperplan de marge maximale parmi tous les hyperplans séparateurs ?','Il est équidistant des observations positive et négative les plus proches : un petit déplacement des données ne le rend pas non séparateur (robustesse, erreurs de mesure). Il minimise l\'incertitude pour un point qui tombe près de la frontière.'],
+ ['svm','Réécriture de la SVM à marge souple avec la perte hinge ?','min 1/(2nC)‖w‖² + 1/n Σ max(0, 1 − yᵢ(⟨w,xᵢ⟩+b)). C\'est une minimisation du risque empirique régularisé ; le terme ‖w‖²/(2nC) évite le sur-apprentissage.'],
+ ['svm','Primal ou dual : lequel résoudre ?','Le primal est un problème en d+1 dimensions, le dual en n dimensions. Peu de données et beaucoup de variables : dual. Beaucoup de données et peu de variables : primal.'],
+ ['svm','Comment calcule-t-on b̂ en marge souple ?','b̂ = yᵢ − Σⱼ α̂ⱼ yⱼ ⟨xⱼ,xᵢ⟩ pour un i tel que 0 < α̂ᵢ < C (avec un noyau : k(xⱼ,xᵢ) à la place du produit scalaire).'],
+ ['svm','Qu\'est-ce que la matrice de Gram ?','Pour un noyau k et des observations x₁,…,x_n : la matrice n×n de terme K_ij = k(xᵢ,xⱼ). C\'est elle qui intervient dans le dual.'],
+ ['svm','Lien entre σ et γ pour le noyau gaussien ?','exp(−‖x−x\'‖²/(2σ²)) = exp(−γ‖x−x\'‖²) avec γ = 1/(2σ²). σ petit ⇔ γ grand ⇔ frontière très locale (variance ↑).'],
+ // ---- clust ----
+ ['clust','Les trois propriétés d\'une distance ?','Symétrie d(x,y) = d(y,x) ; séparation d(x,y) = 0 ⇔ x = y ; inégalité triangulaire d(x,z) ≤ d(x,y) + d(y,z). (Gower ne vérifie pas l\'inégalité triangulaire.)'],
+ ['clust','Distances de Manhattan, Chebyshev et Mahalanobis ?','Manhattan : Σ|xⱼ−yⱼ|. Chebyshev : maxⱼ |xⱼ−yⱼ|. Mahalanobis : √((x−y)ᵀΣ⁻¹(x−y)), Σ matrice de variance-covariance empirique.'],
+ ['clust','Lien moyen et lien centroïdal ?','Moyen : 1/(|C_k||C_l|) Σ_{x∈C_k} Σ_{y∈C_l} d(x,y). Centroïdal : d(μ_k, μ_l). Le centroïdal peut créer des inversions.'],
+ ['clust','Pourquoi la distance de Ward crée-t-elle des groupes équilibrés ?','Elle vaut |C_k||C_l|/(|C_k|+|C_l|)·‖μ_k−μ_l‖². Le facteur xy/(x+y) est petit si l\'un des groupes est petit : fusionner un petit groupe coûte peu, donc les petits groupes sont absorbés en premier.'],
+ ['clust','Que représente la hauteur d\'une branche du dendrogramme ?','La distance (selon le lien choisi) entre les deux clusters qu\'elle relie au moment de leur fusion.'],
+ ['clust','Comment évaluer un clustering sans étiquettes ?','Stabilité (perturber les données ou l\'initialisation ne doit pas tout changer) ; évaluation externe (avis d\'expert a posteriori, ou indice de Rand si on a des étiquettes partielles) ; évaluation interne (Davies-Bouldin, silhouette).'],
+ ['clust','Comment le K-means peut-il servir à détecter des valeurs aberrantes ?','Une observation très éloignée des autres se retrouve seule dans un cluster (les n−1 autres sont réparties en K−1 clusters) : les points seuls dans leur cluster sont suspects.']
+];
+
+const EXTRA_QUIZ = [
+ // ---- intro ----
+ ['intro','« Prédire le nombre de clics sur un lien » est un problème de…',['classification binaire','classification multiclasse','régression','clustering'],2,'Le nombre de clics est une quantité numérique, non bornée a priori : régression (exemple du quiz du cours).'],
+ ['intro','« Identifier si une transaction bancaire est frauduleuse » est un problème de…',['classification binaire','régression','clustering','classification multiclasse'],0,'Deux étiquettes possibles : frauduleuse ou non.'],
+ ['intro','Pour le coût absolu ℓ(y,y\') = |y − y\'|, la règle optimale f*(x) est…',['E[Y|X=x]','argmax_k P(Y=k|X=x)','0','la médiane de Y sachant X=x'],3,'Coût quadratique → espérance conditionnelle ; coût absolu → médiane conditionnelle ; coût 0/1 → classifieur de Bayes.'],
+ ['intro','KNN en régression avec K = 3 : les 3 plus proches voisins ont pour étiquettes 2, 5 et 11. Prédiction ?',['5','6','11','18'],1,'Moyenne des étiquettes des voisins : (2 + 5 + 11)/3 = 6.'],
+ ['intro','Le paradigme ERM consiste à…',['minimiser le risque empirique 1/n Σ ℓ(yᵢ, f(xᵢ))','maximiser la vraisemblance des étiquettes','minimiser le risque réel E[ℓ(Y,f(X))]','choisir K par validation croisée'],0,'Le risque réel dépend de ℙ_{X,Y} inconnue : on minimise son estimation à partir des données.'],
+ ['intro','Prédire avec un KNN naïf (n données, dimension d) demande de calculer les distances en…',['O(d)','O(K)','O(nd)','O(n²d)'],2,'n distances, chacune en O(d), puis le tri des distances en O(n log n).'],
+ // ---- eval ----
+ ['eval','Matrice (lignes = prédit, colonnes = réel) : prédit 0 → [TN=140, FN=10] ; prédit 1 → [FP=20, TP=30]. Accuracy ?',['0,75','0,80','0,85','0,875'],2,'(TP + TN)/total = (30 + 140)/200 = 0,85.'],
+ ['eval','Même matrice (TP=30, FN=10, FP=20, TN=140). Sensibilité ?',['0,60','0,75','0,85','0,875'],1,'TP/(TP+FN) = 30/40 = 0,75.'],
+ ['eval','Même matrice (TP=30, FN=10, FP=20, TN=140). Précision ?',['0,60','0,75','0,667','0,875'],0,'TP/(TP+FP) = 30/50 = 0,60.'],
+ ['eval','Même matrice (TP=30, FN=10, FP=20, TN=140). F1-score ?',['0,60','0,675','0,75','0,667'],3,'2TP/(2TP+FP+FN) = 60/90 ≈ 0,667 (moyenne harmonique de 0,6 et 0,75).'],
+ ['eval','Une spécificité de 0,8 correspond à un taux de faux positifs de…',['0,8','0,2','1,25','impossible à dire'],1,'FPR = FP/(FP+TN) = 1 − spécificité = 0,2.'],
+ ['eval','Leave-p-out avec n = 10 et p = 2 : combien de jeux de test ?',['10','20','45','90'],2,'C(10,2) = 10·9/2 = 45.'],
+ ['eval','Validation croisée 5-fold sur n = 200 : chaque modèle est entraîné sur…',['40 observations','200 observations','199 observations','160 observations'],3,'On entraîne sur 4 parties sur 5, soit 4/5 × 200 = 160, et on évalue sur les 40 restantes.'],
+ ['eval','Précisions par classe : 0,9 ; 0,5 ; 0,4. Précision macro-average ?',['0,6','0,9','0,5','dépend des effectifs'],0,'Moyenne simple : (0,9 + 0,5 + 0,4)/3 = 0,6. Le micro-average, lui, dépendrait des effectifs.'],
+ ['eval','Erreurs de prédiction yᵢ − f(xᵢ) : 1, −2, 2. RMSE ?',['3','≈ 1,73','≈ 1,67','9'],1,'MSE = (1 + 4 + 4)/3 = 3, RMSE = √3 ≈ 1,73.'],
+ // ---- reglog ----
+ ['reglog','Si ⟨w,x⟩ + b = ln 3, la régression logistique donne P̂(Y=1|x) = …',['0,25','0,50','0,75','3'],2,'σ(ln 3) = 1/(1 + e^{−ln 3}) = 1/(1 + 1/3) = 3/4.'],
+ ['reglog','Frontière 2x₁ + 4x₂ − 8 = 0 : pente et ordonnée à l\'origine ?',['pente 2, ordonnée 8','pente −0,5, ordonnée 2','pente 0,5, ordonnée −2','pente −2, ordonnée 4'],1,'x₂ = −(w₁/w₂)x₁ − b/w₂ = −(2/4)x₁ + 8/4.'],
+ ['reglog','Scores (étiquette) : 0,9 (1) ; 0,6 (0) ; 0,4 (1) ; 0,2 (0). AUC ?',['0,5','1','0,25','0,75'],3,'Courbe : (0,0) → (0;0,5) → (0,5;0,5) → (0,5;1) → (1,1). Aire = 0,5×0,5 + 0,5×1 = 0,75. Autre lecture : 3 paires (positif, négatif) bien ordonnées sur 4.'],
+ ['reglog','Pour un seuil s = 1, la régression logistique donne le point ROC…',['(0,0)','(1,1)','(0,1)','(1,0)'],0,'σ < 1 : aucune observation n\'est prédite positive, donc TPR = FPR = 0.'],
+ ['reglog','Combien de classifieurs en one-versus-all et en one-versus-one avec 5 classes ?',['5 et 10','5 et 20','10 et 5','4 et 10'],0,'OvA : C = 5. OvO : C(C−1)/2 = 5·4/2 = 10.'],
+ ['reglog','En one-versus-one, chaque classifieur est entraîné sur…',['toutes les données','les données d\'une seule classe','les données des deux classes de la paire','un échantillon bootstrap'],2,'Les observations des autres classes sont ignorées. En OvA, chaque classifieur utilise toutes les données.'],
+ ['reglog','Par rapport au classifieur des demi-espaces, le coût logistique…',['ne pénalise que les points mal classés','pénalise aussi les points bien classés proches de l\'hyperplan','ne dépend pas de la distance à l\'hyperplan','est le coût 0/1'],1,'log(1 + exp(−y(⟨w,x⟩+b))) est petit mais non nul pour un point bien classé près de la frontière, et croît avec la distance pour un point mal classé.'],
+ // ---- cart ----
+ ['cart','Gini d\'un nœud contenant [10, 10, 20] (3 classes) ?',['0,500','0,625','0,667','1,5'],1,'p = (0,25 ; 0,25 ; 0,5) : 1 − 0,0625 − 0,0625 − 0,25 = 0,625.'],
+ ['cart','Entropie (log₂) d\'un nœud contenant [4, 4, 8] ?',['1','1,5','2','0,5'],1,'−(0,25 log₂ 0,25 × 2 + 0,5 log₂ 0,5) = 0,5 + 0,5 + 0,5 = 1,5 bit.'],
+ ['cart','Erreur de classification d\'un nœud [12, 3, 5] ?',['0,25','0,6','0,15','0,4'],3,'1 − max p_k = 1 − 12/20 = 0,4.'],
+ ['cart','Nœud [20, 20] coupé en [15, 5] et [5, 15]. Gain d\'information avec Gini ?',['0,125','0,375','0,5','0'],0,'I(R) = 0,5 ; chaque enfant : 1 − 0,75² − 0,25² = 0,375 ; IG = 0,5 − ½·0,375 − ½·0,375 = 0,125.'],
+ ['cart','Arbre à 4 feuilles avec Σ n_l·I(R_l) = 10. Coût C_λ(T) pour λ = 2 ?',['12','14','18','40'],2,'C_λ(T) = 10 + 2 × 4 = 18.'],
+ ['cart','Un arbre binaire de profondeur 3 définit au plus…',['3 régions','6 régions','9 régions','8 régions'],3,'2³ = 8 feuilles au maximum, donc 8 régions (une par feuille).'],
+ // ---- svm ----
+ ['svm','SVM à marge rigide avec ŵ = (6, 8). Marge ?',['0,1','0,2','10','100'],0,'‖w‖ = √(36 + 64) = 10, marge = 1/‖w‖ = 0,1.'],
+ ['svm','Distance du point (1,1) à l\'hyperplan 3x₁ + 4x₂ − 2 = 0 ?',['5','0,2','7','1'],3,'|3 + 4 − 2| / √(9 + 16) = 5/5 = 1.'],
+ ['svm','Marge souple : yᵢ(⟨w,xᵢ⟩+b) = 0,3. Valeur de ξᵢ et position ?',['ξᵢ = 0,3 : mal classé','ξᵢ = 0,7 : bien classé, dans la zone d\'indécision','ξᵢ = 0 : hors de la marge','ξᵢ = 1,3 : mal classé'],1,'À l\'optimum ξᵢ = max(0, 1 − yᵢ(⟨w,xᵢ⟩+b)) = 0,7 ∈ ]0,1[.'],
+ ['svm','Perte hinge d\'un point tel que yᵢ(⟨w,xᵢ⟩+b) = −0,5 ?',['0','0,5','1,5','−0,5'],2,'max(0, 1 − (−0,5)) = 1,5 : le point est mal classé (ξᵢ > 1).'],
+ ['svm','n = 50 observations, d = 10 000 variables : quelle formulation de la SVM résoudre ?',['le primal','le dual','les deux sont équivalents en coût','aucune'],1,'Primal : d + 1 = 10 001 inconnues ; dual : n = 50. Peu de données, beaucoup de variables → dual.'],
+ ['svm','Pour le noyau gaussien, k(x, x) vaut…',['0','‖x‖²','1','dépend de γ'],2,'exp(−γ‖x − x‖²) = exp(0) = 1 pour tout γ.'],
+ ['svm','Si ⟨x, x\'⟩ = 2, le noyau quadratique (⟨x,x\'⟩ + 1)² vaut…',['4','5','9','3'],2,'(2 + 1)² = 9.'],
+ ['svm','Noyau gaussien avec σ = 0,5. Valeur de γ dans exp(−γ‖x−x\'‖²) ?',['0,5','2','4','0,25'],1,'γ = 1/(2σ²) = 1/(2 × 0,25) = 2.'],
+ // ---- clust ----
+ ['clust','a(x) = 2 et b(x) = 5. Coefficient de silhouette s(x) ?',['0,6','0,4','−0,6','1,5'],0,'(b − a)/max(a,b) = 3/5 = 0,6 : x est plutôt bien assigné.'],
+ ['clust','a(x) = 6 et b(x) = 4. Coefficient de silhouette s(x) ?',['0,333','−0,5','−0,333','0,5'],2,'(4 − 6)/max(6,4) = −2/6 ≈ −0,333 : x est en moyenne plus proche d\'un autre cluster.'],
+ ['clust','Distance de Ward entre un cluster de 2 points et un cluster de 3 points, avec ‖μ_k − μ_l‖² = 10 ?',['10','12','25','60'],1,'|C_k||C_l|/(|C_k|+|C_l|) × 10 = 6/5 × 10 = 12.'],
+ ['clust','Distance de Manhattan entre (1, 2) et (4, −2) ?',['5','4','7','25'],2,'|1−4| + |2−(−2)| = 3 + 4 = 7 (euclidienne : 5 ; Chebyshev : 4).'],
+ ['clust','CAH sur n = 100 points : combien de distances entre points au départ ?',['100','4 950','9 900','10 000'],1,'n(n−1)/2 = 100 × 99/2 = 4 950.'],
+ ['clust','Inertie totale I = 100 et inertie intra-classes I_W = 30. Inertie inter-classes I_B ?',['30','130','70','impossible à dire'],2,'I = I_W + I_B, donc I_B = 70.'],
+ ['clust','K = 2 clusters : T₁ = 1, T₂ = 2, S₁₂ = 6. Indice de Davies-Bouldin global ?',['0,5','2','0,25','3'],0,'D₁ = D₂ = (T₁ + T₂)/S₁₂ = 3/6 = 0,5, donc D = 0,5.'],
+ ['clust','Lien moyen entre {a, b} et {c}, avec d(a,c) = 4 et d(b,c) = 8 ?',['4','8','12','6'],3,'Moyenne des distances entre éléments des deux clusters : (4 + 8)/2 = 6. Lien simple : 4 ; lien complet : 8.']
+];
+
+const EXTRA_EXAMS = [
+{ id:'blanc1', title:'Sujet blanc 1 (entraînement)', exos:[
+ {t:'Exercice 1 (7 pts) : types de problèmes, matrice de confusion, courbe ROC', qs:[
+  ['Indiquer (sans justifier) s\'il s\'agit de clustering, de régression, de classification binaire ou multiclasse : (a) prédire la durée d\'hospitalisation (en jours) d\'un patient ; (b) reconnaître le chiffre manuscrit (0 à 9) sur une image ; (c) regrouper les clients d\'un site de vente selon leur comportement d\'achat ; (d) détecter si un e-mail est un spam ; (e) prédire la température maximale de demain ; (f) identifier des groupes de gènes au comportement similaire.',
+   `<ul><li>(a) régression (valeur numérique)</li><li>(b) classification multiclasse (10 étiquettes fixées à l'avance)</li><li>(c) clustering (pas d'étiquettes)</li><li>(d) classification binaire</li><li>(e) régression</li><li>(f) clustering</li></ul>`],
+  [`Un modèle de détection de fraude est évalué sur 20 transactions de validation (1 = fraude, classe positive) :<div class="scroll"><table class="t"><tr><th>i</th><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td><td>8</td><td>9</td><td>10</td><td>11</td><td>12</td><td>13</td><td>14</td><td>15</td><td>16</td><td>17</td><td>18</td><td>19</td><td>20</td></tr><tr><th>y</th><td>0</td><td>1</td><td>0</td><td>0</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>0</td><td>0</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>0</td><td>0</td><td>1</td><td>0</td></tr><tr><th>ŷ</th><td>0</td><td>1</td><td>1</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>1</td><td>0</td><td>1</td><td>1</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>0</td></tr></table></div>Construire la matrice de confusion (lignes = classe prédite, colonnes = classe réelle).`,
+   `On compte d'abord les classes réelles : 6 positifs (i = 2, 5, 9, 12, 16, 19) et 14 négatifs.<ul><li>Parmi les 6 positifs, ŷ = 1 pour i = 2, 9, 12, 19 → <b>TP = 4</b> ; ŷ = 0 pour i = 5, 16 → <b>FN = 2</b>.</li><li>Parmi les 14 négatifs, ŷ = 1 pour i = 3, 11, 18 → <b>FP = 3</b> ; les autres → <b>TN = 11</b>.</li></ul><div class="scroll"><table class="t"><tr><th>prédit \\ réel</th><th>0</th><th>1</th></tr><tr><th>0</th><td>TN = 11</td><td>FN = 2</td></tr><tr><th>1</th><td>FP = 3</td><td>TP = 4</td></tr></table></div>Vérification : 11 + 2 + 3 + 4 = 20.`],
+  ['Calculer l\'accuracy, la sensibilité, la spécificité, la précision et le F1-score.',
+   `<div class="f">Accuracy    = (TP+TN)/n      = 15/20 = 0,75
+Sensibilité = TP/(TP+FN)     = 4/6   ≈ 0,667
+Spécificité = TN/(TN+FP)     = 11/14 ≈ 0,786
+Précision   = TP/(TP+FP)     = 4/7   ≈ 0,571
+F1          = 2TP/(2TP+FP+FN) = 8/13 ≈ 0,615</div>Le modèle détecte 2 fraudes sur 3, et un peu plus de la moitié de ses alertes sont de vraies fraudes.`],
+  ['Un collègue propose un modèle « naïf » qui prédit toujours 0. Calculer son accuracy et sa sensibilité sur ces 20 transactions. Que peut-on en conclure ?',
+   `Toujours 0 : TP = 0, FN = 6, FP = 0, TN = 14. <b>Accuracy = 14/20 = 0,70</b>, à peine moins que notre modèle (0,75). <b>Sensibilité = 0/6 = 0</b> : il ne détecte aucune fraude (sa précision n'est même pas définie, 0/0).<br>Conclusion : avec des classes <b>déséquilibrées</b>, l'accuracy est trompeuse. Elle ne reflète pas la capacité à bien classer la classe minoritaire, qui est ici la plus importante. Il faut regarder la sensibilité (et la précision ou la spécificité).`],
+  [`Un autre modèle renvoie un score dans [0,1] pour 10 nouvelles transactions :<div class="scroll"><table class="t"><tr><th>score</th><td>0,95</td><td>0,88</td><td>0,80</td><td>0,71</td><td>0,62</td><td>0,55</td><td>0,47</td><td>0,33</td><td>0,21</td><td>0,10</td></tr><tr><th>y</th><td>1</td><td>1</td><td>0</td><td>1</td><td>0</td><td>0</td><td>1</td><td>0</td><td>0</td><td>0</td></tr></table></div>(a) Avec le seuil s = 0,5 (ŷ = 1 si score ≥ s), donner TP, FP, FN, TN, puis le point (FPR, TPR) correspondant.<br>(b) Tracer la courbe ROC à la main et calculer l'AUC.`,
+   `<b>(a)</b> Scores ≥ 0,5 : 0,95 ; 0,88 ; 0,80 ; 0,71 ; 0,62 ; 0,55 → 6 prédits positifs, dont 3 vrais positifs. <b>TP = 3, FP = 3, FN = 1, TN = 3</b>. TPR = 3/4 = 0,75 ; FPR = 3/6 = 0,5. Point <b>(0,5 ; 0,75)</b>.<br><b>(b)</b> P = 4 positifs, N = 6 négatifs. Les scores sont déjà triés par ordre décroissant. On part de (0,0) : un positif fait monter de 1/4, un négatif fait avancer de 1/6.<div class="f">0,95 (1) → (0 ; 0,25)
+0,88 (1) → (0 ; 0,5)
+0,80 (0) → (1/6 ; 0,5)
+0,71 (1) → (1/6 ; 0,75)
+0,62 (0) → (2/6 ; 0,75)
+0,55 (0) → (3/6 ; 0,75)
+0,47 (1) → (3/6 ; 1)
+0,33 (0) → (4/6 ; 1)
+0,21 (0) → (5/6 ; 1)
+0,10 (0) → (1 ; 1)</div>AUC = somme des rectangles sous chaque pas horizontal (largeur 1/6, hauteur = TPR atteint) :<div class="f">AUC = (0,5 + 0,75 + 0,75 + 1 + 1 + 1) / 6 = 5/6 ≈ 0,833</div>Vérification : sur les 4 × 6 = 24 paires (positif, négatif), 20 sont bien ordonnées (positif mieux noté), et 20/24 = 5/6. Le point de la question (a) est bien sur la courbe.`],
+  ['On veut détecter toutes les fraudes de cet échantillon (sensibilité = 1) en faisant le moins de fausses alertes possible. Quel seuil choisir ? Quelle spécificité obtient-on ? Pourquoi un seuil inférieur à 0,5 peut-il se justifier ici ?',
+   `Le positif le moins bien noté a le score 0,47. Le plus grand seuil qui le détecte est <b>s = 0,47</b> (tout s ∈ ]0,33 ; 0,47] convient). On prédit alors 7 positifs : TP = 4, FP = 3, TN = 3 → sensibilité = 1, <b>spécificité = 3/6 = 0,5</b> (point (0,5 ; 1) de la courbe).<br>Un seuil s &lt; 0,5 revient à accepter de déclarer une fraude avec un niveau de confiance plus faible. C'est justifié quand rater un positif coûte beaucoup plus cher qu'une fausse alerte, ce qui est le cas pour une fraude.`]
+ ]},
+ {t:'Exercice 2 (6 pts) : arbre CART', qs:[
+  [`On veut prédire si un client résilie son abonnement (classe 1) ou non (classe 0). Le nœud racine R contient 40 clients : 30 de classe 0 et 10 de classe 1. Calculer l'indice de Gini, l'entropie (log₂) et l'erreur de classification de R.`,
+   `p₀ = 30/40 = 0,75 ; p₁ = 10/40 = 0,25.<div class="f">Gini     I(R) = 1 − 0,75² − 0,25² = 1 − 0,5625 − 0,0625 = 0,375
+Entropie I(R) = −0,75 log₂ 0,75 − 0,25 log₂ 0,25 ≈ 0,311 + 0,5 = 0,811
+Erreur   I(R) = 1 − max p_k = 1 − 0,75 = 0,25</div>`],
+  [`Deux coupures sont candidates (effectifs [classe 0, classe 1]) :<ul><li>coupure 1, x¹ = ancienneté &lt; 5 ans : R_l = [20, 2], R_m = [10, 8] ;</li><li>coupure 2, x² = nombre de réclamations &lt; 3 : R_l = [28, 4], R_m = [2, 6].</li></ul>Calculer le gain d'information IG = I(R) − n_l/n·I(R_l) − n_m/n·I(R_m) de chaque coupure avec l'indice de Gini. Laquelle CART retient-il ?`,
+   `<b>Coupure 1</b> (n_l = 22, n_m = 18) :<div class="f">I(R_l) = 1 − (20/22)² − (2/22)²  ≈ 0,165
+I(R_m) = 1 − (10/18)² − (8/18)²  ≈ 0,494
+IG₁ = 0,375 − 22/40 × 0,165 − 18/40 × 0,494 ≈ 0,375 − 0,091 − 0,222 ≈ 0,062</div><b>Coupure 2</b> (n_l = 32, n_m = 8) :<div class="f">I(R_l) = 1 − (28/32)² − (4/32)²  ≈ 0,219
+I(R_m) = 1 − (2/8)² − (6/8)²     = 0,375
+IG₂ = 0,375 − 32/40 × 0,219 − 8/40 × 0,375 = 0,375 − 0,175 − 0,075 = 0,125</div>IG₂ &gt; IG₁ : CART retient la <b>coupure 2</b> (nombre de réclamations &lt; 3). Elle crée un enfant R_l presque pur en classe 0 et un enfant R_m majoritairement de classe 1.`],
+  ['Refaire la comparaison avec l\'entropie, puis avec l\'erreur de classification. Commenter le gain de la coupure 1 avec l\'erreur de classification.',
+   `<b>Entropie</b> : I(R) ≈ 0,811.<div class="f">Coupure 1 : I(R_l) ≈ 0,439 ; I(R_m) ≈ 0,991 → IG₁ ≈ 0,811 − 0,55×0,439 − 0,45×0,991 ≈ 0,124
+Coupure 2 : I(R_l) ≈ 0,544 ; I(R_m) ≈ 0,811 → IG₂ ≈ 0,811 − 0,8×0,544 − 0,2×0,811 ≈ 0,214</div>Même choix : coupure 2.<br><b>Erreur de classification</b> : I(R) = 0,25.<div class="f">Coupure 1 : I(R_l) = 2/22 ≈ 0,091 ; I(R_m) = 8/18 ≈ 0,444 → IG₁ = 0,25 − 2/40 − 8/40 = 0
+Coupure 2 : I(R_l) = 4/32 = 0,125 ; I(R_m) = 2/8 = 0,25    → IG₂ = 0,25 − 4/40 − 2/40 = 0,1</div>Avec l'erreur, la coupure 1 a un <b>gain nul</b> : ses deux enfants restent majoritairement de classe 0, donc on fait exactement les mêmes 10 erreurs qu'avant. Pourtant R_l = [20, 2] est bien plus pur que R. Gini et l'entropie tiennent compte de toute la répartition des classes, pas seulement de la classe majoritaire : ils détectent cette amélioration.`],
+  ['On garde la coupure 2 (arbre à 2 feuilles). Quelle est l\'erreur d\'apprentissage de cet arbre ? et celle de l\'arbre à une seule feuille (|T| = 1) ? Quel score l\'arbre attribue-t-il à un nouveau client ayant 4 réclamations (utile pour une courbe ROC) ?',
+   `Feuille R_l = [28, 4] : on prédit 0, 4 erreurs. Feuille R_m = [2, 6] : on prédit 1, 2 erreurs. Erreur d'apprentissage = 6/40 = <b>0,15</b>.<br>|T| = 1 : on prédit la classe majoritaire 0 pour tous → 10 erreurs → <b>0,25</b>.<br>Un client avec 4 réclamations tombe dans R_m (4 ≥ 3). Son score est la proportion de clients de classe 1 dans cette feuille : <b>6/8 = 0,75</b>. Il est prédit « résilie » au seuil 0,5. (Un client avec 1 réclamation aurait le score 4/32 = 0,125.)`],
+  [`Pour élaguer l'arbre maximal, on compare trois sous-arbres :<div class="scroll"><table class="t"><tr><th></th><th>|T|</th><th>Σ n_l·I(R_l)</th></tr><tr><th>T_a</th><td>2</td><td>12,4</td></tr><tr><th>T_b</th><td>5</td><td>6,1</td></tr><tr><th>T_c</th><td>9</td><td>2,5</td></tr></table></div>Rappel : C_λ(T) = Σ_{l=1}^{|T|} n_l·I(R_l) + λ|T|. Quel sous-arbre est choisi pour λ = 0,5 ? λ = 1,5 ? λ = 4 ? Pour quelles valeurs de λ chaque arbre est-il choisi ? Commenter en termes de biais et de variance.`,
+   `<div class="f">           T_a                 T_b                 T_c
+λ = 0,5    12,4 + 1  = 13,4    6,1 + 2,5  = 8,6    2,5 + 4,5  = 7,0   → T_c
+λ = 1,5    12,4 + 3  = 15,4    6,1 + 7,5  = 13,6   2,5 + 13,5 = 16,0  → T_b
+λ = 4      12,4 + 8  = 20,4    6,1 + 20   = 26,1   2,5 + 36   = 38,5  → T_a</div>Seuils : T_b et T_c sont à égalité quand 6,1 + 5λ = 2,5 + 9λ, soit <b>λ = 0,9</b>. T_a et T_b sont à égalité quand 12,4 + 2λ = 6,1 + 5λ, soit <b>λ = 2,1</b>. (T_a et T_c sont à égalité pour λ = 9,9/7 ≈ 1,41, mais T_b y est moins coûteux.) Donc T_c pour λ &lt; 0,9, T_b pour 0,9 &lt; λ &lt; 2,1, T_a pour λ &gt; 2,1.<br>Plus λ augmente, plus chaque feuille coûte cher et plus l'arbre retenu est petit : modèle plus simple, <b>biais ↑ et variance ↓</b>. En pratique, λ est choisi sur un échantillon de validation.`]
+ ]},
+ {t:'Exercice 3 (7 pts) : clustering', qs:[
+  [`La matrice des distances entre 5 points est :<div class="scroll"><table class="t"><tr><th></th><th>x1</th><th>x2</th><th>x3</th><th>x4</th><th>x5</th></tr><tr><th>x1</th><td>0</td><td></td><td></td><td></td><td></td></tr><tr><th>x2</th><td>14</td><td>0</td><td></td><td></td><td></td></tr><tr><th>x3</th><td>31</td><td>27</td><td>0</td><td></td><td></td></tr><tr><th>x4</th><td>9</td><td>30</td><td>40</td><td>0</td><td></td></tr><tr><th>x5</th><td>35</td><td>18</td><td>12</td><td>37</td><td>0</td></tr></table></div>Appliquer la CAH avec le lien simple puis avec le lien complet. Donner l'ordre et la hauteur des fusions, et décrire les dendrogrammes.`,
+   `<b>Lien simple</b> (d(C_k,C_l) = min) :<ul><li>Plus petite distance : d14 = 9 → fusion {x1,x4} à <b>9</b>.</li><li>Nouvelles distances : d({x1,x4},x2) = min(14,30) = 14 ; d({x1,x4},x3) = min(31,40) = 31 ; d({x1,x4},x5) = min(35,37) = 35. Plus petite : d35 = 12 → {x3,x5} à <b>12</b>.</li><li>d({x1,x4},x2) = 14 ; d({x1,x4},{x3,x5}) = min(31,35,40,37) = 31 ; d(x2,{x3,x5}) = min(27,18) = 18. → {x1,x2,x4} à <b>14</b>.</li><li>Dernière fusion : d({x1,x2,x4},{x3,x5}) = min(31,35,27,18,40,37) = 18 → à <b>18</b>.</li></ul><b>Lien complet</b> (d(C_k,C_l) = max) :<ul><li>{x1,x4} à <b>9</b>.</li><li>d({x1,x4},x2) = max(14,30) = 30 ; d({x1,x4},x3) = 40 ; d({x1,x4},x5) = 37 ; d23 = 27 ; d25 = 18 ; d35 = 12 → {x3,x5} à <b>12</b>.</li><li>d({x1,x4},x2) = 30 ; d({x1,x4},{x3,x5}) = 40 ; d(x2,{x3,x5}) = max(27,18) = 27 → {x2,x3,x5} à <b>27</b>.</li><li>Dernière fusion : max de toutes les distances entre {x1,x4} et {x2,x3,x5} = 40 → à <b>40</b>.</li></ul><div class="f">Simple  : ((x1,x4)₉ , x2)₁₄  et (x3,x5)₁₂  réunis à 18
+Complet : (x1,x4)₉  et ((x3,x5)₁₂ , x2)₂₇  réunis à 40</div>Vérifie avec l'outil CAH (exemple « Sujet blanc 1 »).`],
+  ['Donner la partition en 3 clusters puis en 2 clusters obtenue avec chaque lien. Pourquoi x2 n\'est-il pas rattaché au même groupe ?',
+   `<b>3 clusters</b> : les deux premières fusions sont identiques, donc {x1,x4}, {x3,x5}, {x2} dans les deux cas.<br><b>2 clusters</b> : lien simple → {x1,x2,x4} / {x3,x5} ; lien complet → {x1,x4} / {x2,x3,x5}.<br>Le lien simple rattache x2 au groupe qui contient son plus proche voisin (x1, à 14). Le lien complet regarde le point le plus éloigné : x2 est à 30 de x4 mais seulement à 27 de x3, donc il rejoint {x3,x5}. Le lien simple suit les points proches de proche en proche ; le lien complet évite de mettre dans un même cluster des points trop éloignés.`],
+  ['On évalue une partition en 3 clusters. Un point x appartient à C₁ = {x, p₂, p₃, p₄} avec d(x,p₂) = 2, d(x,p₃) = 3, d(x,p₄) = 4. Ses distances aux points de C₂ = {q₁, q₂} sont 5 et 7, et aux points de C₃ = {r₁, r₂, r₃} sont 2,5 ; 3,5 et 4,5. Calculer a(x), b(x) et s(x). Un autre point y a a(y) = 4 et b(y) = 2,5 : calculer s(y) et interpréter.',
+   `<div class="f">a(x) = (2 + 3 + 4)/3 = 3                     (moyenne sur son cluster, x exclu)
+moyenne vers C₂ = (5 + 7)/2 = 6
+moyenne vers C₃ = (2,5 + 3,5 + 4,5)/3 = 3,5
+b(x) = min(6 ; 3,5) = 3,5
+s(x) = (3,5 − 3)/max(3 ; 3,5) = 0,5/3,5 ≈ 0,143</div>s(x) &gt; 0 mais proche de 0 : x est un peu plus proche de son cluster que de C₃, il est à la frontière entre C₁ et C₃.<br>s(y) = (2,5 − 4)/4 = <b>−0,375</b> &lt; 0 : y est en moyenne plus proche des points d'un autre cluster que de ceux du sien, il est probablement mal assigné.`],
+  ['On applique l\'algorithme de Lloyd (K = 2) aux 7 points de ℝ : 1, 2, 4, 7, 9, 10, 15, avec les centroïdes initiaux μ₁ = 1 et μ₂ = 4. Dérouler l\'algorithme jusqu\'à convergence en donnant l\'inertie intra-classes I_W après chaque mise à jour des centroïdes.',
+   `<b>Itération 1</b> — affectation : 1 et 2 vont à μ₁ = 1 (2 est à distance 1 de μ₁, 2 de μ₂) ; 4, 7, 9, 10, 15 vont à μ₂ = 4.<br>Mise à jour : μ₁ = (1+2)/2 = 1,5 ; μ₂ = (4+7+9+10+15)/5 = 9.<div class="f">I_W = 0,25 + 0,25 + (25 + 4 + 0 + 1 + 36) = 0,5 + 66 = 66,5</div><b>Itération 2</b> — affectation : 4 est à 2,5 de μ₁ et à 5 de μ₂ → passe dans le cluster 1 ; 7 est à 5,5 de μ₁ et à 2 de μ₂ → reste dans le cluster 2. Clusters {1, 2, 4} et {7, 9, 10, 15}.<br>Mise à jour : μ₁ = 7/3 ≈ 2,333 ; μ₂ = 41/4 = 10,25.<div class="f">I_W = [(1−7/3)² + (2−7/3)² + (4−7/3)²] + [3,25² + 1,25² + 0,25² + 4,75²]
+    = 42/9 + 34,75 ≈ 4,667 + 34,75 ≈ 39,417</div><b>Itération 3</b> — affectation : 4 est à 1,667 de μ₁ et à 6,25 de μ₂ ; 7 est à 4,667 de μ₁ et à 3,25 de μ₂. Les affectations ne changent plus : <b>convergence</b>. Partition finale {1, 2, 4} / {7, 9, 10, 15}. I_W a bien diminué à chaque itération (66,5 → 39,417).`],
+  ['Calculer l\'inertie totale I et l\'inertie inter-classes I_B de la partition finale. Vérifier que I = I_W + I_B.',
+   `Moyenne globale : μ = 48/7 ≈ 6,857.<div class="f">I   = Σ (xᵢ − μ)² ≈ 146,857
+I_B = 3 × (7/3 − 48/7)² + 4 × (10,25 − 48/7)²
+    ≈ 3 × 20,465 + 4 × 11,512 ≈ 61,395 + 46,046 ≈ 107,440
+I_W + I_B ≈ 39,417 + 107,440 = 146,857 = I</div>I ne dépend pas de la partition : minimiser I_W revient à maximiser I_B.`],
+  ['On relance l\'algorithme avec μ₁ = 10 et μ₂ = 15. Quelle partition obtient-on ? Que montre cet exemple et comment s\'en prémunir ?',
+   `Itération 1 : 1, 2, 4, 7, 9, 10 sont plus proches de 10 que de 15 ; 15 reste seul. μ₁ = 33/6 = 5,5 ; μ₂ = 15.<br>Itération 2 : 10 est à 4,5 de μ₁ et à 5 de μ₂ → reste dans le cluster 1. Rien ne change : convergence vers {1, 2, 4, 7, 9, 10} / {15}.<div class="f">I_W = 4,5² + 3,5² + 1,5² + 1,5² + 3,5² + 4,5² + 0 = 69,5 &gt; 39,417</div>L'algorithme de Lloyd converge vers un <b>minimum local</b> qui dépend de l'initialisation. Ici, on obtient une partition moins bonne (et 15 se retrouve seul, comme une valeur aberrante). Remède : relancer l'algorithme avec plusieurs initialisations aléatoires (<code>nstart</code>) et garder la partition de plus petite I_W, ou initialiser avec K-means++ (centroïdes initiaux dispersés).`]
+ ]}
+]},
+{ id:'blanc2', title:'Sujet blanc 2 (entraînement)', exos:[
+ {t:'Exercice 1 (6 pts) : KNN et métriques multiclasse', qs:[
+  [`On dispose de 7 données d'apprentissage dans ℝ avec deux classes A et B :<div class="scroll"><table class="t"><tr><th>xᵢ</th><td>1</td><td>2,2</td><td>3</td><td>5</td><td>6</td><td>8</td><td>9</td></tr><tr><th>yᵢ</th><td>A</td><td>A</td><td>A</td><td>B</td><td>A</td><td>B</td><td>B</td></tr></table></div>Prédire l'étiquette du point x = 5,7 avec un KNN (distance |x − xᵢ|) pour K = 1, 3, 5 et 7. Que remarque-t-on pour K = 7 ?`,
+   `Distances à x = 5,7, triées :<div class="f">xᵢ = 6 (A) : 0,3     xᵢ = 5 (B) : 0,7     xᵢ = 8 (B) : 2,3     xᵢ = 3 (A) : 2,7
+xᵢ = 9 (B) : 3,3     xᵢ = 2,2 (A) : 3,5   xᵢ = 1 (A) : 4,7</div><ul><li>K = 1 : voisin 6 (A) → <b>A</b>.</li><li>K = 3 : A, B, B → <b>B</b>.</li><li>K = 5 : A, B, B, A, B → 3 B contre 2 A → <b>B</b>.</li><li>K = 7 : tous les points, 4 A contre 3 B → <b>A</b>.</li></ul>Avec K = 7 = n, tous les points sont voisins : on prédit toujours la classe majoritaire de l'apprentissage (A), quel que soit x. C'est du sous-apprentissage.`],
+  ['Calculer l\'erreur d\'apprentissage du 1-NN, puis son erreur en leave-one-out (chaque point est prédit par son plus proche voisin parmi les 6 autres). Expliquer la différence.',
+   `<b>Erreur d'apprentissage</b> : chaque point est son propre plus proche voisin → <b>0</b>.<br><b>Leave-one-out</b> : on retire chaque point tour à tour.<div class="f">1   (A) → voisin 2,2 (A)  ok
+2,2 (A) → voisin 3   (A)  ok     (distance 0,8)
+3   (A) → voisin 2,2 (A)  ok
+5   (B) → voisin 6   (A)  erreur  (distance 1 contre 2 pour 3)
+6   (A) → voisin 5   (B)  erreur  (distance 1 contre 2 pour 8)
+8   (B) → voisin 9   (B)  ok
+9   (B) → voisin 8   (B)  ok</div>Erreur LOO = <b>2/7 ≈ 0,286</b>. L'erreur d'apprentissage est trompeuse : le 1-NN a été évalué sur les données qui ont servi à le construire. Le leave-one-out estime l'erreur sur des points qui n'ont pas servi à la prédiction : il mesure la capacité de généralisation. Avec n = 7, il demande 7 apprentissages par valeur de K.`],
+  ['Comment évoluent le biais et la variance du KNN quand K augmente ? Quelle procédure utiliser pour choisir K ?',
+   `K ↑ : la prédiction est une moyenne sur plus de voisins, donc plus lisse et moins sensible au bruit → <b>variance ↓, biais ↑</b>. K ↓ : l'inverse (K = 1 colle à chaque point, sur-apprentissage).<br>On choisit K par <b>validation croisée</b> (K-fold ou leave-one-out) sur les données d'apprentissage : pour chaque K candidat, erreur moyenne sur les plis ; on garde le K de plus petite erreur moyenne, on réentraîne sur tout l'apprentissage et on évalue le modèle final sur un jeu de test.`],
+  [`Un classifieur à 3 classes donne, sur 90 observations de validation, la matrice suivante (lignes = classe prédite, colonnes = classe réelle) :<div class="scroll"><table class="t"><tr><th>prédit \\ réel</th><th>1</th><th>2</th><th>3</th></tr><tr><th>1</th><td>40</td><td>5</td><td>3</td></tr><tr><th>2</th><td>6</td><td>20</td><td>4</td></tr><tr><th>3</th><td>2</td><td>3</td><td>7</td></tr></table></div>Calculer l'accuracy, la précision et la sensibilité de chaque classe (stratégie one-versus-all), puis la précision et la sensibilité en macro-average, et la précision en micro-average.`,
+   `Effectifs réels (colonnes) : 48, 28, 14. Effectifs prédits (lignes) : 48, 30, 12.<div class="f">Accuracy = (40 + 20 + 7)/90 = 67/90 ≈ 0,744
+
+           précision = M[k,k]/ligne k     sensibilité = M[k,k]/colonne k
+classe 1   40/48 ≈ 0,833                  40/48 ≈ 0,833
+classe 2   20/30 ≈ 0,667                  20/28 ≈ 0,714
+classe 3    7/12 ≈ 0,583                   7/14 = 0,5
+
+Précision macro   = (0,833 + 0,667 + 0,583)/3 ≈ 0,694
+Sensibilité macro = (0,833 + 0,714 + 0,5)/3   ≈ 0,683
+Précision micro   = ΣTP / Σ(TP+FP) = 67/90 ≈ 0,744 = accuracy</div>Le macro-average est plus bas que le micro-average : la petite classe 3 est la moins bien traitée (la moitié de ses observations est ratée), et le macro-average lui donne autant de poids qu'aux autres.`],
+  ['On veut traiter ce problème à 3 classes avec une régression logistique. Combien de classifieurs faut-il entraîner en one-versus-all et en one-versus-one ? Et avec 10 classes ? Quelles données chacun utilise-t-il ?',
+   `C = 3 : OvA → 3 classifieurs ; OvO → 3·2/2 = 3 classifieurs (même nombre, cas particulier). C = 10 : OvA → <b>10</b> ; OvO → 10·9/2 = <b>45</b>.<br>OvA : chaque classifieur utilise <b>toutes</b> les données (classe k = positifs, le reste = négatifs) ; on prédit la classe de score σ(⟨ŵ_k,x⟩ + b̂_k) maximal. OvO : chaque classifieur n'utilise que les données des <b>deux classes</b> de sa paire ; on prédit la classe la plus souvent choisie (vote).`]
+ ]},
+ {t:'Exercice 2 (7 pts) : régression logistique et SVM', qs:[
+  ['Une régression logistique (𝒴 = {−1, 1}) a appris ŵ = (1,2 ; −0,8) et b̂ = −0,5. Calculer P̂(Y = 1 | x) = σ(⟨ŵ,x⟩ + b̂) pour x_a = (2, 1), x_b = (0,5 ; 1) et x_c = (1 ; 0,5). Donner les prédictions avec le seuil s = 0,5 puis s = 0,3.',
+   `<div class="f">x_a : z = 1,2×2 − 0,8×1 − 0,5   = 1,1   → σ(1,1)  = 1/(1+e^{−1,1}) ≈ 0,750
+x_b : z = 1,2×0,5 − 0,8×1 − 0,5 = −0,7  → σ(−0,7) ≈ 0,332
+x_c : z = 1,2×1 − 0,8×0,5 − 0,5 = 0,3   → σ(0,3)  ≈ 0,574</div>s = 0,5 : x_a → 1, x_b → −1, x_c → 1.<br>s = 0,3 : x_a → 1, <b>x_b → 1</b> (0,332 ≥ 0,3), x_c → 1. Abaisser le seuil augmente le nombre de prédictions positives : sensibilité ↑, spécificité ↓.`],
+  ['Donner l\'équation de la frontière de décision pour s = 0,5 puis pour s = 0,3 (sous la forme x₂ = a·x₁ + c). La régression logistique est-elle un classifieur linéaire quel que soit le seuil ?',
+   `σ(z) ≥ s ⇔ z ≥ ln(s/(1−s)) car σ est croissante.<br><b>s = 0,5</b> : ln 1 = 0, frontière 1,2x₁ − 0,8x₂ − 0,5 = 0, soit <b>x₂ = 1,5x₁ − 0,625</b> (pente −w₁/w₂ = 1,5, ordonnée −b/w₂ = −0,625).<br><b>s = 0,3</b> : ln(0,3/0,7) ≈ −0,847, frontière 1,2x₁ − 0,8x₂ − 0,5 = −0,847, soit 1,2x₁ − 0,8x₂ + 0,347 = 0, donc <b>x₂ ≈ 1,5x₁ + 0,434</b>.<br>Les deux frontières sont des droites parallèles : quel que soit le seuil, la frontière est un hyperplan ⟨ŵ,x⟩ + b̂ = ln(s/(1−s)). La régression logistique est bien un classifieur linéaire.`],
+  [`Une SVM à marge souple a appris ŵ = (3, 4) et b̂ = −12 (valeurs fictives choisies pour l'exercice ; on étudie seulement la position des points). Calculer la marge. Pour chacun des points suivants, calculer yᵢ(⟨ŵ,xᵢ⟩ + b̂), la valeur de ξᵢ, et dire où se trouve le point :<div class="scroll"><table class="t"><tr><th>point</th><th>A</th><th>B</th><th>C</th><th>D</th><th>E</th><th>F</th></tr><tr><th>xᵢ</th><td>(1 ; 2,5)</td><td>(4 ; 1)</td><td>(2 ; 1,5)</td><td>(2 ; 1,4)</td><td>(3 ; 1)</td><td>(1 ; 1)</td></tr><tr><th>yᵢ</th><td>+1</td><td>+1</td><td>+1</td><td>−1</td><td>−1</td><td>−1</td></tr></table></div>`,
+   `‖ŵ‖ = √(9 + 16) = 5 → <b>marge = 1/‖ŵ‖ = 0,2</b> ; la zone d'indécision entre H⁺ et H⁻ a une largeur 2/‖ŵ‖ = 0,4.<br>À l'optimum, ξᵢ = max(0, 1 − yᵢ(⟨ŵ,xᵢ⟩ + b̂)).<div class="f">pt  ⟨ŵ,x⟩+b̂            yᵢ(…)   ξᵢ    position
+A   3 + 10 − 12 = 1      1      0     sur H⁺ : vecteur de support
+B   12 + 4 − 12 = 4      4      0     bien classé, hors de la marge
+C   6 + 6 − 12 = 0       0      1     sur l'hyperplan séparateur H
+D   6 + 5,6 − 12 = −0,4  0,4    0,6   bien classé, dans la zone d'indécision
+E   9 + 4 − 12 = 1      −1      2     mal classé (ξ &gt; 1)
+F   3 + 4 − 12 = −5      5      0     bien classé, hors de la marge</div>Distance d'un point à H : |⟨ŵ,x⟩ + b̂|/‖ŵ‖, par exemple 4/5 = 0,8 pour B et 0,2 pour A (= la marge).`],
+  ['Calculer Σξᵢ puis la valeur de la fonction objectif ½‖w‖² + CΣξᵢ en (ŵ, b̂) pour C = 1 et pour C = 10. Quels points interviennent dans le classifieur sign(Σ α̂ᵢyᵢ⟨xᵢ,x⟩ + b̂) ? Que se passerait-il si on réentraînait avec un C beaucoup plus grand ?',
+   `Σξᵢ = 0 + 0 + 1 + 0,6 + 2 + 0 = <b>3,6</b>. ½‖ŵ‖² = 12,5.<div class="f">C = 1  : 12,5 + 1 × 3,6  = 16,1
+C = 10 : 12,5 + 10 × 3,6 = 48,5</div>Avec C = 10, les violations de marge pèsent beaucoup plus que le terme de marge.<br>Par l'écart complémentaire (KKT), α̂ᵢ[yᵢ(⟨ŵ,xᵢ⟩+b̂) − 1 + ξᵢ] = 0 : les points B et F (yᵢ(…) &gt; 1) ont <b>α̂ᵢ = 0</b> et n'interviennent pas. Seuls peuvent avoir α̂ᵢ &gt; 0 : le vecteur de support A (sur H⁺) et les outliers C, D, E (ξᵢ &gt; 0).<br>Avec C beaucoup plus grand, on préfère minimiser le nombre d'outliers : la marge se resserre, moins de points dans la zone d'indécision, <b>biais ↓, variance ↑</b>. C → ∞ redonne la marge rigide (impossible ici si les données ne sont pas séparables).`],
+  ['Soient x = (1, 2) et x\' = (3, −1). Calculer les noyaux linéaire, quadratique (⟨x,x\'⟩ + 1)², cosinus et gaussien exp(−γ‖x − x\'‖²) pour γ = 0,1 et γ = 2. Commenter. Vérifier que (⟨x,x\'⟩ + 1)² = ⟨φ(x), φ(x\')⟩ avec φ(z) = (1, √2 z₁, √2 z₂, z₁², z₂², √2 z₁z₂).',
+   `<div class="f">⟨x,x'⟩ = 1×3 + 2×(−1) = 1                        linéaire  : 1
+(⟨x,x'⟩ + 1)² = 2² = 4                             quadratique : 4
+‖x‖ = √5, ‖x'‖ = √10 → 1/√50 ≈ 0,141               cosinus   : 0,141
+‖x − x'‖² = (−2)² + 3² = 13
+γ = 0,1 : exp(−1,3) ≈ 0,273
+γ = 2   : exp(−26)  ≈ 5·10⁻¹²</div>Avec γ = 2, deux points à distance √13 ≈ 3,6 ont une similarité quasi nulle : chaque point n'influence que son voisinage immédiat. C'est ce qui produit des frontières en « îlots » et du sur-apprentissage quand γ est grand.<br><b>Vérification</b> : φ(x) = (1, √2, 2√2, 1, 4, 2√2) et φ(x') = (1, 3√2, −√2, 9, 1, −3√2).<div class="f">⟨φ(x),φ(x')⟩ = 1 + 6 − 4 + 9 + 4 − 12 = 4 = (⟨x,x'⟩ + 1)²</div>Le noyau se calcule en O(d) alors que φ vit en dimension 6 (O(d²) en général) : c'est l'intérêt de l'astuce du noyau, utilisée dans le problème dual.`]
+ ]},
+ {t:'Exercice 3 (7 pts) : CAH, K-means et critères de qualité', qs:[
+  [`La matrice des distances entre 5 points est :<div class="scroll"><table class="t"><tr><th></th><th>x1</th><th>x2</th><th>x3</th><th>x4</th><th>x5</th></tr><tr><th>x1</th><td>0</td><td></td><td></td><td></td><td></td></tr><tr><th>x2</th><td>21</td><td>0</td><td></td><td></td><td></td></tr><tr><th>x3</th><td>6</td><td>24</td><td>0</td><td></td><td></td></tr><tr><th>x4</th><td>29</td><td>11</td><td>26</td><td>0</td><td></td></tr><tr><th>x5</th><td>16</td><td>33</td><td>19</td><td>14</td><td>0</td></tr></table></div>Appliquer la CAH avec le lien simple puis avec le lien complet (fusions et hauteurs), et donner la partition en 2 clusters dans chaque cas.`,
+   `<b>Lien simple</b> :<ul><li>d13 = 6 → {x1,x3} à <b>6</b>.</li><li>d({x1,x3},x2) = min(21,24) = 21 ; d({x1,x3},x4) = min(29,26) = 26 ; d({x1,x3},x5) = min(16,19) = 16 ; d24 = 11 ; d25 = 33 ; d45 = 14 → {x2,x4} à <b>11</b>.</li><li>d({x1,x3},{x2,x4}) = min(21,29,24,26) = 21 ; d({x1,x3},x5) = 16 ; d({x2,x4},x5) = min(33,14) = 14 → {x2,x4,x5} à <b>14</b>.</li><li>d({x1,x3},{x2,x4,x5}) = min(21,29,16,24,26,19) = 16 → fusion finale à <b>16</b>.</li></ul><b>Lien complet</b> :<ul><li>{x1,x3} à <b>6</b>, puis {x2,x4} à <b>11</b> (d({x1,x3},x2) = 24, d({x1,x3},x4) = 29, d({x1,x3},x5) = 19 sont plus grands).</li><li>d({x1,x3},{x2,x4}) = max(21,29,24,26) = 29 ; d({x1,x3},x5) = max(16,19) = 19 ; d({x2,x4},x5) = max(33,14) = 33 → {x1,x3,x5} à <b>19</b>.</li><li>Fusion finale : max de toutes les distances entre {x1,x3,x5} et {x2,x4} = 33 → à <b>33</b>.</li></ul><b>2 clusters</b> : lien simple → {x1,x3} / {x2,x4,x5} ; lien complet → {x1,x3,x5} / {x2,x4}. x5 est proche de x4 (14) mais très loin de x2 (33) : le lien simple le rattache à x4, le lien complet refuse de le mettre avec x2. Vérifie avec l'outil CAH (exemple « Sujet blanc 2 »).`],
+  ['On applique l\'algorithme de Lloyd (K = 2, distance euclidienne) aux points P1 = (0,0), P2 = (1,0), P3 = (0,2), P4 = (5,4), P5 = (6,4), P6 = (5,6), avec μ₁ = P1 et μ₂ = P3 comme centroïdes initiaux. Dérouler l\'algorithme jusqu\'à convergence et donner I_W après chaque mise à jour des centroïdes.',
+   `On compare les distances au carré.<br><b>Itération 1</b> — P2 : 1 (μ₁) contre 5 (μ₂) → 1. P4 : 41 contre 29 → 2. P5 : 52 contre 40 → 2. P6 : 61 contre 41 → 2. Clusters {P1,P2} et {P3,P4,P5,P6}.<br>Mise à jour : μ₁ = (0,5 ; 0) ; μ₂ = ((0+5+6+5)/4 ; (2+4+4+6)/4) = (4 ; 4).<div class="f">I_W = (0,25 + 0,25) + (20 + 1 + 4 + 5) = 0,5 + 30 = 30,5</div><b>Itération 2</b> — P3 : ‖P3 − μ₁‖² = 0,25 + 4 = 4,25 contre ‖P3 − μ₂‖² = 16 + 4 = 20 → passe dans le cluster 1. P4, P5, P6 restent avec μ₂. Clusters {P1,P2,P3} et {P4,P5,P6}.<br>Mise à jour : μ₁ = (1/3 ; 2/3) ; μ₂ = (16/3 ; 14/3).<div class="f">I_W = (5/9 + 8/9 + 17/9) + (5/9 + 8/9 + 17/9) = 30/9 + 30/9 ≈ 6,667</div><b>Itération 3</b> — plus aucun changement d'affectation : <b>convergence</b>. Partition {P1,P2,P3} / {P4,P5,P6}.`],
+  ['Calculer l\'inertie totale I et l\'inertie inter-classes I_B de la partition finale. Calculer la distance de Ward entre les deux clusters finaux et expliquer pourquoi elle est égale à I_B ici.',
+   `Moyenne globale : μ = (17/6 ; 16/6) ≈ (2,833 ; 2,667).<div class="f">I   = Σ‖Pᵢ − μ‖² ≈ 68,167
+I_B = 3‖μ₁ − μ‖² + 3‖μ₂ − μ‖² = 3 × 10,25 + 3 × 10,25 = 61,5
+I_W + I_B = 6,667 + 61,5 = 68,167 = I
+
+Ward(C₁,C₂) = |C₁||C₂|/(|C₁|+|C₂|) × ‖μ₁ − μ₂‖²
+            = 9/6 × ((−5)² + (−4)²) = 1,5 × 41 = 61,5</div>La distance de Ward est la hausse d'inertie intra-classes due à la fusion. Fusionner les 2 clusters donne un seul cluster, dont l'inertie intra vaut I. La hausse vaut donc I − I_W = I_B = 61,5.`],
+  ['Calculer l\'homogénéité T_k de chaque cluster final (distance euclidienne moyenne au centroïde), la séparabilité S₁₂ et l\'indice de Davies-Bouldin global. Comment utiliser cet indice pour choisir K ?',
+   `<div class="f">C₁, μ₁ = (1/3 ; 2/3) : d(P1) ≈ 0,745 ; d(P2) ≈ 0,943 ; d(P3) ≈ 1,374 → T₁ ≈ 1,021
+C₂, μ₂ = (16/3 ; 14/3) : d(P4) ≈ 0,745 ; d(P5) ≈ 0,943 ; d(P6) ≈ 1,374 → T₂ ≈ 1,021
+S₁₂ = d(μ₁,μ₂) = √(25 + 16) = √41 ≈ 6,403
+D₁ = D₂ = (T₁ + T₂)/S₁₂ ≈ 2,042/6,403 ≈ 0,319    → D ≈ 0,319</div>(C₂ est le translaté de C₁ par le vecteur (5, 4), d'où T₁ = T₂.) On calcule D pour plusieurs partitions (plusieurs K) et on garde celle qui <b>minimise</b> D : clusters homogènes (T petits) et bien séparés (S grand).`],
+  ['Calculer le coefficient de silhouette de P3 dans la partition finale. P3 est-il bien assigné ?',
+   `<div class="f">a(P3) = (d(P3,P1) + d(P3,P2))/2 = (2 + √5)/2 ≈ (2 + 2,236)/2 ≈ 2,118
+b(P3) = (d(P3,P4) + d(P3,P5) + d(P3,P6))/3 = (√29 + √40 + √41)/3
+      ≈ (5,385 + 6,325 + 6,403)/3 ≈ 6,038
+s(P3) = (6,038 − 2,118)/6,038 ≈ 0,649</div>s(P3) &gt; 0 et assez proche de 1 : P3 est nettement plus proche de son cluster que de l'autre, il est bien assigné (même si c'est le point le moins central de C₁). Avec K = 2, b(P3) est simplement la distance moyenne à l'autre cluster.`],
+  ['On veut compresser une image de 1 000 × 1 000 pixels en 16 couleurs. Combien de distances l\'algorithme de Lloyd calcule-t-il à chaque itération ? Combien la CAH doit-elle en calculer au départ ? Conclure.',
+   `n = 10⁶ pixels (points de ℝ³ : R, G, B), K = 16.<br>Lloyd : K·n = 16 × 10⁶ = <b>1,6·10⁷ distances par itération</b> (chaque pixel vers chaque centroïde), soit un coût linéaire en n.<br>CAH : n(n−1)/2 = 10⁶ × (10⁶ − 1)/2 ≈ <b>5·10¹¹ distances</b> au départ, à stocker, puis des comparaisons entre toutes les paires de clusters à chaque étape : coût quadratique en n, infaisable en pratique.<br>On utilise donc le K-means : on remplace chaque pixel par la couleur de son centroïde, et l'image n'a plus que 16 couleurs.`]
+ ]}
+]}
+];
+
+const EXTRA_CAH_PRESETS = {
+  'blanc1': {name:'Sujet blanc 1', m:[[0],[14,0],[31,27,0],[9,30,40,0],[35,18,12,37,0]]},
+  'blanc2': {name:'Sujet blanc 2', m:[[0],[21,0],[6,24,0],[29,11,26,0],[16,33,19,14,0]]}
+};
+CARDS.push(...EXTRA_CARDS);
+QUIZ.push(...EXTRA_QUIZ);
+EXAMS.push(...EXTRA_EXAMS);
+Object.assign(CAH_PRESETS, EXTRA_CAH_PRESETS);
+
+function updateDash(){
+  const known = store.get('known', {}) || {};
+  const total = CARDS.length, k = Object.keys(known).filter(i => known[i] && +i < total).length;
+  $('#d-known').innerHTML = `${k}<small> / ${total}</small>`;
+  $('#d-known-pct').textContent = total ? Math.round(100*k/total) + ' %' : '';
+  $('#d-known-bar').style.width = (total ? 100*k/total : 0) + '%';
+  const best = store.get('qbest:all', null);
+  $('#d-qbest').innerHTML = (best === null) ? `–<small class="hide-sm"> pas encore fait</small>` : `${best}<small> %</small>`;
+  $('#d-qbest-bar').style.width = (best || 0) + '%';
+}
+function onStore(k){ if (k === 'known' || k === 'qbest:all') updateDash(); }
+document.querySelectorAll('.dash-item[data-go]').forEach(b => b.addEventListener('click', () => openTab(b.dataset.go)));
+updateDash();
+
+const RENDER = {fiches:renderFiches, flash:renderFlash, quiz:renderQuiz, outils:renderOutils, annales:renderAnnales, tp:renderTP};
+const done = {};
+function openTab(t){
+  if(!RENDER[t]) t='fiches';
+  store.set('tab', t);
+  document.querySelectorAll('#tabs button').forEach(b=>b.setAttribute('aria-selected', b.dataset.tab===t));
+  Object.keys(RENDER).forEach(k=>$('#p-'+k).hidden = k!==t);
+  if(!done[t]){ RENDER[t](); done[t]=true; }
+  const sel = document.querySelector('#tabs [aria-selected="true"]');
+  if (sel && sel.scrollIntoView) sel.scrollIntoView({inline:'nearest', block:'nearest'});
+}
+$('#tabs').addEventListener('click', e=>{ const b=e.target.closest('button'); if(b) openTab(b.dataset.tab); });
+openTab(location.hash ? location.hash.slice(1) : store.get('tab','fiches'));
+</script>
+</body>
+</html>
