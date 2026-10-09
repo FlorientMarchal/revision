@@ -375,6 +375,68 @@ canvas.viz-cv.viz-drag{touch-action:none; cursor:grab}
 .viz-cm span.ko{background:var(--red-soft); border:1px solid var(--red); color:var(--red)}
 .viz-cm b{font-size:20px; color:var(--ink); font-variant-numeric:tabular-nums}
 @media (max-width:420px){ .viz{padding:10px} .viz-leg{font-size:12px; gap:3px 10px} }
+
+/* ---------- flashcards (refonte) ---------- */
+.sr-only{position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap}
+.fc{display:grid; gap:14px; max-width:640px; width:100%; margin:0 auto}
+.fc-top{display:flex; gap:8px; align-items:center; flex-wrap:wrap}
+.fc-sel{flex:1 1 180px; min-width:0}
+.fc-sel select{width:100%; min-height:44px; border-radius:10px; padding:0 12px; font:600 15px var(--f-body); background:var(--paper); border:1px solid var(--line); color:var(--ink)}
+.fc-seg{display:inline-flex; padding:3px; border:1px solid var(--line); border-radius:10px; background:var(--paper)}
+.fc-seg button{border:0; background:none; min-height:36px; padding:0 12px; border-radius:7px; font:600 14px var(--f-body); color:var(--muted); cursor:pointer}
+.fc-seg button[aria-pressed="true"]{background:var(--ink); color:var(--paper)}
+.fc-icon{width:44px; height:44px; display:grid; place-items:center; border:1px solid var(--line); border-radius:10px; background:var(--paper); color:var(--ink); cursor:pointer}
+.fc-icon svg{width:20px; height:20px}
+.fc-icon:hover, .fc-nav:hover:not(:disabled){border-color:var(--accent); color:var(--accent)}
+.fc-progress{display:grid; gap:6px}
+.fc-track{height:4px; border-radius:2px; background:var(--line); overflow:hidden}
+.fc-track i{display:block; height:100%; width:0; background:var(--good); transition:width .35s ease}
+.fc-meta{display:flex; justify-content:space-between; font:500 12px var(--f-mono); color:var(--muted); font-variant-numeric:tabular-nums}
+.fc-card{--fc-col:var(--accent); perspective:1600px; cursor:pointer; border-radius:16px; outline:none; touch-action:pan-y; -webkit-tap-highlight-color:transparent}
+.fc-card:focus-visible .fc-face{box-shadow:0 0 0 3px var(--accent)}
+.fc-inner{display:grid; transition:transform .45s cubic-bezier(.25,.8,.25,1); transform-style:preserve-3d}
+.fc-card.is-flipped .fc-inner{transform:rotateY(180deg)}
+.fc-face{grid-area:1/1; min-height:260px; display:flex; flex-direction:column; gap:14px; padding:20px 22px 18px; background:var(--paper); border:1px solid var(--line); border-radius:16px;
+  box-shadow:0 1px 0 var(--line), 0 10px 28px -18px rgba(0,0,0,.35); backface-visibility:hidden; -webkit-backface-visibility:hidden; position:relative; overflow:hidden}
+.fc-face::before{content:""; position:absolute; inset:0 0 auto 0; height:4px; background:var(--fc-col)}
+.fc-back{transform:rotateY(180deg)}
+.fc-face header{display:flex; justify-content:space-between; align-items:center; gap:10px}
+.fc-tag{font:700 11px var(--f-mono); letter-spacing:.08em; text-transform:uppercase; color:var(--fc-col)}
+.fc-tag-ans{color:var(--good)}
+.fc-state{font:600 12px var(--f-body); color:var(--good)}
+.fc-q{margin:auto 0; font:600 clamp(19px,4.6vw,24px)/1.35 var(--f-display); color:var(--ink); text-wrap:balance}
+.fc-front footer{font-size:13px; color:var(--muted)}
+.fc-qmini{margin:0; font-size:14px; line-height:1.45; color:var(--muted); padding-bottom:12px; border-bottom:1px dashed var(--line)}
+.fc-a{font-size:16.5px; line-height:1.6; color:var(--ink); overflow-wrap:anywhere}
+.fc-card.is-empty{cursor:default}
+.fc-card.is-empty .fc-q{font-size:18px; color:var(--muted); text-align:center}
+.fc-card.slide-l .fc-inner{animation:fcInL .28s ease}
+.fc-card.slide-r .fc-inner{animation:fcInR .28s ease}
+@keyframes fcInL{from{opacity:0; translate:24px 0}to{opacity:1; translate:0 0}}
+@keyframes fcInR{from{opacity:0; translate:-24px 0}to{opacity:1; translate:0 0}}
+.fc-actions{display:grid; grid-template-columns:52px 1fr 52px; gap:10px; align-items:center}
+.fc-nav{height:52px; border:1px solid var(--line); border-radius:12px; background:var(--paper); color:var(--ink); display:grid; place-items:center; cursor:pointer}
+.fc-nav svg{width:22px; height:22px}
+.fc-nav:disabled, .fc-reveal:disabled{opacity:.4; cursor:default}
+.fc-main{min-width:0}
+.fc-reveal, .fc-grade button{width:100%; min-height:52px; border-radius:12px; font:700 16px var(--f-body); cursor:pointer; border:1px solid transparent}
+.fc-reveal{background:var(--ink); color:var(--paper)}
+.fc-reveal:hover:not(:disabled){filter:brightness(1.12)}
+.fc-grade{display:grid; grid-template-columns:1fr 1fr; gap:10px}
+.fc-grade[hidden]{display:none}
+.fc-bad{background:var(--paper); color:var(--red); border-color:var(--red) !important}
+.fc-bad:hover{background:var(--red-soft)}
+.fc-good{background:var(--good); color:var(--paper)}
+.fc-good:hover{filter:brightness(1.08)}
+.fc-keys{margin:0; text-align:center; font-size:12px; color:var(--muted); display:flex; flex-wrap:wrap; gap:4px 6px; justify-content:center; align-items:center}
+.fc-keys kbd{font:600 11px var(--f-mono); padding:1px 6px; border:1px solid var(--line); border-bottom-width:2px; border-radius:5px; background:var(--paper)}
+@media (pointer:coarse){ .fc-keys{display:none} }
+@media (max-width:420px){ .fc-face{padding:18px 16px 16px; min-height:240px} .fc-seg button{padding:0 9px} }
+@media (prefers-reduced-motion: reduce){ .fc-inner{transition:none} .fc-card.slide-l .fc-inner, .fc-card.slide-r .fc-inner{animation:none} }
+.fc-top{display:grid; grid-template-columns:minmax(0,1fr) 44px; grid-template-areas:"sel icon" "seg seg"}
+.fc-sel{grid-area:sel} .fc-icon{grid-area:icon} .fc-seg{grid-area:seg; display:grid; grid-template-columns:1fr 1fr}
+@media (min-width:560px){ .fc-top{grid-template-columns:minmax(0,1fr) auto 44px; grid-template-areas:"sel seg icon"} .fc-seg{display:inline-grid} }
+.fc-front footer{margin:0; padding:10px 0 0; border:0; border-top:1px dashed var(--line); max-width:none; font-size:13px; color:var(--muted)}
 </style>
 </head>
 <body>
@@ -892,61 +954,111 @@ const CARDS = [
 
 function renderFlash(){
   const p = $('#p-flash');
-  let known = store.get('known', {});
+  let known = store.get('known', {}) || {};
   let filter = store.get('fcFilter', 'all');
   let onlyTodo = store.get('fcTodo', false);
-  let deck = [], idx = 0;
-  p.innerHTML = `<div class="row" style="justify-content:space-between">
-    <div class="chips" id="fc-chips"><button class="chip" data-c="all">Tout</button>${CH.map(c=>`<button class="chip" data-c="${c.id}">${c.name}</button>`).join('')}</div>
-    <label class="row stat" style="gap:6px"><input type="checkbox" id="fc-todo"> seulement « à revoir »</label></div>
-  <div class="fc-stage">
-    <div class="bar"><i id="fc-bar"></i></div>
-    <div class="stat" id="fc-stat"></div>
-    <div class="flash" id="fc-card" tabindex="0" role="button" aria-label="Retourner la carte">
-      <div class="flash-inner"><div class="face front"><small id="fc-ch"></small><div class="q" id="fc-q"></div><small style="margin-top:auto">touche la carte (ou espace) pour la retourner</small></div>
-      <div class="face back"><small>Réponse</small><div id="fc-a"></div></div></div></div>
-    <div class="row" style="justify-content:center">
-      <button class="btn" id="fc-prev">← Précédente</button>
-      <button class="btn" id="fc-bad" style="color:var(--red)">À revoir</button>
-      <button class="btn primary" id="fc-good">Je sais</button>
-      <button class="btn" id="fc-next">Suivante →</button>
-      <button class="btn" id="fc-shuffle">Mélanger</button>
+  let deck = [], idx = 0, flipped = false;
+  const CHCOL = {intro:'--c1', eval:'--c2', reglog:'--c3', cart:'--c4', svm:'--c5', clust:'--c6'};
+  p.innerHTML = `<div class="fc">
+    <div class="fc-top">
+      <label class="fc-sel"><span class="sr-only">Chapitre</span><select id="fc-chsel"><option value="all">Tous les chapitres</option>${CH.map(c=>`<option value="${c.id}">${c.name}</option>`).join('')}</select></label>
+      <div class="fc-seg" role="group" aria-label="Cartes à afficher"><button type="button" data-m="all">Toutes</button><button type="button" data-m="todo">À revoir</button></div>
+      <button type="button" class="fc-icon" id="fc-shuffle" aria-label="Mélanger les cartes" title="Mélanger"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M3 6h3.2c1.3 0 2.5.7 3.2 1.8l2.2 3.4c.7 1.1 1.9 1.8 3.2 1.8H17M3 14h3.2c1.3 0 2.5-.7 3.2-1.8M12 7.8c.7-1.1 1.9-1.8 3.2-1.8H17M14.5 3.5 17 6l-2.5 2.5M14.5 11.5 17 14l-2.5 2.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
     </div>
-    <div class="fc-keys" aria-hidden="true"><span><kbd>Espace</kbd> retourner</span><span><kbd>←</kbd> <kbd>→</kbd> naviguer</span></div></div>`;
-  const card = $('#fc-card');
+    <div class="fc-progress"><div class="fc-track" aria-hidden="true"><i id="fc-bar"></i></div>
+      <div class="fc-meta"><span id="fc-pos"></span><span id="fc-known"></span></div></div>
+    <div class="fc-card" id="fc-card" tabindex="0" role="button" aria-label="Retourner la carte">
+      <div class="fc-inner">
+        <section class="fc-face fc-front">
+          <header><span class="fc-tag" id="fc-ch"></span><span class="fc-state" id="fc-state"></span></header>
+          <p class="fc-q" id="fc-q"></p>
+          <footer>Touche la carte pour voir la réponse</footer>
+        </section>
+        <section class="fc-face fc-back" aria-hidden="true">
+          <header><span class="fc-tag fc-tag-ans">Réponse</span></header>
+          <p class="fc-qmini" id="fc-qmini"></p>
+          <div class="fc-a" id="fc-a"></div>
+        </section>
+      </div>
+    </div>
+    <div class="fc-actions">
+      <button type="button" class="fc-nav" id="fc-prev" aria-label="Carte précédente"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M12.5 4.5 7 10l5.5 5.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <div class="fc-main">
+        <button type="button" class="fc-reveal" id="fc-reveal">Voir la réponse</button>
+        <div class="fc-grade" id="fc-grade" hidden>
+          <button type="button" class="fc-bad" id="fc-bad">À revoir</button>
+          <button type="button" class="fc-good" id="fc-good">Je sais</button>
+        </div>
+      </div>
+      <button type="button" class="fc-nav" id="fc-next" aria-label="Carte suivante"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M7.5 4.5 13 10l-5.5 5.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    </div>
+    <p class="fc-keys" aria-hidden="true"><kbd>Espace</kbd> retourner <span>·</span> <kbd>←</kbd><kbd>→</kbd> naviguer <span>·</span> <kbd>1</kbd> à revoir <span>·</span> <kbd>2</kbd> je sais</p>
+  </div>`;
+  const card = $('#fc-card'), back = p.querySelector('.fc-back'), front = p.querySelector('.fc-front');
+  function setFlip(v){
+    flipped = !!v && deck.length > 0;
+    card.classList.toggle('is-flipped', flipped);
+    front.setAttribute('aria-hidden', flipped); back.setAttribute('aria-hidden', !flipped);
+    $('#fc-reveal').hidden = flipped; $('#fc-grade').hidden = !flipped;
+    card.setAttribute('aria-label', flipped ? 'Revenir à la question' : 'Voir la réponse');
+  }
   function build(){
     deck = CARDS.map((c,i)=>i).filter(i => (filter==='all' || CARDS[i][0]===filter) && (!onlyTodo || !known[i]));
     idx = Math.min(idx, Math.max(0, deck.length-1));
-    p.querySelectorAll('#fc-chips .chip').forEach(b=>b.setAttribute('aria-pressed', b.dataset.c===filter));
-    $('#fc-todo').checked = onlyTodo;
+    $('#fc-chsel').value = filter;
+    p.querySelectorAll('.fc-seg button').forEach(b=>b.setAttribute('aria-pressed', (b.dataset.m==='todo') === onlyTodo));
     show();
   }
   function show(){
-    card.classList.remove('flipped');
+    setFlip(false);
     const scope = CARDS.map((c,i)=>i).filter(i => filter==='all' || CARDS[i][0]===filter);
     const k = scope.filter(i=>known[i]).length;
     $('#fc-bar').style.width = (scope.length ? 100*k/scope.length : 0) + '%';
-    if (!deck.length){ $('#fc-q').textContent = onlyTodo ? 'Tout est su dans ce chapitre.' : 'Aucune carte.'; $('#fc-a').textContent=''; $('#fc-ch').textContent=''; $('#fc-stat').textContent = `${k}/${scope.length} cartes sues`; return; }
-    const c = CARDS[deck[idx]];
-    $('#fc-ch').textContent = chName(c[0]) + (known[deck[idx]] ? ' · su' : '');
+    $('#fc-known').textContent = `${k} / ${scope.length} sues`;
+    const empty = !deck.length;
+    card.classList.toggle('is-empty', empty);
+    ['fc-reveal','fc-prev','fc-next'].forEach(id => $('#'+id).disabled = empty);
+    if (empty){
+      card.style.removeProperty('--fc-col');
+      $('#fc-ch').textContent = ''; $('#fc-state').textContent = '';
+      $('#fc-q').textContent = onlyTodo ? 'Tout est su ici. Bravo !' : 'Aucune carte.';
+      p.querySelector('.fc-front footer').textContent = onlyTodo ? 'Repasse sur « Toutes » pour réviser à nouveau.' : '';
+      $('#fc-pos').textContent = ''; return;
+    }
+    const i = deck[idx], c = CARDS[i];
+    card.style.setProperty('--fc-col', `var(${CHCOL[c[0]] || '--accent'})`);
+    $('#fc-ch').textContent = chName(c[0]);
+    $('#fc-state').textContent = known[i] ? '✓ sue' : '';
     $('#fc-q').textContent = c[1];
-    setTimeout(()=>{ $('#fc-a').textContent = c[2]; }, 150);
-    $('#fc-stat').textContent = `Carte ${idx+1}/${deck.length} · ${k}/${scope.length} sues`;
+    $('#fc-qmini').textContent = c[1];
+    $('#fc-a').textContent = c[2];
+    p.querySelector('.fc-front footer').textContent = 'Touche la carte pour voir la réponse';
+    $('#fc-pos').textContent = `Carte ${idx+1} / ${deck.length}`;
   }
-  const flip = () => card.classList.toggle('flipped');
-  card.addEventListener('click', flip);
+  const flip = () => { if (deck.length) setFlip(!flipped); };
+  const move = d => { if(deck.length){ idx = (idx + d + deck.length) % deck.length; card.classList.remove('slide-l','slide-r'); void card.offsetWidth; card.classList.add(d > 0 ? 'slide-l' : 'slide-r'); show(); } };
+  const mark = v => { if(!deck.length) return; const i = deck[idx]; if (v) known[i] = true; else delete known[i]; store.set('known', known);
+    if (onlyTodo && v){ build(); } else move(1); };
+  let sx = null, sy = null, swiped = false;
+  card.addEventListener('pointerdown', e => { sx = e.clientX; sy = e.clientY; swiped = false; });
+  card.addEventListener('pointerup', e => { if (sx === null) return; const dx = e.clientX - sx, dy = e.clientY - sy; sx = null;
+    if (Math.abs(dx) > 60 && Math.abs(dx) > 1.5*Math.abs(dy)){ swiped = true; move(dx < 0 ? 1 : -1); } });
+  card.addEventListener('click', () => { if (swiped){ swiped = false; return; } flip(); });
   card.addEventListener('keydown', e=>{ if(e.key===' '||e.key==='Enter'){ e.preventDefault(); flip(); } });
-  const move = d => { if(deck.length){ idx = (idx + d + deck.length) % deck.length; show(); } };
+  $('#fc-reveal').onclick = () => setFlip(true);
   $('#fc-prev').onclick = ()=>move(-1);
   $('#fc-next').onclick = ()=>move(1);
-  const mark = v => { if(!deck.length) return; known[deck[idx]] = v; if(!v) delete known[deck[idx]]; store.set('known', known);
-    if (onlyTodo && v){ build(); } else move(1); };
   $('#fc-good').onclick = ()=>mark(true);
   $('#fc-bad').onclick = ()=>mark(false);
   $('#fc-shuffle').onclick = ()=>{ for(let i=deck.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [deck[i],deck[j]]=[deck[j],deck[i]]; } idx=0; show(); };
-  $('#fc-chips').onclick = e=>{ const b=e.target.closest('.chip'); if(!b) return; filter=b.dataset.c; store.set('fcFilter',filter); idx=0; build(); };
-  $('#fc-todo').onchange = e=>{ onlyTodo=e.target.checked; store.set('fcTodo',onlyTodo); idx=0; build(); };
-  document.addEventListener('keydown', e=>{ if($('#p-flash').hidden || e.target.tagName==='INPUT') return; if(e.key==='ArrowRight') move(1); if(e.key==='ArrowLeft') move(-1); });
+  $('#fc-chsel').onchange = e=>{ filter=e.target.value; store.set('fcFilter',filter); idx=0; build(); };
+  p.querySelector('.fc-seg').onclick = e=>{ const b=e.target.closest('button'); if(!b) return; onlyTodo = b.dataset.m==='todo'; store.set('fcTodo',onlyTodo); idx=0; build(); };
+  document.addEventListener('keydown', e=>{
+    if($('#p-flash').hidden || /INPUT|SELECT|TEXTAREA/.test(e.target.tagName)) return;
+    if(e.key==='ArrowRight') move(1); else if(e.key==='ArrowLeft') move(-1);
+    else if(e.key===' ' && e.target === document.body){ e.preventDefault(); flip(); }
+    else if(flipped && e.key==='1') mark(false); else if(flipped && e.key==='2') mark(true);
+  });
   build();
 }
 
