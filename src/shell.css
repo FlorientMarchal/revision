@@ -1,0 +1,78 @@
+/* ---------- coque de l'application multi-cours ---------- */
+header.shell{display:flex; align-items:center; gap:10px; padding-block:14px; border-bottom:1px solid var(--line); margin-bottom:18px; flex-wrap:wrap}
+.brand{display:inline-flex; align-items:center; gap:10px; text-decoration:none; color:var(--ink); font:700 17px var(--f-display)}
+.crumb{color:var(--line-strong)}
+.crumb-course{color:var(--muted); text-decoration:none; font-weight:600; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.crumb-course:hover, .brand:hover{color:var(--accent)}
+.account-btn{margin-left:auto; display:inline-flex; align-items:center; gap:8px; min-height:40px; padding:0 14px; border:1px solid var(--line); border-radius:999px; text-decoration:none; color:var(--ink); font:600 14px var(--f-body); background:var(--paper)}
+.account-btn .dot{width:8px; height:8px; border-radius:50%; background:var(--line-strong)}
+.account-btn.on .dot{background:var(--good)}
+.account-btn.err .dot{background:var(--red)}
+.account-btn:hover{border-color:var(--accent)}
+
+/* onglets d'un cours : liens */
+nav.tabs a{flex:none; display:inline-flex; align-items:baseline; gap:7px; border-bottom:2px solid transparent; padding:13px 12px 11px; white-space:nowrap; font-weight:600; font-size:15px; color:var(--muted); text-decoration:none}
+nav.tabs a .tab-n{font:600 11px var(--f-mono); color:var(--line-strong)}
+nav.tabs a:hover{color:var(--ink)}
+nav.tabs a[aria-current="page"]{color:var(--ink); border-bottom-color:var(--accent)}
+nav.tabs a[aria-current="page"] .tab-n{color:var(--accent)}
+nav.tabs a:last-child{margin-right:24px}
+
+.course-head{display:grid; gap:8px; margin-bottom:10px}
+.course-head h1{font-size:clamp(24px,4vw,36px)}
+.course-head .sub{margin:0; font:500 13px var(--f-mono); color:var(--muted)}
+footer.credit{display:grid; gap:8px}
+footer.credit p{margin:0}
+
+/* accueil */
+.home{display:grid; gap:22px}
+.hero{display:grid; gap:10px; padding-block:6px 4px}
+.course-grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(min(320px,100%),1fr)); gap:16px}
+.course-card{display:grid; gap:12px; padding:20px; border:1px solid var(--line); border-radius:14px; background:var(--paper); text-decoration:none; color:var(--ink); position:relative; overflow:hidden; box-shadow:var(--shadow)}
+.course-card::before{content:""; position:absolute; inset:0 auto 0 0; width:4px; background:var(--accent)}
+.course-card:hover{border-color:var(--accent)}
+.course-card h2{font-size:22px; line-height:1.2}
+.cc-head{display:flex; justify-content:space-between; gap:10px; font:600 11px var(--f-mono); letter-spacing:.06em; text-transform:uppercase; color:var(--muted)}
+.cc-topics{margin:0; font-size:14px; color:var(--muted)}
+.cc-stats{margin:0; display:grid; gap:10px}
+.cc-stats div{display:grid; grid-template-columns:1fr auto; gap:3px 10px; align-items:baseline}
+.cc-stats dt{font-size:13px; color:var(--muted)}
+.cc-stats dd{margin:0; font:500 13px var(--f-mono); font-variant-numeric:tabular-nums}
+.cc-stats dd b{font-size:15px; color:var(--ink)}
+.meter{grid-column:1/-1; height:4px; border-radius:2px; background:var(--line); overflow:hidden}
+.meter i{display:block; height:100%; background:var(--good); transition:width .3s}
+.cc-go{font-weight:700; color:var(--accent)}
+.cc-loading{color:var(--muted); margin:0}
+.home-note{font-size:13px; color:var(--muted); margin:0}
+
+/* progression dans les onglets */
+.chip-ok{color:var(--good); font-weight:800}
+.chip[aria-pressed="true"] .chip-ok{color:inherit}
+.chip-count{font:600 11px var(--f-mono); padding:1px 6px; border-radius:99px; background:var(--good-soft); color:var(--good)}
+.chip-warn:not([aria-pressed="true"]){color:var(--red)}
+.chip:disabled{opacity:.45; cursor:default}
+.read-toggle{display:flex; align-items:center; gap:10px; padding:12px 14px; border:1px dashed var(--line); border-radius:10px; font-weight:600; cursor:pointer}
+.read-toggle input{width:20px; height:20px; accent-color:var(--good)}
+.q-status{display:flex; gap:8px; flex-wrap:wrap}
+.q-status .on-ok{background:var(--good); border-color:var(--good); color:var(--paper)}
+.q-status .on-todo{background:var(--red-soft); border-color:var(--red); color:var(--red)}
+.q-item.q-ok{border-left:3px solid var(--good); padding-left:10px}
+.q-item.q-todo{border-left:3px solid var(--red); padding-left:10px}
+
+/* compte */
+.account{max-width:720px}
+.login{display:grid; gap:6px; margin-top:6px}
+.login input{flex:1 1 220px; min-height:44px; font-size:16px}
+.sync-info{display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:10px; margin:6px 0 12px}
+.sync-info div{border:1px solid var(--line); border-radius:8px; padding:8px 12px}
+.sync-info dt{font-size:12px; color:var(--muted)}
+.sync-info dd{margin:0; font-weight:700}
+.st-ok{color:var(--good)} .st-error{color:var(--red)}
+.err-msg{color:var(--red); font-size:14px}
+header.shell{flex-wrap:nowrap}
+.crumb-course{flex:0 1 auto}
+.account .card{display:grid; gap:10px}
+@media (max-width:480px){
+  header.shell:has(.crumb-course) .brand span{display:none}
+  .account-btn{padding:0 12px}
+}
