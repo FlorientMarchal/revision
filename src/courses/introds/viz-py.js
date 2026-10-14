@@ -1394,7 +1394,7 @@ function groupbyViz(el) {
       return `<div class="grp g${n}"><table class="vy-pd" style="width:100%"><caption>groupe ${g}</caption>${rows.map(([r, i]) => `<tr class="k${n}${k === 1 ? ' in' : ''}"><th class="ix">${i}</th><td class="vk">${r[0]}</td><td>${r[1]}</td></tr>`).join('')}</table>
         ${k >= 2 ? `<div class="vy-codel" style="font-size:12.5px;margin-top:4px;animation:vy-in .4s ${reduced() ? 0 : n * 0.2}s both">${agg}(${agg === 'size' ? rows.length + ' lignes' : '[' + vals.join(', ') + ']'}) = <b>${agg === 'mean' ? pyFloat(v) : v}</b></div>` : ''}</div>`;
     }).join('');
-    const comb = `<table class="vy-pd"><caption>${agg === 'size' ? 'Series' : 'Series « score »'}</caption><tr><th class="ix">groupe</th><th></th></tr>${G.map((g, n) => { const v = f(RES.filter(r => r[0] === g).map(r => r[1])); return `<tr class="k${n} in"><th class="ix">${g}</th><td>${agg === 'mean' ? pyFloat(v) : v}</td></tr>`; }).join('')}</table>`;
+    const comb = `<table class="vy-pd"><caption>${agg === 'size' ? 'Series' : 'Series score'}</caption><tr><th class="ix">groupe</th><th></th></tr>${G.map((g, n) => { const v = f(RES.filter(r => r[0] === g).map(r => r[1])); return `<tr class="k${n} in"><th class="ix">${g}</th><td>${agg === 'mean' ? pyFloat(v) : v}</td></tr>`; }).join('')}</table>`;
     $(el, '[data-o=st]').innerHTML = `<div class="vy-gb"><div class="phase on"><div class="st">0 · la table</div>${src}</div><div class="phase${k >= 1 ? ' on' : ''}"><div class="st">1 · split · 2 · apply</div>${k >= 1 ? grp : ''}</div><div class="phase${k >= 3 ? ' on' : ''}"><div class="st">3 · combine</div>${k >= 3 ? comb : ''}</div></div>`;
     $(el, '[data-o=out]').textContent = k >= 3 ? OUT.gb[agg] : '';
     $(el, '[data-o=note]').innerHTML = [
