@@ -1,7 +1,8 @@
 <script>
   import { COURSES, loadCourse } from '../courses/index.js';
   import { progress } from '../lib/progress.js';
-  import { summarize, pct } from '../lib/summary.js';
+  import { summarize, pct, overall } from '../lib/summary.js';
+  import Ring from './Ring.svelte';
   import { link } from '../lib/router.js';
   import { session, configured } from '../lib/sync.js';
   import { evalList, byEval } from '../lib/evals.js';
@@ -29,15 +30,18 @@
   </section>
 
   <div class="course-grid">
-    {#each courses as c (c.id)}
+    {#each courses as c, ci (c.id)}
       {@const d = loaded[c.id]}
       {@const s = d ? summarize(maps[c.id] || {}, d) : null}
-      <a class="course-card" href={link('c', c.id)}>
+      <a class="course-card" href={link('c', c.id)} style="--i:{ci}">
         <div class="cc-head">
           <span class="cc-code">{[c.code, c.level].filter(Boolean).join(' · ')}</span>
           <span class="cc-sem">{c.semester}</span>
         </div>
-        <h2>{c.title}</h2>
+        <div class="cc-title">
+          <h2>{c.title}</h2>
+          {#if s}<Ring value={overall(s)} size={52} stroke={5} label="Progression globale" />{:else}<span class="ring ring-wait" style="--size:52px" aria-hidden="true"></span>{/if}
+        </div>
         <p class="cc-topics">{c.topics.join(' · ')}</p>
         {#if c.evals}
           <ul class="cc-evals" aria-label="Évaluations">
@@ -55,7 +59,7 @@
             <div><dt>QCM : bonnes réponses</dt><dd><b>{s.quizRight}</b> / {s.quiz}</dd><span class="meter"><i style="width:{pct(s.quizRight, s.quiz)}%"></i></span></div>
           </dl>
         {:else}
-          <p class="cc-loading">Chargement…</p>
+          <div class="cc-loading" role="status"><span class="sr-only">Chargement…</span><i></i><i></i><i></i></div>
         {/if}
         <span class="cc-go">Réviser →</span>
       </a>

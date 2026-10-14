@@ -2,6 +2,7 @@
   import { tick } from 'svelte';
   import { kv, progress, setVal } from '../lib/progress.js';
   import { typeset } from '../lib/math.js';
+  import { reveal } from '../lib/motion.js';
 
   let { course, data } = $props();
   const ui = kv(course.id);
@@ -27,6 +28,7 @@
       if (course.viz && body.querySelector('[data-viz]')) {
         try { const m = await course.viz(); m.mountViz(body); } catch (e) { console.error(e); }
       }
+      reveal(body);
     });
   });
 </script>
