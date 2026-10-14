@@ -52,5 +52,4 @@
     {/each}
   </div>
 
-  <p class="home-note">Pour ajouter un cours, il suffit de fournir ses PDF (cours, annales, TP) : il apparaîtra ici avec sa propre progression.</p>
 </main>
