@@ -99,3 +99,5 @@ export const quiz = [
   Q('un', 'index', 'Combien d\'index une requête AQL utilise-t-elle à chaque parcours de collection ?', ['aucun', 'un seul', 'deux au maximum', 'tous ceux de la collection'], 1, 'L\'optimiseur choisit le plus sélectif.'),
   Q('geo', 'index', 'Un index geo porte sur…', ['un seul champ numérique', 'deux champs (latitude, longitude) ou un objet GeoJSON', 'le champ _key', 'n\'importe quelle liste'], 1, 'Il accélère GEO_CONTAINS, GEO_DISTANCE, GEO_INTERSECTS…'),
 ];
+
+export * from './codesheet.js';

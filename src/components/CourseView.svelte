@@ -13,6 +13,7 @@
   import Formulas from './Formulas.svelte';
   import Queries from './Queries.svelte';
   import RLab from './RLab.svelte';
+  import CodeSheet from './CodeSheet.svelte';
   import { evalList } from '../lib/evals.js';
 
   let { course, tab } = $props();
@@ -31,6 +32,7 @@
     { id: 'cours', label: 'Cours complet', on: (data.lessons || []).length },
     { id: 'fiches', label: 'Fiches', on: Object.keys(data.fiches || {}).length },
     { id: 'formules', label: 'Formulaire', on: (data.formulas || []).length },
+    { id: 'memo', label: 'Mémo code', on: (data.codesheet || []).length },
     { id: 'requetes', label: 'Requêtes', on: (data.queries || []).length },
     { id: 'flash', label: 'Flashcards', on: (data.cards || []).length },
     { id: 'quiz', label: 'QCM', on: (data.quiz || []).length },
@@ -74,6 +76,7 @@
     {#if current === 'cours'}<Lessons {course} {data} />
     {:else if current === 'fiches'}<Fiches {course} {data} />
     {:else if current === 'formules'}<Formulas {course} {data} />
+    {:else if current === 'memo'}<CodeSheet {course} {data} />
     {:else if current === 'requetes'}<Queries {course} {data} />
     {:else if current === 'r'}<RLab {course} {data} />
     {:else if current === 'py'}<RLab {course} {data} lang="py" />

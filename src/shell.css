@@ -334,3 +334,13 @@ table.t, .math, .lesson .synthesis-table, .lesson .table-wrap{position:relative}
 .lesson pre.code-out{margin-top:-4px; background:transparent; border:1px dashed var(--line-strong); color:var(--ink-2, var(--ink))}
 .lesson pre.code + pre.code-out::before{content:"Sortie"; display:block; font:600 10.5px var(--f-mono); letter-spacing:.06em; text-transform:uppercase; color:var(--line-strong); margin-bottom:2px}
 .exam-note{font-size:13px; color:var(--ink-2, var(--ink)); border-left:3px solid var(--line-strong); padding-left:10px}
+
+/* ---------- Mémo code ---------- */
+.memo-tools{align-items:center}
+.memo-search{flex:1 1 220px; min-height:40px; padding:0 12px; border:1px solid var(--line-strong); border-radius:8px; background:var(--paper); color:var(--ink); font:15px var(--f-body)}
+.memo-items{display:grid; grid-template-columns:repeat(auto-fill,minmax(min(420px,100%),1fr)); gap:10px}
+.memo-item{border:1px solid var(--line); border-radius:8px; padding:10px 12px; display:grid; gap:6px; background:var(--paper); min-width:0; align-content:start}
+.memo-head{display:flex; justify-content:space-between; align-items:center; gap:8px}
+.memo-code{margin:0; padding:10px 12px; border-radius:6px; background:var(--paper-2); border:1px solid var(--line); font:12.5px/1.5 var(--f-mono); overflow-x:auto; tab-size:4; white-space:pre}
+.memo-code code{border:0; background:none; padding:0; font:inherit}
+@media print{ .memo-tools{display:none!important} .memo-item{break-inside:avoid} }
