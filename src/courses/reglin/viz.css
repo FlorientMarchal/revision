@@ -108,3 +108,4 @@
 .rl-hat::after{content:"ˆ"; position:absolute; left:0; right:0; top:-.2em; text-align:center; font-size:.95em; line-height:1}
 .rl-metrics .metric > span:first-child{text-transform:none; letter-spacing:.02em}
 .rl-g2 .vz-svg.rl-small{max-width:250px}
+.rl-drag{user-select:none; -webkit-user-select:none}

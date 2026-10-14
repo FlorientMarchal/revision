@@ -530,7 +530,7 @@ function bayesViz(el) {
     let cx = x0, cp = x0;
     S.parts.forEach((pt, k) => {
       const cw = pr[k] * w, hD = cd[k] * h, col = CAT[k], on = sel === k;
-      q += `<g class="vp-click" data-k="${k}"><rect x="${cx}" y="${y0}" width="${cw}" height="${h - hD}" fill="${col}" fill-opacity="${0.12 * (1 - post)}" stroke="var(--paper)"/>`;
+      q += `<g class="vp-click" data-k="${k}"><rect x="${cx}" y="${y0}" width="${cw}" height="${h - hD}" fill="${col}" fill-opacity="${0.12 * (1 - 0.6 * post)}" stroke="var(--paper)"/>`;
       // morceau D : du carré vers la barre « sachant D »
       const tw = postP[k] * w, X0 = cx + (cp - cx) * post, Y0 = (y0 + h - hD) + (yb - (y0 + h - hD)) * post, WW = cw + (tw - cw) * post, HH = hD + (hb - hD) * post;
       q += `<rect x="${X0}" y="${Y0}" width="${Math.max(0, WW)}" height="${Math.max(0, HH)}" fill="${col}" fill-opacity="${on ? 0.95 : 0.75}" stroke="${on ? 'var(--ink)' : 'var(--paper)'}" stroke-width="${on ? 2 : 1}"/>`;
@@ -541,7 +541,7 @@ function bayesViz(el) {
       cx += cw; cp += tw;
     });
     q += `<text x="${x0 + w + 4}" y="${y0 + h - 4}" class="vz-t vz-s vp-tb" opacity="${1 - post}">${S.ev}</text>`;
-    q += `<text x="${x0}" y="${yb - 8}" class="vz-t vz-s vp-tm">${post > 0.02 ? `Sachant ${S.ev} : on ne garde que les morceaux « ${S.ev} », remis à l'échelle (total = 100 %)` : `Morceaux pleins : ${S.ev} (${S.evl}), d'aire totale P(${S.ev}) = ${num(PD, 4)}`}</text>`;
+    q += `<text x="${x0}" y="${yb - 8}" class="vz-t vz-s vp-tm">${post > 0.02 ? `Sachant ${S.ev} : morceaux « ${S.ev} » remis à l'échelle (total 100 %)` : `Morceaux pleins : ${S.ev} (${S.evl}), d'aire totale P(${S.ev}) = ${num(PD, 4)}`}</text>`;
     q += `<rect x="${x0}" y="${yb}" width="${w}" height="${hb}" fill="none" stroke="var(--line)" stroke-dasharray="3 3"/>`;
     el.querySelector('[data-s=sq]').innerHTML = svg(SW, SH, q, 'Carré unité des probabilités');
     el.querySelectorAll('[data-s=par] [data-o]').forEach(o => { const k = o.dataset.o; o.textContent = num(k === 'pr' ? pr[0] : cd[+k.slice(1)], 3); });
@@ -606,7 +606,7 @@ function covViz(el) {
     `<div class="viz-ctrl"><span data-s="rho">${rangeI('r', 'ρ', -1, 1, 0.05, rho)}</span><span class="viz-btns">${btn('new', 'Nouveau tirage')}</span></div>
      <div class="vp-stage" data-s="stage"></div><div class="vp-kpis" data-o="kp"></div><p class="viz-out" data-o="out"></p>`;
   const gen = () => { const r = rng(seed); Z = Array.from({ length: N }, () => [gauss(r), gauss(r), r()]); };
-  const W = 400, H = 340, L = 34, R = W - 12, T = 12, B = 276;
+  const W = 400, H = 350, L = 34, R = W - 12, T = 12, B = 276;
   const dom = () => (mode === 'parab' ? [-3.2, 3.2, -2, 8] : [-3.2, 3.2, -3.2, 3.2]);
   const target = () => {
     const P = Z.map(([a, b, c]) => {
@@ -633,7 +633,7 @@ function covViz(el) {
     g += `<text x="${MX + 4}" y="${T + 12}" class="vz-t vz-s vp-halo">x̄</text><text x="${R - 2}" y="${MY - 5}" class="vz-t vz-s vp-halo" text-anchor="end">ȳ</text>`;
     px.forEach(([x, y], i) => { g += `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="3.6" fill="${prods[i] >= 0 ? 'var(--good)' : 'var(--red)'}" fill-opacity=".85" stroke="var(--paper)" stroke-width=".8"/>`; });
     // balance des contributions
-    const pos2 = sum(prods.filter(v => v > 0)), neg = -sum(prods.filter(v => v < 0)), tot = pos2 + neg || 1, bw = R - L, yb = B + 30;
+    const pos2 = sum(prods.filter(v => v > 0)), neg = -sum(prods.filter(v => v < 0)), tot = pos2 + neg || 1, bw = R - L, yb = B + 42;
     g += `<text x="${L}" y="${yb - 5}" class="vz-t vz-s vp-tm">somme des produits : positifs ${num(pos2, 1)} contre négatifs ${num(neg, 1)}</text>`;
     g += `<rect x="${L}" y="${yb}" width="${bw * pos2 / tot}" height="16" fill="var(--good)" fill-opacity=".75"/><rect x="${L + bw * pos2 / tot}" y="${yb}" width="${bw * neg / tot}" height="16" fill="var(--red)" fill-opacity=".75"/><line x1="${L + bw / 2}" x2="${L + bw / 2}" y1="${yb - 3}" y2="${yb + 19}" stroke="var(--ink)" stroke-width="1.5"/>`;
     el.querySelector('[data-s=stage]').innerHTML = svg(W, H, g, 'Nuage de points et signe des produits');
@@ -703,14 +703,14 @@ function gauss2dViz(el) {
      <div class="viz-btns">${btn('p0', 'ρ = 0')}${btn('p95', 'ρ = 0,95 (pic pointu)')}${btn('pneg', 'ρ = −0,6')}${btn('pf', 'Σ de la fiche ex. 11')}<button type="button" class="chip" data-t="pts" aria-pressed="true">points simulés</button><button type="button" class="chip" data-t="spin" aria-pressed="${spin}">rotation</button></div>
      <div class="vp-two"><div data-s="top"></div><div data-s="d3"></div></div>
      <div class="vp-mats" data-o="mat"></div><p class="viz-out" data-o="out"></p>`;
-  const top = el.querySelector('[data-s=top]'), d3 = el.querySelector('[data-s=d3]');
+  const cid = 'vp-clip-' + Math.random().toString(36).slice(2, 8), top = el.querySelector('[data-s=top]'), d3 = el.querySelector('[data-s=d3]');
   const dens = (x, y) => { const q = (x * x / (s1 * s1) - 2 * rho * x * y / (s1 * s2) + y * y / (s2 * s2)) / (1 - rho * rho); return Math.exp(-q / 2) / (2 * Math.PI * s1 * s2 * Math.sqrt(1 - rho * rho)); };
   const drawTop = () => {
     const W = 300, H = 300, c = 150, k = 33, X = x => c + k * x, Y = y => c - k * y, peak = dens(0, 0), G = 30, cs = 8 / G;
     let g = '';
     for (let i = 0; i < G; i++) for (let j = 0; j < G; j++) {
       const x = -4 + (i + 0.5) * cs, y = -4 + (j + 0.5) * cs, d = dens(x, y) / peak;
-      if (d > 0.02) g += `<rect x="${X(x - cs / 2).toFixed(1)}" y="${Y(y + cs / 2).toFixed(1)}" width="${(k * cs + 0.4).toFixed(1)}" height="${(k * cs + 0.4).toFixed(1)}" fill="var(--accent)" fill-opacity="${(0.55 * d).toFixed(3)}"/>`;
+      if (d > 0.02) g += `<rect x="${X(x - cs / 2).toFixed(1)}" y="${Y(y + cs / 2).toFixed(1)}" width="${(k * cs + 1).toFixed(1)}" height="${(k * cs + 1).toFixed(1)}" shape-rendering="crispEdges" fill="color-mix(in srgb, var(--accent) ${(55 * d).toFixed(1)}%, var(--paper))"/>`;
     }
     g += `<line x1="0" x2="${W}" y1="${c}" y2="${c}" class="vz-grid"/><line x1="${c}" x2="${c}" y1="0" y2="${H}" class="vz-grid"/>`;
     const a = s2 * Math.sqrt(1 - rho * rho);
@@ -721,11 +721,12 @@ function gauss2dViz(el) {
       if (m < 3) g += `<text x="${X(tx) + 3}" y="${Y(ty) - 3}" class="vz-t vz-s vp-ta vp-halo">${lab}</text>`;
     });
     if (showPts) ZZ.forEach(([u, v]) => { g += `<circle cx="${X(s1 * u).toFixed(1)}" cy="${Y(rho * s2 * u + a * v).toFixed(1)}" r="1.8" fill="var(--ink)" fill-opacity=".55"/>`; });
+    g = `<defs><clipPath id="${cid}"><rect x="0" y="0" width="${W}" height="${H}"/></clipPath></defs><g clip-path="url(#${cid})">${g}</g>`;
     g += `<text x="${W - 4}" y="${c - 5}" class="vz-t vz-s" text-anchor="end">x₁</text><text x="${c + 5}" y="12" class="vz-t vz-s">x₂</text>`;
     top.innerHTML = `<p class="vp-sub">Vue de dessus : ellipses de niveau</p>` + svg(W, H, g, 'Ellipses de niveau de la densité');
   };
   const draw3d = () => {
-    const W = 360, H = 300, cx = 196, cy = 218, k = 23, tilt = 0.4, Zs = 210, n = 25, cph = Math.cos(phi), sph = Math.sin(phi), peak = dens(0, 0);
+    const W = 360, H = 300, cx = 192, cy = 214, k = 25, tilt = 0.5, Zs = 210, n = 31, cph = Math.cos(phi), sph = Math.sin(phi), peak = dens(0, 0);
     const P = (x, y, z) => [cx + k * (x * cph - y * sph), cy + k * tilt * (x * sph + y * cph) - Zs * z];
     let g = '';
     const corner = [[-4, -4], [4, -4], [4, 4], [-4, 4]].map(([x, y]) => P(x, y, 0));
@@ -736,7 +737,7 @@ function gauss2dViz(el) {
     [0.2, 0.4, 0.6, 0.8].forEach(v => { g += `<line x1="${gx - 3}" x2="${gx + 3}" y1="${cy - Zs * v}" y2="${cy - Zs * v}" class="vz-axis"/><text x="${gx + 5}" y="${cy - Zs * v + 4}" class="vz-t vz-s vp-tm">${num(v, 1)}</text>`; });
     const ref = 1 / (2 * Math.PI);
     g += `<line x1="${gx - 6}" x2="${gx + 6}" y1="${cy - Zs * ref}" y2="${cy - Zs * ref}" stroke="var(--muted)" stroke-width="2"/><text x="${gx - 8}" y="${cy - Zs * ref + 4}" class="vz-t vz-s vp-tm" text-anchor="end">⊥</text>`;
-    const xs = Array.from({ length: 41 }, (_, i) => -4 + 8 * i / 40);
+    const xs = Array.from({ length: 97 }, (_, i) => -4 + 8 * i / 96);
     for (let j = 0; j < n; j++) {
       const y = -4 + 8 * j / (n - 1), curve = xs.map(x => P(x, y, dens(x, y))), base = xs.slice().reverse().map(x => P(x, y, 0));
       g += `<path d="${path([...curve, ...base])}Z" fill="var(--paper)" fill-opacity=".93"/><path d="${path(curve)}" fill="none" stroke="var(--accent)" stroke-width="1.3"/>`;
@@ -817,7 +818,7 @@ function transfoViz(el) {
     const n = pts.length, mx = mean(pts.map(p => p[0])), my = mean(pts.map(p => p[1]));
     const emp = [[mean(pts.map(p => (p[0] - mx) ** 2)), mean(pts.map(p => (p[0] - mx) * (p[1] - my)))], [0, mean(pts.map(p => (p[1] - my) ** 2))]]; emp[1][0] = emp[0][1];
     const Mt = mul(mul(M, S), tr(M));
-    el.querySelector('[data-o=mat]').innerHTML = `<span>Σ = ${mat(S, 0)}</span><span>A = ${mat(A)}</span><span>A Σ A' = ${mat(ST)}</span><span>${t < 1 ? 'étape actuelle M Σ M\' = ' + mat(Mt) : 'covariance des ' + n + ' points ≈ ' + mat(emp)}</span>`;
+    el.querySelector('[data-o=mat]').innerHTML = `<span>Σ = ${mat(S, 0)}</span><span>A = ${mat(A)}</span><span>A Σ A' = ${mat(ST)}</span><span>${t < 1 ? 'étape actuelle M Σ M\' = ' + mat(Mt) : 'covariance observée ≈ ' + mat(emp)}</span>`;
     el.querySelector('[data-o=t]').textContent = num(t * 100, 0) + ' %';
     el.querySelector('[data-i=t]').value = t;
     el.querySelector('[data-o=out]').innerHTML = `${PRE[cur].txt} : AX ~ N₂(0, AΣA'). ${cur === 'fiche' ? 'On retrouve AΣA\' = (7 8 ; 8 13) de la fiche.' : cur === 'somme' ? 'Le nuage s\'écrase sur l\'axe horizontal : X + Y ~ N(0, a\'Σa) avec a\'Σa = 4 + 1 + 2 × 1 = 7 (la somme de tous les termes de Σ).' : cur === 'rot' ? 'Une rotation ne change ni |Σ| ni la forme du nuage : elle le fait tourner.' : 'Chaque coordonnée est multipliée par une constante : les variances par son carré (4 × 0,25 = 1 et 1 × 4 = 4).'} <b>Observe :</b> l'image d'un vecteur gaussien par une application linéaire reste gaussienne : les ellipses restent des ellipses. Flèches : images des vecteurs de base (colonnes de A).`;
@@ -900,7 +901,7 @@ function cibleViz(el) {
     let tb = `<table class="t vp-tab"><thead><tr><th>estimateur</th><th>E(T) − θ</th><th>V(T)</th><th>R(T)</th>${N ? `<th>moyenne des ${N} tirs</th><th>risque observé</th>` : ''}</tr></thead><tbody>`;
     es.list.forEach((e, i) => {
       const ds = darts.filter(d => d.i === i).map(d => d.v);
-      tb += `<tr><td style="text-align:left;color:${CAT[i]}"><b>${e.nm}</b></td><td>${num(e.E - es.th, 4)}</td><td>${num(e.V, 4)}</td><td><b>${num(Rs[i], 4)}</b></td>${N ? `<td>${num(mean(ds), 3)}</td><td>${num(mean(ds.map(v => (v - es.th) ** 2)), 4)}</td>` : ''}</tr>`;
+      tb += `<tr><td style="text-align:left;color:${CAT[i]}"><b>${e.nm.split(" =")[0]}</b></td><td>${num(e.E - es.th, 4)}</td><td>${num(e.V, 4)}</td><td><b>${num(Rs[i], 4)}</b></td>${N ? `<td>${num(mean(ds), 3)}</td><td>${num(mean(ds.map(v => (v - es.th) ** 2)), 4)}</td>` : ''}</tr>`;
     });
     el.querySelector('[data-o=tab]').innerHTML = tb + '</tbody></table>';
     el.querySelector('[data-o=out]').innerHTML = cur === 'ecq'
@@ -929,14 +930,14 @@ function cibleViz(el) {
 function varEmpViz(el) {
   const mu = 10, sg = 2, S2 = 4, lo = 0, hi = 16, nb = 32;
   let n = 4, A = [], Bv = [], last = null, parts = [];
-  const r = rng(12);
+  const r = rng(15);
   el.innerHTML = head('Variance empirique : diviser par n ou par n − 1 ?', 'Échantillons de taille n d\'une loi N(10 ; 4), donc σ² = 4. Chaque échantillon donne deux estimations de σ², qui tombent dans deux histogrammes.') +
     `<div class="viz-ctrl">${rangeI('n', 'n', 2, 30, 1, n)}<span class="viz-btns">${btn(1, '1 échantillon')}${btn(200, '+200 échantillons')}${btn(0, 'Effacer')}</span></div>
      <div class="vp-stage" data-s="stage"></div><div class="vp-kpis" data-o="kp"></div><p class="viz-out" data-o="out"></p>`;
   const sample = () => { const x = Array.from({ length: n }, () => mu + sg * gauss(r)), m = mean(x), ss = sum(x.map(v => (v - m) ** 2)); return { x, m, a: ss / n, b: ss / (n - 1) }; };
   const draw = (now = performance.now()) => {
-    const W = 420, L = 20, R = W - 14, H = 340, X = v => L + (clamp(v, lo, hi) - lo) / (hi - lo) * (R - L);
-    const lanes = [{ y: 112, h: 92, d: A, nm: 'en 1/n (biaisé)', c: 'var(--c2)', th: (n - 1) / n * S2 }, { y: 232, h: 92, d: Bv, nm: 'en 1/(n − 1) (sans biais)', c: 'var(--c1)', th: S2 }];
+    const W = 420, L = 20, R = W - 14, H = 376, X = v => L + (clamp(v, lo, hi) - lo) / (hi - lo) * (R - L);
+    const lanes = [{ y: 190, h: 86, d: A, nm: 'en 1/n (biaisé)', c: 'var(--c2)', th: (n - 1) / n * S2 }, { y: 332, h: 86, d: Bv, nm: 'en 1/(n − 1) (sans biais)', c: 'var(--c1)', th: S2 }];
     const bw = (hi - lo) / nb, cnts = lanes.map(l => { const c = new Array(nb).fill(0); l.d.forEach(v => { const i = Math.floor((v - lo) / bw); if (i >= 0 && i < nb) c[i]++; else if (i >= nb) c[nb - 1]++; }); return c; });
     const cm = Math.max(1, ...cnts.flat());
     let g = '';
@@ -1037,7 +1038,7 @@ function emvViz(el) {
       g += `<text x="${Rm}" y="${H - 4}" class="vz-t vz-s vp-tm" text-anchor="end">points : les ${n} observations</text>`;
     } else {
       const [x0, x1] = M.xr(data), xs = Array.from({ length: 201 }, (_, i) => x0 + (x1 - x0) * i / 200), fs = xs.map(x => M.pdf(x, th));
-      const ym = Math.max(cur === 'expo' ? 1.7 : 0.45, ...fs) * 1.08;
+      const ym = Math.max(cur === 'expo' ? 0.6 : 0.45, ...fs) * 1.08;
       const fr = frame({ L: Lm, R: Rm, T, B, xlo: x0, xhi: x1, yhi: ym, yl: `densité, ${M.par} = ${num(th, 2)}` }), { X, Y } = fr; g += fr.g;
       g += `<path d="${path(xs.map((x, i) => [X(x), Y(fs[i])]))}" class="vp-curve"/>`;
       data.forEach(x => { const f = M.pdf(x, th); g += `<line x1="${X(x)}" x2="${X(x)}" y1="${B}" y2="${Y(f)}" stroke="var(--c4)" stroke-width="3" stroke-linecap="round"/><circle cx="${X(x)}" cy="${Y(f)}" r="3.5" fill="var(--c4)"/><circle cx="${X(x)}" cy="${B + 26}" r="3.6" fill="var(--ink)"/><line x1="${X(x)}" x2="${X(x)}" y1="${B + 4}" y2="${B + 22}" stroke="var(--line-strong)" stroke-dasharray="2 2"/>`; });
@@ -1063,11 +1064,11 @@ function emvViz(el) {
       q += `<circle cx="${cx}" cy="${cy}" r="6" fill="var(--c2)" stroke="var(--paper)" stroke-width="2"/>`;
     }
     q += `<text x="${Rm}" y="${T + 10}" class="vz-t vz-s vp-tm" text-anchor="end">fond : ℓ(θ) (échelle relative)</text>`;
-    el.querySelector('[data-s=lik]').innerHTML = `<p class="vp-sub">Log-vraisemblance en fonction de ${M.par}</p>` + svg(W, H, q, 'Courbe de log-vraisemblance');
+    el.querySelector('[data-s=lik]').innerHTML = `<p class="vp-sub">Log-vraisemblance en fonction de ${M.par}</p>` + svg(W, B + 28, q, 'Courbe de log-vraisemblance');
     el.querySelector('[data-o=th]').textContent = num(th, 3);
     el.querySelector('[data-i=th]').value = th;
     const at = Math.abs(th - hat) < (b - a) / 150;
-    el.querySelector('[data-o=kp]').innerHTML = `<div>ℓ(${M.par}) = produit des ${n} facteurs<b>${sci10(Lc / Math.LN10)}</b></div><div>L(${M.par}) = ln ℓ<b>${num(Lc, 3)}</b></div><div>pente L'(${M.par})<b>${num(d1, 3)}</b></div><div class="hi">maximum : ${M.htxt}<b>${num(hat, 4)}</b>${at ? '<span class="vp-badge yes">atteint !</span>' : ''}</div>`;
+    el.querySelector('[data-o=kp]').innerHTML = `<div>ℓ(${M.par}) = produit des ${n} facteurs<b>${sci10(Lc / Math.LN10)}</b></div><div>L(${M.par}) = ln ℓ<b>${num(Lc, 3)}</b></div><div>pente L'(${M.par})<b>${num(Math.abs(d1) < 5e-3 ? 0 : d1, 3)}</b></div><div class="hi">maximum : ${M.htxt}<b>${num(hat, 4)}</b>${at ? '<span class="vp-badge yes">atteint !</span>' : ''}</div>`;
     el.querySelector('[data-o=out]').innerHTML = `Données : ${data.map(x => num(x, 2)).join(' ; ')}. ${M.disc ? 'Facteurs : P(X = xᵢ) pour chaque observation (barres orange, avec leur multiplicité).' : 'Facteurs : f(xᵢ ; θ) = hauteur de la tige orange au-dessus de chaque observation.'} <b>Observe :</b> loin de ${M.par}̂, certains facteurs deviennent minuscules et le produit s'effondre ; au maximum la pente de L (segment rouge) est nulle : c'est l'équation L'(${M.par}) = 0 du cours, et ℓ et ln ℓ ont le même argmax.`;
   };
   const climb = () => {

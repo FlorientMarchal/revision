@@ -101,7 +101,7 @@ function recorder() {
   r.print = (...a) => r.out.push(a.map(pstr).join(' '));
   return r;
 }
-const TF = b => (b ? '<b class="t">True</b>' : '<b class="f">False</b>');
+const TF = b => (b ? '<b class="yes">True</b>' : '<b class="no">False</b>');
 
 /** progs : [{ label, code, run: () => steps }]. visual(box, step) dessine l'état (listes, grilles…). */
 function tracer(el, { title, hint, progs, visual }) {
@@ -141,7 +141,7 @@ function tracer(el, { title, hint, progs, visual }) {
 function stripVisual(box, s) {
   let h = '';
   (s.strips || []).forEach(st => {
-    h += `<div class="vy-strip"><span class="lab">${esc(st.lab)}</span>${cellsHTML(st.items.map(pstr), { cur: st.cur, cls: st.cls, top: st.top })}</div>`;
+    h += `<div class="vy-strip"><span class="vl">${esc(st.lab)}</span>${cellsHTML(st.items.map(x => (st.raw ? String(x) : pyr(x))), { cur: st.cur, cls: st.cls, top: st.top })}</div>`;
   });
   if (s.flag) h += `<div class="vy-flag${s.flag.up ? ' up' : ''}"><svg viewBox="0 0 26 30" aria-hidden="true"><line x1="4" y1="2" x2="4" y2="29" class="pole"/><path d="M5 22h17l-4 3.5 4 3.5H5z" class="cloth"/></svg><span>drapeau <b>${esc(s.flag.name)}</b> = ${esc(pyr(s.flag.val))}${s.flag.up ? ' : levé, la boucle va s\'arrêter' : ''}</span></div>`;
   if (s.cnt) h += `<div class="vy-cnt2">${s.cnt.map(([k, v]) => `<span>${k} : <b>${v}</b></span>`).join('')}</div>`;
@@ -156,7 +156,7 @@ function loopsViz(el) {
 i = 1
 while i <= 3:
     print(i)
-    i += 1          # sinon : boucle infinie
+    i += 1    # sinon : boucle infinie
 print("fin, i =", i)`, run() {
       const r = recorder(); r.v.i = 1; r.st(1, 'On crée <code>i</code> et on l\'initialise à 1. Le <code>while</code> ne sait pas compter : c\'est à toi de gérer <code>i</code>.');
       for (;;) {
@@ -201,12 +201,12 @@ fruits = ["poire", "pomme", "banane"]
 for i, fruit in enumerate(fruits):
     print(i, fruit)`, run() {
       const r = recorder(), it = FRUITS.map((f, i) => `(${i}, '${f}')`), lab = 'enumerate →';
-      r.v.fruits = FRUITS; r.st(1, 'Une liste de 3 chaînes.', { strips: [{ lab, items: it }] });
+      r.v.fruits = FRUITS; r.st(1, 'Une liste de 3 chaînes.', { strips: [{ lab, items: it, raw: 1 }] });
       FRUITS.forEach((f, k) => {
-        r.v.i = k; r.v.fruit = f; r.st(2, `<code>enumerate</code> fournit le couple (${k}, '${f}') : il est déballé dans <code>i</code> et <code>fruit</code>.`, { strips: [{ lab, items: it, cur: k }] });
-        r.print(k, f); r.st(3, `<code>print</code> sépare ses arguments par une espace.`, { strips: [{ lab, items: it, cur: k }] });
+        r.v.i = k; r.v.fruit = f; r.st(2, `<code>enumerate</code> fournit le couple (${k}, '${f}') : il est déballé dans <code>i</code> et <code>fruit</code>.`, { strips: [{ lab, items: it, cur: k, raw: 1 }] });
+        r.print(k, f); r.st(3, `<code>print</code> sépare ses arguments par une espace.`, { strips: [{ lab, items: it, cur: k, raw: 1 }] });
       });
-      r.st(2, 'Fin : on a eu l\'indice et l\'élément, sans écrire <code>fruits[i]</code>.', { strips: [{ lab, items: it, cls: ['ok', 'ok', 'ok'] }] });
+      r.st(2, 'Fin : on a eu l\'indice et l\'élément, sans écrire <code>fruits[i]</code>.', { strips: [{ lab, items: it, cls: ['ok', 'ok', 'ok'], raw: 1 }] });
       return r.S;
     } },
     { label: 'à l\'envers', code: `
@@ -233,7 +233,7 @@ function flagViz(el) {
     label: `recherche(${pyr(cible)}, lis)`, code: `
 def recherche(a_chercher, lis):
     i = 0
-    indice = -1                     # drapeau : -1 = pas trouvé
+    indice = -1    # drapeau baissé
     while i < len(lis) and indice == -1:
         if lis[i] == a_chercher:
             indice = i
@@ -269,7 +269,7 @@ print(recherche(${pyr(cible).replace(/'/g, '"')}, lis))`, run() {
   const tous = {
     label: 'tous_pairs([2, 4, 7])', code: `
 def tous_pairs(lis):
-    ok = True                       # « pour tout » : True au départ
+    ok = True      # « pour tout »
     i = 0
     while i < len(lis) and ok:
         ok = lis[i] % 2 == 0
@@ -348,7 +348,7 @@ print(est_present(t, ${val}))`, run() {
   });
   const visual = (box, s) => {
     const G = s.grid;
-    box.innerHTML = `<div class="vy-g2">${T.map((row, i) => `<div class="row${G.ci === i ? ' cur' : ''}"><span class="rl">ligne ${i}</span>${row.length ? row.map((x, j) => {
+    box.innerHTML = `<div class="vy-g2">${T.map((row, i) => `<div class="gr${G.ci === i ? ' cur' : ''}"><span class="rl">ligne ${i}</span>${row.length ? row.map((x, j) => {
       const cls = G.ci === i && G.cj === j ? (G.hit ? 'ok' : 'cur') : G.seen.has(i + ',' + j) ? 'ko' : '';
       return `<span class="vy-cell ${cls}"><b>${x}</b></span>`;
     }).join('') : '<span class="vide">[ ] ligne vide</span>'}</div>`).join('')}</div>` + (s.flag ? `<div class="vy-flag${s.flag.up ? ' up' : ''}"><svg viewBox="0 0 26 30" aria-hidden="true"><line x1="4" y1="2" x2="4" y2="29" class="pole"/><path d="M5 22h17l-4 3.5 4 3.5H5z" class="cloth"/></svg><span>drapeau <b>trouve</b> = ${pyr(s.flag.val)}</span></div>` : '');
@@ -414,9 +414,9 @@ print(tri_par_insertion(LISTE))`;
   });
   const visual = (box, s) => {
     const B = s.bars, mx = Math.max(...B.src.map(Math.abs), 1), n = B.src.length;
-    const bar = (v, c) => `<div class="bar ${c}" style="height:${Math.max(4, (Math.abs(v) / mx) * 125)}px"><span>${v}</span></div>`;
-    const resb = Array.from({ length: n }, (_, i) => i < B.res.length ? bar(B.res[i], B.done ? 'done' : i === B.i ? 'i' : i === B.j ? (B.mode === 'put' ? 'cur' : 'j') : (B.mode === 'new' && i === B.i ? 'cur' : '')) : '<div class="bar ghost" style="height:4px"></div>').join('');
-    box.innerHTML = `<div class="vy-strip"><span class="lab">lis</span>${cellsHTML(B.src.map(String), { cur: B.k < n ? B.k : undefined, cls: B.src.map((_, i) => (i < B.k ? 'dim' : '')) })}</div>
+    const bar = (v, c) => `<div class="vb ${c}" style="height:${Math.max(4, (Math.abs(v) / mx) * 125)}px"><span>${v}</span></div>`;
+    const resb = Array.from({ length: n }, (_, i) => i < B.res.length ? bar(B.res[i], B.done ? 'done' : i === B.i ? 'i' : i === B.j ? (B.mode === 'put' ? 'cur' : 'j') : (B.mode === 'new' && i === B.i ? 'cur' : '')) : '<div class="vb ghost" style="height:4px"></div>').join('');
+    box.innerHTML = `<div class="vy-strip"><span class="vl">lis</span>${cellsHTML(B.src.map(String), { cur: B.k < n ? B.k : undefined, cls: B.src.map((_, i) => (i < B.k ? 'dim' : '')) })}</div>
       <div><div class="vy-bars" aria-label="liste res">${resb}</div><div class="vy-barlab">${Array.from({ length: n }, (_, i) => `<span>${i}</span>`).join('')}</div></div>` +
       `<div class="vy-cnt2">${s.cnt.map(([k, v]) => `<span>${k} : <b>${v}</b></span>`).join('')}</div>`;
   };
@@ -441,7 +441,8 @@ function monteCarloViz(el) {
       <text x="${W - M - 4}" y="${Y(0) - 4}" class="vz-t vz-s" text-anchor="end">1</text><text x="${M + 3}" y="${Y(0) - 4}" class="vz-t vz-s">−1</text>`, 'Carré [-1,1]² et disque unité, avec les points tirés', 'vy-mcsq')}</div>
     <div class="vy-side"><div class="vy-kpis"><div><small>nb (tirés)</small><b data-o="nb">0</b></div><div><small>dc (dans le disque)</small><b data-o="dc" style="color:var(--c3)">0</b></div><div><small>4 * dc / nb</small><b data-o="pi" style="color:var(--accent)">–</b></div><div><small>écart à π</small><b data-o="err">–</b></div></div>
       <div class="vy-code" data-o="code">${codeHTML(`
-x, y = random.uniform(-1, 1), random.uniform(-1, 1)
+x = random.uniform(-1, 1)
+y = random.uniform(-1, 1)
 if x*x + y*y <= 1:
     dc += 1
 nb += 1
@@ -457,7 +458,7 @@ print(4 * dc / nb)`)}</div>
     for (let t = 0; t < k && nb < MAX; t++) {
       const x = R() * 2 - 1, y = R() * 2 - 1, inn = x * x + y * y <= 1;
       nb++; if (inn) dc++;
-      const sq = `M${X(x).toFixed(1)} ${Y(y).toFixed(1)}h1.8v1.8h-1.8z`;
+      const sq = `M${X(x).toFixed(1)} ${Y(y).toFixed(1)}h2.4v2.4h-2.4z`;
       if (inn) din += sq; else dout += sq;
       last = { x, y, inn };
       if (nb <= 50 || nb % Math.max(1, Math.floor(nb / 200)) === 0) hist.push([nb, 4 * dc / nb]);
@@ -470,7 +471,7 @@ print(4 * dc / nb)`)}</div>
     const w = 320, h = 150, L = 36, Rr = w - 8, T = 10, B = h - 24, lmax = Math.log10(MAX);
     const sx = n => L + (Math.log10(n) / lmax) * (Rr - L), sy = v => B - ((clamp(v, 2.2, 4.2) - 2.2) / 2) * (B - T);
     let g = `<path d="M${L},${T}V${B}H${Rr}" class="vz-axis"/>`;
-    [1, 10, 100, 1000, 10000].forEach(n => { g += `<text x="${sx(n)}" y="${B + 14}" class="vz-t vz-s" text-anchor="middle">${n.toLocaleString('fr-FR')}</text>`; });
+    [[1, '1'], [10, '10'], [100, '100'], [1000, '10³'], [10000, '10⁴']].forEach(([n, t]) => { g += `<text x="${sx(n)}" y="${B + 14}" class="vz-t vz-s" text-anchor="middle">${t}</text>`; });
     [2.5, 3, 3.5, 4].forEach(v => { g += `<text x="${L - 4}" y="${sy(v) + 4}" class="vz-t vz-s" text-anchor="end">${fr(v, 1)}</text><line x1="${L}" x2="${Rr}" y1="${sy(v)}" y2="${sy(v)}" class="vz-grid"/>`; });
     g += `<line x1="${L}" x2="${Rr}" y1="${sy(Math.PI)}" y2="${sy(Math.PI)}" stroke="var(--good)" stroke-width="1.5" stroke-dasharray="6 4"/><text x="${Rr}" y="${sy(Math.PI) - 4}" class="vz-t vz-s" text-anchor="end" fill="var(--good)">π</text>`;
     if (hist.length) g += `<path d="${hist.map(([n, v], i) => `${i ? 'L' : 'M'}${sx(n).toFixed(1)},${sy(v).toFixed(1)}`).join('')}" fill="none" stroke="var(--accent)" stroke-width="2"/>`;
@@ -482,8 +483,8 @@ print(4 * dc / nb)`)}</div>
     $(el, '[data-o=dc]').textContent = dc.toLocaleString('fr-FR');
     $(el, '[data-o=pi]').textContent = nb ? (4 * dc / nb).toFixed(4) : '–';
     $(el, '[data-o=err]').textContent = nb ? (4 * dc / nb - Math.PI >= 0 ? '+' : '−') + Math.abs(4 * dc / nb - Math.PI).toFixed(4) : '–';
-    $$(el, '[data-o=code] .vy-ln').forEach(n => n.classList.toggle('on', !!last && (n.dataset.l === '1' || (n.dataset.l === '3' && last.inn))));
-    if (last) $(el, '[data-o=note]').innerHTML = `x = ${last.x.toFixed(3)}, y = ${last.y.toFixed(3)} : x*x + y*y = ${(last.x * last.x + last.y * last.y).toFixed(3)} ${last.inn ? '&lt;= 1 → <b class="t">dans le disque</b>, dc augmente.' : '&gt; 1 → <b class="f">hors du disque</b>.'}`;
+    $$(el, '[data-o=code] .vy-ln').forEach(n => n.classList.toggle('on', !!last && (n.dataset.l === '1' || n.dataset.l === '2' || (n.dataset.l === '4' && last.inn))));
+    if (last) $(el, '[data-o=note]').innerHTML = `x = ${last.x.toFixed(3)}, y = ${last.y.toFixed(3)} : x*x + y*y = ${(last.x * last.x + last.y * last.y).toFixed(3)} ${last.inn ? '&lt;= 1 → <b class="yes">dans le disque</b>, dc augmente.' : '&gt; 1 → <b class="no">hors du disque</b>.'}`;
     else if (nb >= MAX) $(el, '[data-o=note]').innerHTML = `${MAX.toLocaleString('fr-FR')} points : l'erreur reste de l'ordre de 1/√nb ≈ ${fr(1 / Math.sqrt(nb), 3)}. Pour gagner une décimale, il faut 100 fois plus de points.`;
     else if (playing) $(el, '[data-o=note]').innerHTML = 'Observe la courbe : elle oscille autour de π et se resserre très lentement.';
     chart();
@@ -506,6 +507,7 @@ print(4 * dc / nb)`)}</div>
 
 /* ------------------------------------------------------------------ py2 · indices et tranches */
 function pySliceIdx(n, a, b, c) {
+  if (c == null) c = 1;
   if (c === 0) return null;
   const out = [];
   if (c > 0) {
@@ -540,11 +542,11 @@ function sliceViz(el) {
     if (pick != null) {
       $(el, '[data-o=boxes]').innerHTML = cellsHTML(L.map(disp), { top: L.map((_, i) => i), bot: L.map((_, i) => i - n), cls: L.map((_, i) => (i === pick ? 'sel' : '')) });
       res.innerHTML = '';
-      out.innerHTML = `<code>${nm}[${pick}]</code> = <code>${nm}[${pick - n}]</code> = <b>${esc(disp(L[pick]))}</b>. Indices valides : de 0 à ${n - 1} (ou de −1 à −${n}) ; <code>${nm}[${n}]</code> → <b class="f">IndexError</b>.`;
+      out.innerHTML = `<code>${nm}[${pick}]</code> = <code>${nm}[${pick - n}]</code> = <b>${esc(disp(L[pick]))}</b>. Indices valides : de 0 à ${n - 1} (ou de −1 à −${n}) ; <code>${nm}[${n}]</code> → <b class="no">IndexError</b>.`;
     } else if ([a, b, c].some(Number.isNaN)) { out.innerHTML = 'Entre des entiers (ou laisse vide).'; res.innerHTML = ''; }
     else {
       const idx = pySliceIdx(n, a, b, c);
-      if (!idx) { out.innerHTML = '<b class="f">ValueError: slice step cannot be zero</b>'; res.innerHTML = ''; }
+      if (!idx) { out.innerHTML = '<b class="no">ValueError: slice step cannot be zero</b>'; res.innerHTML = ''; }
       else {
         const ord = {}; idx.forEach((i, k) => { ord[i] = k + 1; });
         $(el, '[data-o=boxes]').innerHTML = L.map((v, i) => `<span class="vy-cell ${ord[i] ? 'sel' : 'dim'}"><span class="ord">${ord[i] ? '#' + ord[i] : ''}</span><span class="ix">${i}</span><b>${esc(disp(v))}</b><span class="ix neg">${i - n}</span></span>`).join('');
@@ -665,7 +667,7 @@ function listOpsViz(el) {
     `<div class="vy-ops">${OPS.map((o, i) => `<button type="button" class="btn small" data-op="${i}">${esc(o.c)}</button>`).join('')}<button type="button" class="btn small" data-op="r" aria-label="Recommencer">⟲ lis = [3, 8, 10]</button></div>
     <div class="vy-lst" data-o="lst" aria-live="polite"></div>
     <div class="vy-row" style="align-items:center"><span data-o="badge"></span><span class="viz-out" data-o="why"></span></div>
-    <div class="vy-codel" data-o="log"></div>`;
+    <div class="vy-codel" data-o="log"></div><pre class="vy-pre" data-o="po"></pre>`;
   const box = $(el, '[data-o=lst]');
   const render = (res) => {
     const before = {};
@@ -677,7 +679,8 @@ function listOpsViz(el) {
       else n.animate([{ transform: 'translateY(-26px) scale(.5)', opacity: 0 }, { transform: 'none', opacity: 1 }], { duration: 450, easing: 'cubic-bezier(.3,1.4,.5,1)' });
     });
     $$(el, '[data-op]').forEach(b => { const o = OPS[+b.dataset.op]; if (o) b.disabled = (o.c.includes('pop') ? L.length === 0 : L.length >= 11); });
-    $(el, '[data-o=log]').textContent = (log ? log + '\n' : '') + `print(lis, len(lis))   # ${pyr(L.map(e => e.v))} ${L.length}`;
+    $(el, '[data-o=log]').innerHTML = (log ? hl(log) + '\n' : '') + hl('print(lis, len(lis))');
+    $(el, '[data-o=po]').textContent = `${pyr(L.map(e => e.v))} ${L.length}`;
   };
   $$(el, '[data-op]').forEach(b => {
     b.onclick = () => {
@@ -698,7 +701,7 @@ function compViz(el) {
   const EX = [['2*i + 1', i => 2 * i + 1], ['i**2', i => i * i], ['i % 3', i => i % 3]];
   const FI = [['', null], ['i % 2 == 0', i => i % 2 === 0], ['i % 3 != 0', i => i % 3 !== 0]];
   let e = 0, f = 0, n = 6;
-  el.innerHTML = head('Liste par compréhension, élément par élément', 'Choisis l\'expression, le filtre et n, puis lance : chaque i est testé, transformé, et rejoint (ou non) la liste. À gauche, la version générique équivalente.') +
+  el.innerHTML = head('Liste par compréhension, élément par élément', 'Choisis l\'expression, le filtre et n, puis lance : chaque i est testé, transformé, et rejoint (ou non) la liste. Le code déroulé est la version générique équivalente.') +
     `<div class="vy-q"><span class="qs">expression</span><div class="vy-chips" data-g="e">${EX.map((x, i) => `<button type="button" class="chip" data-v="${i}"><code>${x[0]}</code></button>`).join('')}</div>
      <span class="qs">filtre</span><div class="vy-chips" data-g="f">${FI.map((x, i) => `<button type="button" class="chip" data-v="${i}">${x[0] ? `<code>if ${x[0]}</code>` : 'sans filtre'}</button>`).join('')}</div>
      <div class="viz-ctrl"><label>n = <b data-o="n">6</b> <input type="range" min="1" max="12" value="6" aria-label="n"></label></div></div>
@@ -734,8 +737,8 @@ print(res == ${comp})`;
     tracer($(el, '[data-tr]'), { progs: [{ label: '', code, run }], visual: (box, s) => {
       const C = s.comp;
       $$(el, '[data-o=expr] [data-p]').forEach(x => x.classList.toggle('hl', x.dataset.p === C.ph));
-      box.innerHTML = `<div class="vy-pipe"><div class="lane"><span class="lab">range(${n})</span>${cellsHTML(C.it.map(String), { cur: C.cur, cls: C.it.map(i => (C.cls[i] === 'ko' ? 'ko' : C.cls[i] === 'ok' ? 'ok' : '')) })}</div>
-        <div class="lane vy-res"><span class="lab">res</span><span class="vy-brk">[</span>${C.res.map((v, k) => `<span class="vy-cell"><b${k === C.res.length - 1 && C.ph === 'expr' ? '' : ' style="animation:none"'}>${v}</b></span>`).join('')}<span class="vy-brk">]</span></div></div>`;
+      box.innerHTML = `<div class="vy-pipe"><div class="lane"><span class="vl">range(${n})</span>${cellsHTML(C.it.map(String), { cur: C.cur, cls: C.it.map(i => (C.cls[i] === 'ko' ? 'ko' : C.cls[i] === 'ok' ? 'ok' : '')) })}</div>
+        <div class="lane vy-res"><span class="vl">res</span><span class="vy-brk">[</span>${C.res.map((v, k) => `<span class="vy-cell"><b${k === C.res.length - 1 && C.ph === 'expr' ? '' : ' style="animation:none"'}>${v}</b></span>`).join('')}<span class="vy-brk">]</span></div></div>`;
     } });
   };
   $$(el, '[data-g] .chip').forEach(b => { b.onclick = () => { if (b.parentNode.dataset.g === 'e') e = +b.dataset.v; else f = +b.dataset.v; build(); }; });
@@ -763,18 +766,23 @@ function complexityViz(el) {
     const ymax = logY ? Math.log10(N * N) : N * N;
     const sx = x => L + (x / N) * (R - L), sy = v => B - ((logY ? Math.log10(Math.max(v, 1)) : v) / ymax) * (B - T);
     let g = `<path d="M${L},${T}V${B}H${R}" class="vz-axis"/>`;
+    const labs = [];
     CUR.forEach(c => {
       let d = '';
       for (let t = 0; t <= 80; t++) { const x = Math.max(1, (t / 80) * N); d += `${t ? 'L' : 'M'}${sx(x).toFixed(1)},${clamp(sy(c.f(x)), T - 4, B).toFixed(1)}`; }
-      g += `<path d="${d}" fill="none" stroke="${c.c}" stroke-width="2.5"/><text x="${R - 2}" y="${clamp(sy(c.f(N)), T + 10, B - 4) - 4}" class="vz-t vz-s" text-anchor="end" fill="${c.c}" style="fill:${c.c}">${c.k}</text>`;
+      g += `<path d="${d}" fill="none" stroke="${c.c}" stroke-width="2.5"/>`;
+      labs.push([clamp(sy(c.f(N)), T + 10, B) - 4, c]);
     });
+    labs.sort((a, b) => b[0] - a[0]);
+    let prev = Infinity;
+    labs.forEach(([y, c]) => { y = Math.min(y, prev - 13); prev = y; g += `<text x="${R - 2}" y="${y}" class="vz-t vz-s" text-anchor="end" style="fill:${c.c};paint-order:stroke;stroke:var(--paper);stroke-width:3px">${c.k}</text>`; });
     g += `<text x="${(L + R) / 2}" y="${h - 4}" class="vz-t vz-s" text-anchor="middle">n (de 1 à ${Math.round(N).toLocaleString('fr-FR')})</text><text x="${L - 6}" y="${T + 4}" class="vz-t vz-s" text-anchor="end">${logY ? '10^' + Math.round(ymax) : 'n²'}</text><text x="${L - 6}" y="${B}" class="vz-t vz-s" text-anchor="end">${logY ? '1' : '0'}</text>`;
     $(el, '[data-o=ch]').innerHTML = svg(w, h, g, 'Nombre d\'opérations en fonction de n');
   };
   const table = () => {
     const N = NS[ni];
     $(el, '[data-o=n]').textContent = N.toLocaleString('fr-FR');
-    $(el, '[data-o=tb]').innerHTML = `<tr><th>coût</th><th>opérations</th><th>temps</th><th>exemples du cours</th></tr>` + CUR.map(c => { const v = c.f(N); return `<tr><td><span class="sw" style="background:${c.c}"></span>${c.k}</td><td>${v < 1e7 ? Math.round(v).toLocaleString('fr-FR') : v.toExponential(1).replace('e+', '·10^')}</td><td>${tfmt(v * 1e-8)}</td><td style="font-family:var(--f-body);text-align:left">${c.ex}</td></tr>`; }).join('');
+    $(el, '[data-o=tb]').innerHTML = `<tr><th>coût · exemples du cours</th><th>opérations</th><th>temps</th></tr>` + CUR.map(c => { const v = c.f(N); return `<tr><td><span class="sw" style="background:${c.c}"></span><b>${c.k}</b><br><small style="font-family:var(--f-body);color:var(--muted)">${c.ex}</small></td><td style="white-space:nowrap">${v < 1e7 ? Math.round(v).toLocaleString('fr-FR') : v.toExponential(1).replace('.', ',').replace(/e\+(\d+)/, (m, e) => ' × 10<sup>' + e + '</sup>')}</td><td style="white-space:nowrap">${tfmt(v * 1e-8)}</td></tr>`; }).join('');
     const r = (N * N) / (N * Math.log2(N));
     $(el, '[data-o=out]').innerHTML = `À n = ${N.toLocaleString('fr-FR')}, le tri par insertion fait environ <b>${r < 1000 ? fr(r, 0) : Math.round(r).toLocaleString('fr-FR')} fois</b> plus d'opérations que Timsort. Doubler n double le coût linéaire mais <b>quadruple</b> le coût quadratique.`;
   };
@@ -849,10 +857,10 @@ function dictViz(el) {
       have.forEach((n, k) => { if (!D.e.some(e => e[0] === k)) n.remove(); });
       D.e.forEach(([k, v]) => {
         let n = have.get(k);
-        if (!n) { n = document.createElement('div'); n.className = 'ent'; n.dataset.k = k; n.innerHTML = `<span class="k">'${esc(k)}'</span><b></b><span><i class="bar" style="display:block;width:0"></i></span>`; n.style.position = 'absolute'; n.style.left = '0'; n.style.right = '0'; n.style.transform = `translateY(${order.indexOf(k) * H}px)`; dic.appendChild(n); }
+        if (!n) { n = document.createElement('div'); n.className = 'ent'; n.dataset.k = k; n.innerHTML = `<span class="k">'${esc(k)}'</span><b></b><span><i class="db" style="display:block;width:0"></i></span>`; n.style.position = 'absolute'; n.style.left = '0'; n.style.right = '0'; n.style.transform = `translateY(${order.indexOf(k) * H}px)`; dic.appendChild(n); }
         n.style.transform = `translateY(${order.indexOf(k) * H}px)`;
         $(n, 'b').textContent = v;
-        $(n, '.bar').style.width = (100 * v) / mx + '%';
+        $(n, '.db').style.width = (100 * v) / mx + '%';
         n.classList.toggle('new', D.nw === k);
         n.classList.remove('hit'); if (D.hit === k || D.nw === k) { void n.offsetWidth; n.classList.add('hit'); }
       });
@@ -887,14 +895,14 @@ function cesarViz(el) {
   let d = 3, sel = 0;
   const C = 150, R1 = 128, R2 = 98, step = 360 / 26;
   const pos = (i, r) => { const a = (i * step - 90) * Math.PI / 180; return [C + r * Math.cos(a), C + r * Math.sin(a)]; };
-  let outer = `<circle cx="${C}" cy="${C}" r="${R1 + 15}" class="ring"/><circle cx="${C}" cy="${C}" r="${(R1 + R2) / 2}" class="ring"/>`;
+  let outer = `<circle cx="${C}" cy="${C}" r="${R1 + 15}" class="rg"/><circle cx="${C}" cy="${C}" r="${(R1 + R2) / 2}" class="rg"/>`;
   for (let i = 0; i < 26; i++) { const [x, y] = pos(i, R1); outer += `<circle cx="${x}" cy="${y}" r="12" fill="transparent" data-l="${i}" style="cursor:pointer"/><text x="${x}" y="${y}" class="lo" data-t="${i}" style="pointer-events:none">${A[i]}</text>`; }
-  let inner = `<circle cx="${C}" cy="${C}" r="${R2 - 15}" class="ring"/>`;
+  let inner = `<circle cx="${C}" cy="${C}" r="${R2 - 15}" class="rg"/>`;
   for (let i = 0; i < 26; i++) { const [x, y] = pos(i, R2); inner += `<text x="${x}" y="${y}" class="li" transform="rotate(${i * step} ${x} ${y})">${A[i].toLowerCase()}</text>`; }
   el.innerHTML = head('Code de César : la roue de décalage', 'Tourne la roue avec d : chaque lettre (anneau extérieur) est remplacée par celle d rangs plus loin (anneau intérieur). Tape une lettre de la roue pour voir le calcul.') +
     `<div class="viz-ctrl"><label>d = <b data-o="d"></b> <input type="range" min="-25" max="25" value="3" aria-label="décalage d"></label>
       <button type="button" class="btn small" data-a="neg">d → −d (décoder)</button></div>
-    <div class="vy-row"><div style="flex:1 1 240px;max-width:330px;margin:0 auto">${svg(300, 300, `<g class="vy-wheel">${outer}<path d="" class="hilo" data-o="hl"/><g class="inner" data-o="inner" style="transform-origin:${C}px ${C}px">${inner}</g><path d="M${C - 7},${C - R1 - 26} L${C + 7},${C - R1 - 26} L${C},${C - R1 - 16}z" class="ptr"/></g>`, 'Roue de César', 'vy-wheel')}</div>
+    <div class="vy-row"><div style="flex:1 1 240px;max-width:330px;margin:0 auto">${svg(300, 300, `<g class="vy-wheel">${outer}<path d="" class="hilo" data-o="hl"/><g class="inner" data-o="inner" style="transform-origin:${C}px ${C}px">${inner}</g><text x="${C}" y="${C - 6}" text-anchor="middle" style="font:700 30px var(--f-mono);fill:var(--ink)" data-o="ctr"></text><text x="${C}" y="${C + 24}" text-anchor="middle" class="vz-t" data-o="ctr2"></text><path d="M${C - 7},${C - R1 - 26} L${C + 7},${C - R1 - 26} L${C},${C - R1 - 16}z" class="ptr"/></g>`, 'Roue de César', 'vy-wheel')}</div>
     <div class="vy-ces" style="flex:1 1 260px">
       <div class="vy-chips"><button type="button" class="chip" data-x="ave">« Ave Caesar ! »</button><button type="button" class="chip" data-x="tp">message du TP</button></div>
       <label class="qs" for="${'ces' + (++UID)}" style="font-size:13px;color:var(--muted)">texte</label><textarea id="${'ces' + UID}" spellcheck="false">Ave Caesar !</textarea>
@@ -912,9 +920,11 @@ function cesarViz(el) {
     const k = ((sel % 26) + 26) % 26, a0 = (k * step - 90 - step / 2) * Math.PI / 180, a1 = (k * step - 90 + step / 2) * Math.PI / 180, ro = R1 + 15, ri = R2 - 15;
     $(el, '[data-o=hl]').setAttribute('d', `M${C + ro * Math.cos(a0)},${C + ro * Math.sin(a0)} A${ro},${ro} 0 0 1 ${C + ro * Math.cos(a1)},${C + ro * Math.sin(a1)} L${C + ri * Math.cos(a1)},${C + ri * Math.sin(a1)} A${ri},${ri} 0 0 0 ${C + ri * Math.cos(a0)},${C + ri * Math.sin(a0)}z`);
     const txt = ta.value, out = [...txt].map(c => sh(c, d));
-    $(el, '[data-o=call]').textContent = `codage_par_substitution(texte, cree_dictionnaire_codage_par_decalage(${d}))`;
+    $(el, '[data-o=call]').innerHTML = hl('codage_par_substitution(texte,') + '\n' + hl(`    cree_dictionnaire_codage_par_decalage(${d}))`);
     $(el, '[data-o=out]').innerHTML = out.map((c, i) => `<span style="animation-delay:${reduced() ? 0 : Math.min(i, 60) * 0.012}s">${esc(c)}</span>`).join('');
     const j = (((k + d) % 26) + 26) % 26;
+    $(el, '[data-o=ctr]').textContent = `${A[k]} → ${A[j]}`;
+    $(el, '[data-o=ctr2]').textContent = `d = ${d}`;
     $(el, '[data-o=calc]').innerHTML = `${A[k]} est à l'indice ${k} : <code>(${k} + ${d < 0 ? '(' + d + ')' : d}) % 26 = ${j}</code> → <b>${A[j]}</b>. Le modulo rend l'alphabet circulaire${d < 0 ? ' ; en Python, % reste entre 0 et 25 même si la somme est négative' : ''}. Les caractères hors de l'alphabet (espaces, ponctuation, « à ») ne sont pas dans le dictionnaire : ils sont recopiés tels quels.`;
   };
   rg.oninput = () => { d = +rg.value; draw(); };
@@ -985,7 +995,7 @@ def resolution(t, niveau=0):
     if (!ev) note.innerHTML = 'Les cases sont numérotées de 0 à ' + (N * N - 1) + ' ligne par ligne : <code>niveau</code> = numéro de la case.';
     else if (ev.t === 'try') note.innerHTML = `Case (${ev.i}, ${ev.j}) : ${ev.d} n'est ni dans la ligne, ni dans la colonne, ni dans le bloc → on le pose et on passe à la case suivante.`;
     else if (ev.t === 'undo') note.innerHTML = `Impasse plus loin : on efface ${ev.d} en (${ev.i}, ${ev.j}) et on essaie le chiffre suivant.`;
-    else note.innerHTML = `<b class="t">Grille complète !</b> ${tries} chiffres posés, ${undos} effacés. Pas la méthode d'un humain, mais l'ordinateur calcule vite. (La fonction du cours continue ensuite pour chercher d'autres solutions.)`;
+    else note.innerHTML = `<b class="yes">Grille complète !</b> ${tries} chiffres posés, ${undos} effacés. Pas la méthode d'un humain, mais l'ordinateur calcule vite. (La fonction du cours continue ensuite pour chercher d'autres solutions.)`;
     $(el, '[data-a=play]').textContent = playing ? '❚❚ Pause' : done ? '⟲ Rejouer' : '▶ Résoudre';
     $(el, '[data-a=step]').disabled = done;
   };
@@ -1076,13 +1086,13 @@ function axisViz(el) {
     const show = v => (fn === 'argmax' ? String(v) : Number.isInteger(v) ? String(v) : fr(v, 2).replace(',', '.').replace(/0$/, ''));
     // grille : en-têtes + données + emplacements du résultat
     const cols = A[0].length + 1 + (axn === 1 || axn == null ? 1 : 0);
-    let h = `<span class="c h"></span>${JOURS.map(j => `<span class="c h">${j}</span>`).join('')}${axn === 1 ? '<span class="c h">→ résultat</span>' : axn == null ? '<span class="c h"></span>' : ''}`;
+    let h = `<span class="c h"></span>${JOURS.map(j => `<span class="c h">${j}</span>`).join('')}${axn === 1 ? '<span class="c h" title="résultat">→ rés.</span>' : axn == null ? '<span class="c h"></span>' : ''}`;
     A.forEach((r, i) => {
-      h += `<span class="c lab">${rows[i]}</span>` + r.map((x, j) => `<span class="c" data-c="${i},${j}">${n1(x)}</span>`).join('');
+      h += `<span class="c vl">${rows[i]}</span>` + r.map((x, j) => `<span class="c" data-c="${i},${j}">${n1(x)}</span>`).join('');
       if (axn === 1) h += `<span class="c r" data-r="${i}" style="opacity:0">${show(res[i])}</span>`;
       else if (axn == null) h += i === 1 ? `<span class="c r" data-r="0" style="opacity:0">${show(res[0])}</span>` : '<span class="c h"></span>';
     });
-    if (axn === 0) h += `<span class="c h">↓ résultat</span>${res.map((v, j) => `<span class="c r" data-r="${j}" style="opacity:0">${show(v)}</span>`).join('')}`;
+    if (axn === 0) h += `<span class="c h" title="résultat">↓ rés.</span>${res.map((v, j) => `<span class="c r" data-r="${j}" style="opacity:0">${show(v)}</span>`).join('')}`;
     const tab = $(el, '[data-o=tab]');
     tab.style.gridTemplateColumns = `auto repeat(${cols - 1}, minmax(40px, auto))`;
     tab.innerHTML = h;
@@ -1170,7 +1180,7 @@ function broadcastViz(el) {
       let h = `<div class="vy-tab" style="grid-template-columns:repeat(${rc}, minmax(38px, auto))">`;
       for (let i = 0; i < rr; i++) for (let j = 0; j < rc; j++) {
         const v = c.A[i % c.A.length][j % c.A[0].length] + c.B[i % c.B.length][j % c.B[0].length];
-        h += `<span class="c t"${reduced() ? '' : ` style="animation:vy-pop .4s ${(i * rc + j) * 0.04}s both"`}>${c.A === TEMP ? n1(v) : v}</span>`;
+        h += `<span class="c yes"${reduced() ? '' : ` style="animation:vy-pop .4s ${(i * rc + j) * 0.04}s both"`}>${c.A === TEMP ? n1(v) : v}</span>`;
       }
       st += `<span class="vy-op">=</span><div><div style="font-size:12px;color:var(--muted)">résultat (${rr}, ${rc})</div>${h}</div></div>`;
     }
@@ -1178,7 +1188,7 @@ function broadcastViz(el) {
     const notes = [
       `A a la forme (${as.join(', ')}), B la forme ${c.bShape}. Peut-on les additionner ?`,
       `On aligne les formes <b>par la droite</b>${bs.length < 2 ? ' et on complète B à gauche par des 1' : ''}. Chaque dimension doit être égale à l'autre ou valoir 1.`,
-      c.err ? `<b class="f">ValueError: operands could not be broadcast together with shapes (3,5) (3,)</b><br>${c.note}` : `Les dimensions égales à 1 sont <b>étirées</b> (copies virtuelles en pointillés, rien n'est recopié en mémoire). ${c.note}`,
+      c.err ? `<b class="no">ValueError: operands could not be broadcast together with shapes (3,5) (3,)</b><br>${c.note}` : `Les dimensions égales à 1 sont <b>étirées</b> (copies virtuelles en pointillés, rien n'est recopié en mémoire). ${c.note}`,
       'Le calcul se fait case par case, sans boucle Python.',
     ];
     $(el, '[data-o=note]').innerHTML = notes[k];
@@ -1211,9 +1221,9 @@ function maskViz(el) {
     const tab = $(el, '[data-o=tab]');
     tab.innerHTML = M.map((r, i) => r.map((x, j) => {
       const b = B[i][j];
-      if (mode === 'mask') return `<span class="c ${b ? 't' : 'f'}">${b ? 'True' : 'False'}</span>`;
-      if (mode === 'where') return `<span class="c ${b ? 't' : 'f'}">${b ? n1(x) : '−1'}</span>`;
-      return `<span class="c ${b ? 't' : 'f'}" data-k="${i * 3 + j}">${n1(x)}</span>`;
+      if (mode === 'mask') return `<span class="c ${b ? 'yes' : 'no'}">${b ? 'True' : 'False'}</span>`;
+      if (mode === 'where') return `<span class="c ${b ? 'yes' : 'no'}">${b ? n1(x) : '−1'}</span>`;
+      return `<span class="c ${b ? 'yes' : 'no'}" data-k="${i * 3 + j}">${n1(x)}</span>`;
     }).join('')).join('');
     let out = '', side = '';
     const nT = flat.length;
@@ -1225,7 +1235,7 @@ function maskViz(el) {
     $(el, '[data-o=side]').innerHTML = side;
     $(el, '[data-o=out]').textContent = out;
     if (mode === 'filt' && anim && !reduced()) {
-      $$(tab, '.c.t').forEach((c, k) => c.animate([{ transform: 'scale(1.15)', boxShadow: '0 0 0 3px var(--good)' }, { transform: 'none' }], { duration: 500, delay: k * 100 }));
+      $$(tab, '.c.yes').forEach((c, k) => c.animate([{ transform: 'scale(1.15)', boxShadow: '0 0 0 3px var(--good)' }, { transform: 'none' }], { duration: 500, delay: k * 100 }));
     }
     $(el, '[data-o=txt]').innerHTML = {
       mask: `<code>${esc(cond)}</code> donne un tableau de booléens de même forme : le <b>masque</b>. Pour combiner : <code>(M &gt; 20) &amp; (M &lt; 28)</code>, avec parenthèses, jamais <code>and</code>.`,
@@ -1326,7 +1336,7 @@ function mergeViz(el) {
   const table = (sc, T, name, hiRows, scan, dim) => {
     const ki = T.cols.indexOf(sc.key);
     return `<table class="vy-pd"><caption>${name}</caption><tr><th></th>${T.cols.map(c => `<th>${c}</th>`).join('')}</tr>` +
-      T.rows.map((r, i) => `<tr class="${kc(sc, r[ki])}${hiRows.includes(i) ? ' sel' : ''}${scan === i ? ' scan' : ''}${dim && !hiRows.includes(i) && scan !== i ? ' dim' : ''}"><th class="ix">${i}</th>${r.map((v, j) => `<td class="${j === ki ? 'key' : ''}">${esc(v)}</td>`).join('')}</tr>`).join('') + '</table>';
+      T.rows.map((r, i) => `<tr class="${kc(sc, r[ki])}${hiRows.includes(i) ? ' sel' : ''}${scan === i ? ' scan' : ''}${dim && !hiRows.includes(i) && scan !== i ? ' dim' : ''}"><th class="ix">${i}</th>${r.map((v, j) => `<td class="${j === ki ? 'vk' : ''}">${esc(v)}</td>`).join('')}</tr>`).join('') + '</table>';
   };
   const result = sc => {
     const L = sc.L, R = sc.R, lk = L.cols.indexOf(sc.key), rk = R.cols.indexOf(sc.key);
@@ -1349,7 +1359,7 @@ function mergeViz(el) {
     const done = out.filter(o => o.i <= (k >= sc.L.rows.length + 1 ? 99 : cur) && o.row);
     const fmtv = v => (v === 'NaN' ? '<td class="nan">NaN</td>' : `<td>${esc(v)}</td>`);
     $(el, '[data-o=res]').innerHTML = `<caption>résultat${k > sc.L.rows.length ? ` · forme (${done.length}, ${cols.length})` : ''}</caption><tr><th></th>${cols.map(c => `<th>${c}</th>`).join('')}</tr>` +
-      done.map((o, n) => `<tr class="${kc(sc, o.row[sc.L.cols.indexOf(sc.key)])}${o.i === cur ? ' in sel' : ''}"><th class="ix">${n}</th>${o.row.map((v, j) => (j === sc.L.cols.indexOf(sc.key) ? `<td class="key">${esc(v)}</td>` : fmtv(v))).join('')}</tr>`).join('');
+      done.map((o, n) => `<tr class="${kc(sc, o.row[sc.L.cols.indexOf(sc.key)])}${o.i === cur ? ' in sel' : ''}"><th class="ix">${n}</th>${o.row.map((v, j) => (j === sc.L.cols.indexOf(sc.key) ? `<td class="vk">${esc(v)}</td>` : fmtv(v))).join('')}</tr>`).join('');
     let note;
     if (k === 0) note = `On joint <code>${sc.Ln}</code> et <code>${sc.Rn}</code> sur leur colonne commune <b>${sc.key}</b>.`;
     else if (cur >= 0) {
@@ -1378,10 +1388,10 @@ function groupbyViz(el) {
     const f = AGG[agg], call = agg === 'size' ? 'resultats.groupby("groupe").size()' : `resultats.groupby("groupe")["score"].${agg}()`;
     $(el, '[data-o=code]').innerHTML = hl(`print(${call})`);
     const gi = g => G.indexOf(g);
-    const src = `<table class="vy-pd"><caption>resultats</caption><tr><th></th><th>groupe</th><th>score</th><th>duree_min</th></tr>${RES.map((r, i) => `<tr class="k${gi(r[0])}"><th class="ix">${i}</th><td class="key">${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td></tr>`).join('')}</table>`;
+    const src = `<table class="vy-pd"><caption>resultats</caption><tr><th></th><th>groupe</th><th>score</th><th>duree_min</th></tr>${RES.map((r, i) => `<tr class="k${gi(r[0])}"><th class="ix">${i}</th><td class="vk">${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td></tr>`).join('')}</table>`;
     const grp = G.map((g, n) => {
       const rows = RES.map((r, i) => [r, i]).filter(([r]) => r[0] === g), vals = rows.map(([r]) => r[1]), v = f(vals);
-      return `<div class="grp g${n}"><table class="vy-pd" style="width:100%"><caption>groupe ${g}</caption>${rows.map(([r, i]) => `<tr class="k${n}${k === 1 ? ' in' : ''}"><th class="ix">${i}</th><td class="key">${r[0]}</td><td>${r[1]}</td></tr>`).join('')}</table>
+      return `<div class="grp g${n}"><table class="vy-pd" style="width:100%"><caption>groupe ${g}</caption>${rows.map(([r, i]) => `<tr class="k${n}${k === 1 ? ' in' : ''}"><th class="ix">${i}</th><td class="vk">${r[0]}</td><td>${r[1]}</td></tr>`).join('')}</table>
         ${k >= 2 ? `<div class="vy-codel" style="font-size:12.5px;margin-top:4px;animation:vy-in .4s ${reduced() ? 0 : n * 0.2}s both">${agg}(${agg === 'size' ? rows.length + ' lignes' : '[' + vals.join(', ') + ']'}) = <b>${agg === 'mean' ? pyFloat(v) : v}</b></div>` : ''}</div>`;
     }).join('');
     const comb = `<table class="vy-pd"><caption>${agg === 'size' ? 'Series' : 'Series « score »'}</caption><tr><th class="ix">groupe</th><th></th></tr>${G.map((g, n) => { const v = f(RES.filter(r => r[0] === g).map(r => r[1])); return `<tr class="k${n} in"><th class="ix">${g}</th><td>${agg === 'mean' ? pyFloat(v) : v}</td></tr>`; }).join('')}</table>`;
@@ -1457,7 +1467,8 @@ function nanViz(el) {
       t.innerHTML = `<tr><th class="ix">colonne</th><th>NaN</th></tr>` + COLS.map((c, j) => { const n = D.filter(r => r[j] == null).length; return `<tr class="in"${reduced() ? '' : ` style="animation-delay:${j * 0.08}s"`}><th class="ix">${c}</th><td class="${n ? 'nan' : ''}">${n}</td></tr>`; }).join('');
       return;
     }
-    let h = `<tr><th></th>${COLS.map((c, j) => `<th style="${op === 'dropcol' && nanCol(j) ? 'opacity:.25;text-decoration:line-through' : ''}">${c}</th>`).join('')}</tr>`;
+    const brk = c => c.replace('_', '_<wbr>').replace('satisfaction', 'satis&shy;faction');
+    let h = `<tr><th></th>${COLS.map((c, j) => `<th style="${op === 'dropcol' && nanCol(j) ? 'opacity:.25;text-decoration:line-through' : ''}">${brk(c)}</th>`).join('')}</tr>`;
     D.forEach((r, i) => {
       const goneRow = (op === 'dropna' && nanRow(i)) || (op === 'dropsub' && r[2] == null);
       h += `<tr style="${goneRow ? 'opacity:.25;text-decoration:line-through' : ''}"><th class="ix">${i}</th>` + r.map((v, j) => {
@@ -1517,7 +1528,7 @@ function anatomyViz(el) {
     $$(s, '.part').forEach(p => p.classList.toggle('on', p.dataset.p === cur || (cur === 'ax' && ['ax', 'tk', 'l1', 'l2', 'leg', 'title', 'xl', 'yl'].includes(p.dataset.p))));
     $$(el, '[data-k]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.k === cur)));
     const P = PARTS.find(p => p[0] === cur);
-    $(el, '[data-o=code]').innerHTML = P ? P[2].split('\n').map(hl).join('\n') : hl('plt.show()   # affiche la figure ; plt.savefig("fig.png") l\'enregistre');
+    $(el, '[data-o=code]').innerHTML = P ? P[2].split('\n').map(hl).join('\n') : [hl('plt.show()               # affiche'), hl('plt.savefig("fig.png")   # enregistre')].join('\n');
     $(el, '[data-o=note]').innerHTML = P ? P[3] : 'Une figure contient un ou plusieurs <b>axes</b> ; chaque élément visible correspond à une instruction.';
     if (P && (cur === 'l1' || cur === 'l2') && !reduced()) { const p = $(s, `[data-p=${cur}] path`); p.animate([{ strokeDashoffset: 1200, strokeDasharray: cur === 'l1' ? '1200' : '7 5' }, { strokeDashoffset: 0 }], { duration: 700 }); }
   };
@@ -1547,7 +1558,7 @@ function subplotViz(el) {
     $$(el, '[data-o=fig] [data-k]').forEach(c => { c.onclick = () => { sel = +c.dataset.k; draw(false); }; });
     const i = Math.floor(sel / nc), j = sel % nc, pos = sel + 1;
     const idx = nr === 1 && nc === 1 ? 'ax' : nr === 1 || nc === 1 ? `axes[${nr === 1 ? j : i}]` : `axes[${i}, ${j}]`;
-    $(el, '[data-o=code]').innerHTML = [`ax = fig.add_subplot(${nr}, ${nc}, ${pos})`, `fig, axes = plt.subplots(${nr}, ${nc})`, `${idx}.plot(x, y)   # la même case`].map(hl).join('\n');
+    $(el, '[data-o=code]').innerHTML = [`ax = fig.add_subplot(${nr}, ${nc}, ${pos})`, `fig, axes = plt.subplots(${nr}, ${nc})`, `${idx}.plot(x, y)   # même case`].map(hl).join('\n');
     $(el, '[data-o=note]').innerHTML = `Case en ligne ${i}, colonne ${j} (en comptant de 0) → position <b>${i} × ${nc} + ${j} + 1 = ${pos}</b>. Les positions de <code>add_subplot</code> commencent à <b>1</b>, d'où le <code>i + 1</code> dans la boucle <code>for i, … in enumerate(…)</code>. ` +
       (nr === 1 && nc === 1 ? 'Avec une seule case, <code>plt.subplots()</code> renvoie un seul axes.' : nr === 1 || nc === 1 ? 'Une seule ligne (ou colonne) : <code>axes</code> est un <b>vecteur</b>, un seul indice.' : `<code>axes</code> est un tableau NumPy de forme (${nr}, ${nc}) : deux indices, à partir de 0.`);
   };
@@ -1645,12 +1656,12 @@ function chartPickViz(el) {
   ];
   let qi = 1, ci = 0;
   el.innerHTML = head('Choisir le bon graphique', 'Dis ce que tu veux montrer : le graphique adapté se dessine, avec l\'instruction Matplotlib / Seaborn et la raison du choix.') +
-    `<div class="vy-q"><span class="qs">Mes données…</span><div class="vy-chips" data-g="q">${Q.map((x, i) => `<button type="button" class="chip" data-v="${i}">${x[0]}</button>`).join('')}</div><div class="vy-chips" data-g="c"></div></div>
+    `<div class="vy-q"><span class="qs">Mes données…</span><div class="vy-chips vy-cg" data-g="q">${Q.map((x, i) => `<button type="button" class="chip" data-v="${i}">${x[0]}</button>`).join('')}</div><div class="vy-chips" data-g="c" style="align-items:center"></div></div>
     <div class="vy-row"><div style="flex:1 1 280px;max-width:420px" data-o="ch"></div><div style="flex:1 1 240px;display:grid;gap:8px;align-content:start"><div class="vy-codel" data-o="code" style="white-space:pre-wrap"></div><p class="vy-note" data-o="tip"></p></div></div>`;
   const draw = () => {
     $$(el, '[data-g=q] .chip').forEach(b => b.setAttribute('aria-pressed', String(+b.dataset.v === qi)));
     const opts = Q[qi][1];
-    $(el, '[data-g=c]').innerHTML = opts.length > 1 ? opts.map((k, i) => `<button type="button" class="chip" data-v="${i}" aria-pressed="${i === ci}">${CH[k].t}</button>`).join('') : '';
+    $(el, '[data-g=c]').innerHTML = opts.length > 1 ? '<span class="qs">Graphique :</span>' + opts.map((k, i) => `<button type="button" class="chip" data-v="${i}" aria-pressed="${i === ci}">${CH[k].t}</button>`).join('') : '';
     $$(el, '[data-g=c] .chip').forEach(b => { b.onclick = () => { ci = +b.dataset.v; draw(); }; });
     const c = CH[opts[ci]];
     $(el, '[data-o=ch]').innerHTML = svg(W, H, c.draw(), c.t, 'vy-ch');
