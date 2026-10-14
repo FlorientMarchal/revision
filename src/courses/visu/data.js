@@ -1,8 +1,9 @@
 // Contenu du cours « Visualisation d'informations ». Identifiants fixes : la progression ne se décale pas si l'on ajoute du contenu.
 import { chapters, fiches } from './fiches.js';
 import { labs } from './labs.js';
+import { lessons } from './lessons.js';
 
-export { chapters, fiches, labs };
+export { chapters, fiches, labs, lessons };
 
 const C = (id, ch, q, a) => ({ id: 'vc_' + id, ch, q, a });
 export const cards = [

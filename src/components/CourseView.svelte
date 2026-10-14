@@ -9,6 +9,8 @@
   import Annales from './Annales.svelte';
   import TP from './TP.svelte';
   import TPLab from './TPLab.svelte';
+  import Lessons from './Lessons.svelte';
+  import Formulas from './Formulas.svelte';
   import { evalList } from '../lib/evals.js';
 
   let { course, tab } = $props();
@@ -24,7 +26,9 @@
     .catch(e => { error = e.message || String(e); });
 
   const tabs = $derived(data ? [
+    { id: 'cours', label: 'Cours complet', on: (data.lessons || []).length },
     { id: 'fiches', label: 'Fiches', on: Object.keys(data.fiches || {}).length },
+    { id: 'formules', label: 'Formulaire', on: (data.formulas || []).length },
     { id: 'flash', label: 'Flashcards', on: (data.cards || []).length },
     { id: 'quiz', label: 'QCM', on: (data.quiz || []).length },
     { id: 'outils', label: 'Exercices interactifs', on: !!course.tools },
@@ -45,6 +49,9 @@
       {#each evalList(course) as e}<li class:next={e.next} class:past={e.past}><b>{e.label}</b>{#if e.when}<span>{e.when}{#if e.time} · {e.time}{/if}</span>{:else}<span class="tbd">date à venir</span>{/if}</li>{/each}
     </ul>
   {/if}
+  {#if course.links}
+    <p class="course-links">{#each course.links as l}<a href={l.url} target="_blank" rel="noopener">{l.label} ↗</a>{/each}</p>
+  {/if}
   {#if course.examInfo}<p class="exam-info">{@html course.examInfo}</p>{/if}
 </section>
 
@@ -59,7 +66,9 @@
     {/each}
   </nav>
   <main class="panel">
-    {#if current === 'fiches'}<Fiches {course} {data} />
+    {#if current === 'cours'}<Lessons {course} {data} />
+    {:else if current === 'fiches'}<Fiches {course} {data} />
+    {:else if current === 'formules'}<Formulas {course} {data} />
     {:else if current === 'flash'}<Flashcards {course} {data} />
     {:else if current === 'quiz'}<Quiz {course} {data} />
     {:else if current === 'outils'}<Tools {course} />
