@@ -14,5 +14,6 @@ export default {
   examsLabel: 'Exercices corrigés',
   topics: ['conditions d\'optimalité', 'convexité', 'descente de gradient', 'SGD, Newton, Adam', 'méthodes proximales', 'dualité et KKT', 'bagging, forêts, boosting', 'Ridge, Lasso, Elastic Net'],
   load: () => import('./data.js'),
+  viz: () => import('./viz.js'),
   credit: '<p><b>Source du cours.</b> Fiche de révision personnelle reprenant les parties « Optimisation » et « Régularisation » du cours en ligne <i>Fondations de l\'apprentissage statistique</i> (Master MIASHS, Université Paul-Valéry Montpellier 3) : leçons, exercices et leurs solutions (mode enseignant), questions de quiz. Le contenu appartient à ses auteurs ; seules la mise en page et la conversion ont été faites pour ce site.</p>',
 };

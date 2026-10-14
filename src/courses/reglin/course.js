@@ -15,5 +15,6 @@ export default {
   examsLabel: 'TD corrigés',
   topics: ['régression multiple', 'moindres carrés', 'tests de Student et de Fisher', 'prévision', 'moindres carrés généralisés', 'validation sur R'],
   load: () => import('./data.js'),
+  viz: () => import('./viz.js'),
   credit: '<p><b>Source du cours.</b> Fiche de révision personnelle tirée du cours <i>Modèles de régression linéaire et outils du diagnostic</i> (TW133MI, M1 MIASHS, Université Paul-Valéry Montpellier 3) : diapositives du cours, TD 1 et 2, exercices de révision, éléments de correction et commandes R, et TP de validation en R Markdown. Les notions, exemples, énoncés et codes appartiennent à leurs auteurs. Les exemples <i>swiss</i> et <i>longley</i> sont des jeux de données fournis avec R.</p>',
 };

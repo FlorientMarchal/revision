@@ -1,0 +1,278 @@
+/* Illustrations interactives Python / NumPy / Pandas / Matplotlib (viz-py.js). Couleurs : variables du thème uniquement. */
+
+/* ---------- lecteur : boutons Play / Pas / Reset ---------- */
+.vy-play{display:flex; flex-wrap:wrap; gap:6px; align-items:center}
+.vy-play .btn{min-height:44px; min-width:44px; display:inline-flex; align-items:center; justify-content:center; gap:6px}
+.vy-play .btn[data-a=play]{min-width:108px}
+.vy-play .btn.primary{color:var(--accent-ink)}
+.vy-play .vy-prog{flex:1 1 90px; min-width:80px; height:6px; border-radius:3px; background:var(--line); overflow:hidden; position:relative}
+.vy-play .vy-prog i{position:absolute; inset:0 auto 0 0; background:var(--accent); border-radius:3px; transition:width .2s}
+.vy-play .vy-cnt{font:12px var(--f-mono); color:var(--muted); min-width:4.5em; text-align:right}
+.vy-speed{display:inline-flex; align-items:center; gap:6px; font-size:13px; color:var(--muted)}
+.vy-speed input{width:90px; accent-color:var(--accent); height:44px; margin:0}
+.vy-chips{display:flex; flex-wrap:wrap; gap:6px}
+.vy-chips .chip{min-height:40px; font-size:13px}
+.vy-chips .chip code{font:600 12.5px var(--f-mono); background:none; border:0; padding:0; color:inherit}
+
+/* ---------- tracer (pas-à-pas d'exécution) ---------- */
+.vy-trace{display:grid; grid-template-columns:minmax(0,1fr); gap:10px}
+@media (min-width:760px){ .vy-trace{grid-template-columns:minmax(0,1.15fr) minmax(0,1fr)} }
+.vy-code{font:12.5px/1.6 var(--f-mono); background:var(--paper-2); border:1px solid var(--line); border-radius:8px; padding:6px 0; overflow-x:auto; counter-reset:none; tab-size:4}
+.vy-ln{display:flex; padding:0 10px 0 0; white-space:pre; position:relative; transition:background-color .25s; min-width:max-content}
+.vy-ln .vy-no{flex:none; width:2.6em; text-align:right; padding-right:10px; color:var(--muted); opacity:.7; user-select:none}
+.vy-ln.on{background:var(--accent-soft); box-shadow:inset 3px 0 0 var(--accent)}
+.vy-ln.on .vy-no{color:var(--accent); opacity:1; font-weight:700}
+.vy-ln.on .vy-no::before{content:"▶"; font-size:9px; margin-right:3px; vertical-align:1px}
+.vy-ln.was{background:color-mix(in srgb, var(--accent-soft) 45%, transparent)}
+.vy-k{color:var(--accent); font-weight:600}
+.vy-s{color:var(--c3)}
+.vy-n{color:var(--c4)}
+.vy-c{color:var(--muted); font-style:italic}
+.vy-f{color:var(--c6)}
+.vy-side{display:grid; gap:8px; align-content:start; min-width:0}
+.vy-panel{border:1px solid var(--line); border-radius:8px; background:var(--paper); min-width:0}
+.vy-panel > h5{margin:0; padding:4px 10px; font:600 10.5px var(--f-mono); letter-spacing:.07em; text-transform:uppercase; color:var(--muted); border-bottom:1px solid var(--line); background:var(--paper-2); border-radius:8px 8px 0 0}
+.vy-vars{display:grid; grid-template-columns:auto minmax(0,1fr); gap:3px 10px; padding:8px 10px; font:13px var(--f-mono); align-items:center}
+.vy-vars .k{color:var(--muted); text-align:right}
+.vy-vars .v{overflow-wrap:anywhere; padding:1px 6px; border-radius:4px; justify-self:start; transition:background-color .6s}
+.vy-vars .v.chg{animation:vy-flash 1s ease-out}
+.vy-vars .empty{grid-column:1/-1; color:var(--muted); font-style:italic; font-family:var(--f-body)}
+@keyframes vy-flash{0%{background:var(--warn-soft); box-shadow:0 0 0 2px var(--warn)} 100%{background:transparent; box-shadow:0 0 0 0 transparent}}
+.vy-out{margin:0; padding:8px 10px; font:13px/1.5 var(--f-mono); min-height:2.2em; white-space:pre-wrap; overflow-wrap:anywhere; max-height:12em; overflow:auto}
+.vy-out .new{animation:vy-in .35s ease-out; display:inline-block; color:var(--good); font-weight:600}
+.vy-out .err{color:var(--red); font-weight:600}
+@keyframes vy-in{from{opacity:0; transform:translateY(6px)} to{opacity:1; transform:none}}
+.vy-note{margin:0; font-size:14px; line-height:1.5; padding:8px 10px; border-radius:8px; background:var(--accent-soft); border:1px solid var(--accent-line); min-height:2.6em}
+.vy-note code{font-size:12.5px}
+.vy-note b.t{color:var(--good)} .vy-note b.f{color:var(--red)}
+
+/* ---------- boîtes de liste ---------- */
+.vy-strip{display:flex; flex-wrap:wrap; gap:4px; align-items:flex-end; padding:4px 0}
+.vy-strip .lab{font:12px var(--f-mono); color:var(--muted); margin-right:6px; align-self:center}
+.vy-cell{display:flex; flex-direction:column; align-items:center; gap:2px; font:12px var(--f-mono); color:var(--muted); transition:transform .35s cubic-bezier(.3,1.3,.5,1), opacity .3s}
+.vy-cell > b{display:flex; align-items:center; justify-content:center; min-width:40px; height:40px; padding:0 6px; border:1.5px solid var(--line-strong); border-radius:6px; background:var(--paper); color:var(--ink); font:600 14px var(--f-mono); transition:background-color .25s, border-color .25s, color .25s, transform .25s, box-shadow .25s}
+.vy-cell.cur > b{border-color:var(--accent); background:var(--accent-soft); box-shadow:0 0 0 3px var(--accent-line); transform:translateY(-3px)}
+.vy-cell.ok > b{border-color:var(--good); background:var(--good-soft); color:var(--good)}
+.vy-cell.ko > b{border-color:var(--red); background:var(--red-soft); color:var(--red)}
+.vy-cell.sel > b{border-color:var(--accent); background:var(--accent); color:var(--accent-ink)}
+.vy-cell.dim{opacity:.4}
+.vy-cell .ix{font-size:11px; line-height:1}
+.vy-cell .ix.neg{color:var(--c6)}
+.vy-cell .ord{font:700 11px var(--f-mono); color:var(--accent); height:13px}
+.vy-flag{display:inline-flex; align-items:center; gap:8px; font:13px var(--f-mono); padding:6px 10px; border-radius:8px; border:1px solid var(--line); background:var(--paper-2)}
+.vy-flag svg{width:26px; height:30px; flex:none}
+.vy-flag .pole{stroke:var(--ink-2); stroke-width:2}
+.vy-flag .cloth{fill:var(--muted); transition:transform .5s cubic-bezier(.3,1.4,.5,1), fill .3s; transform-origin:4px 28px}
+.vy-flag.up .cloth{fill:var(--good); transform:translateY(-18px)}
+.vy-visual{display:grid; gap:8px; min-width:0}
+.vy-cnt2{display:flex; flex-wrap:wrap; gap:6px; font:12px var(--f-mono); color:var(--muted)}
+.vy-cnt2 span{border:1px solid var(--line); border-radius:6px; padding:3px 8px; background:var(--paper-2)}
+.vy-cnt2 b{color:var(--ink)}
+
+/* ---------- grille 2D ---------- */
+.vy-g2{display:grid; gap:4px; font:13px var(--f-mono)}
+.vy-g2 .row{display:flex; gap:4px; align-items:center; min-height:40px}
+.vy-g2 .rl{width:3.6em; color:var(--muted); font-size:12px; text-align:right; padding-right:4px; transition:color .2s}
+.vy-g2 .row.cur .rl{color:var(--accent); font-weight:700}
+.vy-g2 .row.cur{background:var(--accent-soft); border-radius:6px}
+.vy-g2 .vide{color:var(--muted); font-style:italic; font-size:12px}
+
+/* ---------- barres (tri) ---------- */
+.vy-bars{display:flex; align-items:flex-end; gap:4px; height:150px; padding:4px 2px 0; border-bottom:1.5px solid var(--line-strong)}
+.vy-bars .bar{flex:1 1 0; min-width:0; max-width:46px; position:relative; border-radius:4px 4px 0 0; background:var(--c1); opacity:.8; transition:height .35s cubic-bezier(.3,1.2,.5,1), background-color .25s, opacity .25s}
+.vy-bars .bar span{position:absolute; left:0; right:0; top:-17px; text-align:center; font:600 11.5px var(--f-mono); color:var(--ink)}
+.vy-bars .bar.i{background:var(--warn); opacity:1}
+.vy-bars .bar.j{background:var(--c6); opacity:1}
+.vy-bars .bar.done{background:var(--good); opacity:.85}
+.vy-bars .bar.ghost{background:transparent; border:1.5px dashed var(--line-strong); opacity:1}
+.vy-bars .bar.src{background:var(--c0); opacity:.55}
+.vy-bars .bar.cur{background:var(--accent); opacity:1}
+.vy-barlab{display:flex; gap:4px; padding:0 2px; font:11px var(--f-mono); color:var(--muted)}
+.vy-barlab span{flex:1 1 0; max-width:46px; text-align:center}
+
+/* ---------- Monte-Carlo ---------- */
+.vy-mc{display:grid; grid-template-columns:minmax(0,1fr); gap:10px; align-items:start}
+@media (min-width:700px){ .vy-mc{grid-template-columns:minmax(0,1fr) minmax(0,1.1fr)} }
+.vy-mc .pin{fill:var(--c3)} .vy-mc .pout{fill:var(--c2)}
+.vy-mc .last{animation:vy-drop .45s cubic-bezier(.3,1.5,.5,1)}
+@keyframes vy-drop{from{transform:translateY(-14px); opacity:0} to{transform:none; opacity:1}}
+.vy-big{font:700 26px var(--f-mono); color:var(--accent); font-variant-numeric:tabular-nums}
+.vy-kpis{display:grid; grid-template-columns:repeat(auto-fill,minmax(96px,1fr)); gap:6px}
+.vy-kpis > div{border:1px solid var(--line); border-radius:8px; padding:6px 8px; background:var(--paper-2); display:grid; gap:1px}
+.vy-kpis small{font-size:11.5px; color:var(--muted)}
+.vy-kpis b{font:700 16px var(--f-mono); font-variant-numeric:tabular-nums}
+
+/* ---------- slicing ---------- */
+.vy-sl-in{display:flex; flex-wrap:wrap; align-items:center; gap:4px; font:600 17px var(--f-mono)}
+.vy-sl-in input{width:3.2em; min-height:40px; font:600 16px var(--f-mono); text-align:center; border:1.5px solid var(--line-strong); border-radius:6px; background:var(--field, var(--paper)); color:var(--ink); padding:0 2px}
+.vy-sl-in input:focus{outline:none; border-color:var(--accent); box-shadow:0 0 0 3px var(--accent-line)}
+.vy-res{display:flex; flex-wrap:wrap; gap:4px; align-items:center; min-height:48px; font:13px var(--f-mono)}
+.vy-res .vy-cell > b{animation:vy-pop .45s cubic-bezier(.3,1.5,.5,1) both}
+@keyframes vy-pop{from{transform:scale(.3) translateY(-30px); opacity:0} to{transform:none; opacity:1}}
+.vy-brk{font:600 22px var(--f-mono); color:var(--muted)}
+
+/* ---------- mémoire : alias / copie ---------- */
+.vy-mem .name{font:600 14px var(--f-mono); fill:var(--ink)}
+.vy-mem .namebox{fill:var(--paper-2); stroke:var(--line-strong); stroke-width:1.2}
+.vy-mem .obj{fill:var(--paper); stroke:var(--line-strong); stroke-width:1.5}
+.vy-mem .val{font:600 14px var(--f-mono); fill:var(--ink); text-anchor:middle; dominant-baseline:central}
+.vy-mem .arr{stroke:var(--accent); stroke-width:2; fill:none; stroke-dasharray:400; stroke-dashoffset:0; animation:vy-draw .6s ease-out}
+.vy-mem .arr2{stroke:var(--c6); stroke-width:1.8; fill:none; animation:vy-draw .6s ease-out; stroke-dasharray:400}
+.vy-mem .hd{fill:var(--accent)} .vy-mem .hd2{fill:var(--c6)}
+.vy-mem .hot{fill:var(--warn-soft); stroke:var(--warn); stroke-width:2; animation:vy-hot 1s ease-out}
+.vy-mem .idl{font:11px var(--f-mono); fill:var(--muted)}
+@keyframes vy-draw{from{stroke-dashoffset:400} to{stroke-dashoffset:0}}
+@keyframes vy-hot{0%{stroke-width:5} 100%{stroke-width:2}}
+
+/* ---------- opérations sur les listes ---------- */
+.vy-ops{display:flex; flex-wrap:wrap; gap:6px}
+.vy-ops .btn{min-height:44px; font:600 13px var(--f-mono)}
+.vy-ops .btn:disabled{opacity:.45; cursor:not-allowed}
+.vy-lst{display:flex; flex-wrap:wrap; gap:4px; min-height:64px; align-items:flex-end; padding:6px 0}
+.vy-lst .vy-cell.new > b{border-color:var(--good); background:var(--good-soft); color:var(--good)}
+.vy-lst .vy-cell.mv > b{border-color:var(--warn); background:var(--warn-soft)}
+.vy-badge{display:inline-flex; align-items:center; gap:6px; font:700 13px var(--f-mono); padding:4px 10px; border-radius:999px; border:1.5px solid}
+.vy-badge.o1{color:var(--good); border-color:var(--good); background:var(--good-soft)}
+.vy-badge.on{color:var(--red); border-color:var(--red); background:var(--red-soft)}
+.vy-badge.ok{color:var(--accent); border-color:var(--accent); background:var(--accent-soft)}
+
+/* ---------- compréhension ---------- */
+.vy-pipe{display:grid; gap:8px}
+.vy-pipe .lane{display:flex; flex-wrap:wrap; gap:4px; align-items:center; min-height:48px}
+.vy-pipe .lane > .lab{font:12px var(--f-body); color:var(--muted); width:100%}
+.vy-expr{font:600 15px var(--f-mono); padding:8px 12px; border-radius:8px; background:var(--paper-2); border:1px solid var(--line); overflow-wrap:anywhere}
+.vy-expr .hl{color:var(--accent); background:var(--accent-soft); border-radius:4px; padding:0 3px}
+.vy-expr .ok{color:var(--good)} .vy-expr .ko{color:var(--red)}
+
+/* ---------- dictionnaire ---------- */
+.vy-txt{font:14px/1.9 var(--f-mono); padding:8px 10px; border:1px solid var(--line); border-radius:8px; background:var(--paper-2)}
+.vy-txt span{padding:1px 2px; border-radius:4px; transition:background-color .25s, color .25s, opacity .25s}
+.vy-txt span.done{opacity:.45}
+.vy-txt span.cur{background:var(--accent); color:var(--accent-ink)}
+.vy-dict{position:relative; display:grid; gap:3px; font:13px var(--f-mono)}
+.vy-dict .ent{display:grid; grid-template-columns:7.5em 2.2em minmax(0,1fr); gap:6px; align-items:center; height:28px; transition:transform .5s cubic-bezier(.4,1.2,.5,1); padding:0 6px; border-radius:6px}
+.vy-dict .ent.hit{animation:vy-hit .7s ease-out}
+.vy-dict .ent .bar{height:14px; border-radius:3px; background:var(--c1); transition:width .35s ease-out; opacity:.8}
+.vy-dict .ent.new .k{color:var(--good); font-weight:700}
+.vy-dict .ent b{text-align:right}
+@keyframes vy-hit{0%{background:var(--warn-soft)} 100%{background:transparent}}
+
+/* ---------- César ---------- */
+.vy-wheel .ring{fill:none; stroke:var(--line-strong); stroke-width:1}
+.vy-wheel .lo{font:600 13px var(--f-mono); fill:var(--ink); text-anchor:middle; dominant-baseline:central}
+.vy-wheel .li{font:600 13px var(--f-mono); fill:var(--accent); text-anchor:middle; dominant-baseline:central}
+.vy-wheel .inner{transition:transform .6s cubic-bezier(.3,1.2,.5,1)}
+.vy-wheel .hilo{fill:var(--warn-soft); stroke:var(--warn); stroke-width:1.5}
+.vy-wheel .ptr{fill:var(--warn)}
+.vy-ces{display:grid; gap:8px}
+.vy-ces textarea{width:100%; box-sizing:border-box; min-height:64px; font:14px/1.5 var(--f-mono); border:1.5px solid var(--line-strong); border-radius:8px; padding:8px; background:var(--field, var(--paper)); color:var(--ink); resize:vertical}
+.vy-ces .outt{font:600 15px/1.6 var(--f-mono); padding:8px 10px; border-radius:8px; background:var(--good-soft); border:1px solid var(--good-line, var(--good)); color:var(--ink); overflow-wrap:anywhere; min-height:2.2em}
+.vy-ces .outt span{display:inline-block; animation:vy-in .3s ease-out both; white-space:pre}
+
+/* ---------- Sudoku ---------- */
+.vy-sdk{display:grid; gap:0; border:2.5px solid var(--ink-2); border-radius:6px; width:min(100%, 360px); aspect-ratio:1; margin:0 auto; font:600 16px var(--f-mono)}
+.vy-sdk span{display:flex; align-items:center; justify-content:center; border:1px solid var(--line); transition:background-color .2s, color .2s}
+.vy-sdk span.g{color:var(--ink); background:var(--paper-2)}
+.vy-sdk span.p{color:var(--accent); background:var(--accent-soft)}
+.vy-sdk span.cur{background:var(--warn-soft); box-shadow:inset 0 0 0 2px var(--warn); color:var(--warn)}
+.vy-sdk span.back{background:var(--red-soft); color:var(--red)}
+.vy-sdk span.win{background:var(--good-soft); color:var(--good)}
+.vy-sdk span.bR{border-right:2.5px solid var(--ink-2)} .vy-sdk span.bB{border-bottom:2.5px solid var(--ink-2)}
+
+/* ---------- tableaux NumPy / Pandas ---------- */
+.vy-tab{display:grid; gap:3px; font:13px var(--f-mono); width:max-content; max-width:100%; position:relative}
+.vy-tab .c{min-width:44px; height:36px; padding:0 4px; display:flex; align-items:center; justify-content:center; border-radius:5px; background:var(--paper-2); border:1px solid var(--line); transition:background-color .3s, border-color .3s, color .3s, opacity .3s, transform .3s; font-variant-numeric:tabular-nums}
+.vy-tab .h{background:none; border-color:transparent; color:var(--muted); font-size:11.5px}
+.vy-tab .c.r{background:var(--accent-soft); border-color:var(--accent); color:var(--accent); font-weight:700}
+.vy-tab .c.t{background:var(--good-soft); border-color:var(--good); color:var(--good); font-weight:600}
+.vy-tab .c.f{background:var(--paper); color:var(--muted)}
+.vy-tab .c.nan{background:var(--red-soft); border-color:var(--red); color:var(--red); font-weight:600}
+.vy-tab .c.fill{background:var(--good-soft); border-color:var(--good); color:var(--good); font-weight:700; animation:vy-hit .9s}
+.vy-tab .c.hi{background:var(--accent-soft); border-color:var(--accent); font-weight:700}
+.vy-tab .c.hot{background:var(--warn-soft); border-color:var(--warn)}
+.vy-tab .c.ghost{background:transparent; border:1.5px dashed var(--accent); color:var(--accent); opacity:.8}
+.vy-tab .c.gone{opacity:.15; text-decoration:line-through}
+.vy-tab .c.lab{background:none; border-color:transparent; font-weight:700; color:var(--ink-2)}
+.vy-scroll{overflow-x:auto; max-width:100%; padding-bottom:2px}
+.vy-shape{font:600 13px var(--f-mono); display:grid; grid-template-columns:auto auto; gap:2px 12px; width:max-content; padding:6px 10px; border-radius:8px; background:var(--paper-2); border:1px solid var(--line)}
+.vy-shape .d{display:inline-flex; gap:6px}
+.vy-shape .d i{font-style:normal; display:inline-block; min-width:1.6em; text-align:center; border-radius:4px; padding:0 3px}
+.vy-shape .d i.ok{background:var(--good-soft); color:var(--good)}
+.vy-shape .d i.st{background:var(--warn-soft); color:var(--warn)}
+.vy-shape .d i.ko{background:var(--red-soft); color:var(--red)}
+.vy-shape .d i.pad{color:var(--muted); font-style:italic}
+.vy-row{display:flex; flex-wrap:wrap; gap:14px; align-items:flex-start}
+.vy-row > *{min-width:0}
+.vy-op{font:700 22px var(--f-mono); color:var(--muted); align-self:center}
+.vy-pd{font:12.5px var(--f-mono); border-collapse:collapse}
+.vy-pd th, .vy-pd td{padding:5px 8px; border:1px solid var(--line); text-align:right; transition:background-color .3s, color .3s, opacity .3s}
+.vy-pd th{background:var(--paper-2); color:var(--muted); font-weight:600}
+.vy-pd th.ix{text-align:left}
+.vy-pd tr.sel td, .vy-pd tr.sel th{background:var(--accent-soft); color:var(--accent); font-weight:700}
+.vy-pd tr.scan th{box-shadow:inset 0 0 0 2px var(--warn)}
+.vy-pd tr.in{animation:vy-in .4s ease-out}
+.vy-pd td.key{font-weight:700}
+.vy-pd tr.k0 td.key{color:var(--c1)} .vy-pd tr.k1 td.key{color:var(--c2)} .vy-pd tr.k2 td.key{color:var(--c3)} .vy-pd tr.k3 td.key{color:var(--c6)}
+.vy-pd tr.dim td, .vy-pd tr.dim th{opacity:.35}
+.vy-pd td.nan{color:var(--red); background:var(--red-soft)}
+.vy-pd caption{caption-side:top; text-align:left; font:600 12px var(--f-mono); color:var(--muted); padding:0 0 3px}
+.vy-pd .pos{color:var(--c6); font-size:11px; font-weight:400}
+.vy-pre{margin:0; font:12.5px/1.45 var(--f-mono); padding:8px 10px; border:1px dashed var(--line-strong); border-radius:8px; white-space:pre; overflow-x:auto; color:var(--ink-2)}
+.vy-pre.err{color:var(--red); border-color:var(--red)}
+.vy-codel{font:600 14px var(--f-mono); padding:8px 12px; border-radius:8px; background:var(--paper-2); border:1px solid var(--line); overflow-x:auto; white-space:pre}
+
+/* groupby */
+.vy-gb{display:grid; grid-template-columns:minmax(0,1fr); gap:10px}
+@media (min-width:760px){ .vy-gb{grid-template-columns:repeat(3, minmax(0,1fr))} }
+.vy-gb .st{font:600 11px var(--f-mono); letter-spacing:.06em; text-transform:uppercase; color:var(--muted); margin-bottom:4px}
+.vy-gb .grp{border:1.5px solid var(--line); border-radius:8px; padding:4px; margin-bottom:6px; transition:border-color .3s}
+.vy-gb .grp.g0{border-color:var(--c1)} .vy-gb .grp.g1{border-color:var(--c2)} .vy-gb .grp.g2{border-color:var(--c3)}
+.vy-gb .phase{opacity:.3; transition:opacity .4s}
+.vy-gb .phase.on{opacity:1}
+
+/* ---------- Matplotlib ---------- */
+.vy-fig .ax{fill:var(--paper-2); stroke:var(--line-strong); stroke-width:1.5; cursor:pointer; transition:fill .2s}
+.vy-fig .ax:hover{fill:var(--accent-soft)}
+.vy-fig .ax.on{fill:var(--accent-soft); stroke:var(--accent); stroke-width:2.5}
+.vy-fig .num{font:700 20px var(--f-mono); fill:var(--muted); text-anchor:middle; dominant-baseline:central; pointer-events:none}
+.vy-fig .ax.on + .num{fill:var(--accent)}
+.vy-fig .figr{fill:var(--paper); stroke:var(--ink-2); stroke-width:2}
+.vy-fig g.cellg{animation:vy-pop .45s cubic-bezier(.3,1.4,.5,1) both}
+.vy-anat .part{cursor:pointer; transition:opacity .2s}
+.vy-anat.focus .part{opacity:.25}
+.vy-anat.focus .part.on{opacity:1}
+.vy-anat .lbl{font:12px var(--f-body); fill:var(--ink-2)}
+.vy-anat .call{stroke:var(--warn); stroke-width:1.5; fill:none; stroke-dasharray:3 3}
+.vy-anat .callt{font:700 12px var(--f-mono); fill:var(--warn)}
+.vy-ch .draw{stroke-dasharray:1200; animation:vy-draw2 1s ease-out both}
+.vy-ch .grow{transform-box:fill-box; transform-origin:50% 100%; animation:vy-grow .6s cubic-bezier(.3,1.3,.5,1) both}
+.vy-ch .growx{transform-box:fill-box; transform-origin:0 50%; animation:vy-growx .6s cubic-bezier(.3,1.3,.5,1) both}
+.vy-ch .fade{animation:vy-fade .5s ease-out both}
+.vy-ch .spin{transform-origin:150px 120px; animation:vy-spin .8s cubic-bezier(.3,1.1,.5,1) both}
+@keyframes vy-draw2{from{stroke-dashoffset:1200} to{stroke-dashoffset:0}}
+@keyframes vy-grow{from{transform:scaleY(0)} to{transform:none}}
+@keyframes vy-growx{from{transform:scaleX(0)} to{transform:none}}
+@keyframes vy-fade{from{opacity:0; transform:scale(.6)} to{opacity:1; transform:none}}
+@keyframes vy-spin{from{transform:rotate(-90deg) scale(.4); opacity:0} to{transform:none; opacity:1}}
+.vy-q{display:grid; gap:6px}
+.vy-q .qs{font:600 13px var(--f-body); color:var(--muted)}
+
+/* ---------- complexité ---------- */
+.vy-cx .crv{fill:none; stroke-width:2.5; transition:d .3s}
+.vy-tbl{font:12.5px var(--f-mono); border-collapse:collapse; width:100%}
+.vy-tbl td, .vy-tbl th{padding:4px 6px; border-bottom:1px solid var(--line); text-align:right}
+.vy-tbl th{color:var(--muted); font-weight:600; font-family:var(--f-body)}
+.vy-tbl td:first-child, .vy-tbl th:first-child{text-align:left}
+.vy-tbl .sw{display:inline-block; width:14px; height:3px; border-radius:2px; vertical-align:middle; margin-right:6px}
+
+@media (max-width:420px){
+  .vy-code{font-size:11.5px}
+  .vy-cell > b{min-width:36px; height:38px; font-size:13px}
+  .vy-tab .c{min-width:38px; height:34px; font-size:12px}
+  .vy-pd th, .vy-pd td{padding:4px 5px}
+}
+@media (prefers-reduced-motion: reduce){
+  .vy-cell, .vy-cell > b, .vy-bars .bar, .vy-dict .ent, .vy-dict .ent .bar, .vy-wheel .inner, .vy-tab .c, .vy-flag .cloth, .vy-ln, .vy-play .vy-prog i{transition:none !important}
+  .vy-vars .v.chg, .vy-out .new, .vy-res .vy-cell > b, .vy-mem .arr, .vy-mem .arr2, .vy-mem .hot, .vy-mc .last, .vy-dict .ent.hit, .vy-ces .outt span, .vy-tab .c.fill, .vy-pd tr.in,
+  .vy-fig g.cellg, .vy-ch .draw, .vy-ch .grow, .vy-ch .growx, .vy-ch .fade, .vy-ch .spin{animation:none !important}
+}
