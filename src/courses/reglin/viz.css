@@ -61,7 +61,7 @@
 /* tests */
 .rl-dens{fill:none; stroke:var(--ink); stroke-width:2}
 .rl-norm{fill:none; stroke:var(--muted); stroke-width:1.3; stroke-dasharray:5 4}
-.rl-rej{fill:var(--red-soft); stroke:none}
+.rl-rej{fill:var(--red); fill-opacity:.22; stroke:none}
 .rl-pv{fill:var(--accent); fill-opacity:.35; stroke:none}
 .rl-crit{stroke:var(--red); stroke-width:1.6; stroke-dasharray:5 3}
 .rl-tcrit{fill:var(--red); font-weight:600}
