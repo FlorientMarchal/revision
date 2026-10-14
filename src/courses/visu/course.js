@@ -2,13 +2,14 @@
 export default {
   id: 'visu',
   title: 'Visualisation d\'informations',
+  code: 'TW113MI',
   short: 'Visualisation',
   level: 'M1 MIASHS',
   semester: 'S1 · 2025-2026',
   teacher: 'Arnaud Sallaberry',
   evals: [
-    { label: 'Partiel', date: null },
-    { label: 'Rattrapage', date: null },
+    { label: 'Partiel', date: '2026-11-02', time: '9h15' },
+    { label: 'Rattrapage', date: '2027-01-05', time: '9h30' },
   ],
   examInfo: '<b>Examen sur 20 :</b> 10 points de cours (questions dans l\'esprit du TD, dont certaines viennent d\'anciens examens) et 10 points de TP (coder une visualisation). Pour la partie TP, <b>seuls les codes fournis par l\'enseignant sont acceptés</b> ; tu as droit à tous les codes faits en exemple, mais les consignes ne seront pas détaillées comme dans les supports.',
   examsLabel: 'TD corrigé',
