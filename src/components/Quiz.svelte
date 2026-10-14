@@ -1,5 +1,6 @@
 <script>
   import { kv, progress, setVal, setBest, getVal } from '../lib/progress.js';
+  import { inlineMath } from '../lib/math.js';
 
   let { course, data } = $props();
   const prog = progress(course.id);
@@ -65,14 +66,14 @@
   {:else}
     <div class="row" style="justify-content:space-between"><span class="eyebrow" style="margin:0">{chName(q.ch)}</span><span class="stat">Question {i + 1}/{list.length} · score {score}</span></div>
     <div class="bar thin"><i style="width:{(100 * i) / list.length}%"></i></div>
-    <h3 class="qz-q" style="margin-top:10px">{q.q}</h3>
+    <h3 class="qz-q" style="margin-top:10px">{@html inlineMath(q.q)}</h3>
     <div class="opts">
       {#each opts as { o, k } (k)}
-        <button class="opt" class:ok={picked !== null && k === q.ans} class:ko={picked === k && k !== q.ans} disabled={picked !== null} onclick={() => answer(k)}>{o}</button>
+        <button class="opt" class:ok={picked !== null && k === q.ans} class:ko={picked === k && k !== q.ans} disabled={picked !== null} onclick={() => answer(k)}>{@html inlineMath(o)}</button>
       {/each}
     </div>
     {#if picked !== null}
-      <div class="exp"><b>{picked === q.ans ? 'Bonne réponse.' : 'Raté.'}</b> {q.exp}</div>
+      <div class="exp"><b>{picked === q.ans ? 'Bonne réponse.' : 'Raté.'}</b> {@html inlineMath(q.exp)}</div>
       <div class="row" style="margin-top:12px"><button class="btn primary" onclick={next}>Question suivante →</button></div>
     {/if}
   {/if}
