@@ -1,0 +1,54 @@
+/* Illustrations interactives du cours de probabilités (viz-proba.js). Couleurs : variables du thème uniquement. */
+.vp-stage{min-width:0; position:relative}
+.vp-svg{max-width:620px; margin:0 auto; user-select:none; -webkit-user-select:none; -webkit-tap-highlight-color:transparent; touch-action:pan-y}
+.vp-two{display:grid; grid-template-columns:repeat(auto-fit,minmax(min(300px,100%),1fr)); gap:12px 18px; align-items:start}
+.vp-two > *{min-width:0}
+.vp-two .vp-svg{max-width:520px}
+.vp-row{display:flex; flex-wrap:wrap; gap:8px; align-items:center}
+.vp-seg{display:flex; flex-wrap:wrap; gap:6px}
+.vp-seg .chip{min-height:40px}
+.vp-sub{font-size:12px; color:var(--muted); font-weight:600; letter-spacing:.04em; text-transform:uppercase; margin:0 0 2px}
+
+/* marques des graphiques */
+.vp-emp{fill:var(--c4); fill-opacity:.32; stroke:var(--c4); stroke-width:1}
+.vp-th{stroke:var(--accent); stroke-width:2}
+.vp-thd{fill:var(--accent)}
+.vp-curve{fill:none; stroke:var(--accent); stroke-width:2.5; stroke-linejoin:round}
+.vp-curve2{fill:none; stroke:var(--c2); stroke-width:2.5; stroke-linejoin:round}
+.vp-area{fill:var(--accent); fill-opacity:.18}
+.vp-area2{fill:var(--c2); fill-opacity:.2}
+.vp-ball{fill:var(--c4); stroke:var(--paper); stroke-width:1}
+.vp-E{stroke:var(--red); stroke-width:1.5; stroke-dasharray:5 4}
+.vp-band{fill:var(--accent-soft); opacity:.75}
+.vp-mu{stroke:var(--good); stroke-width:1.8; stroke-dasharray:6 4}
+.vp-hit{fill:transparent; cursor:pointer}
+.vp-hit:hover{fill:var(--accent); fill-opacity:.06}
+.vp-click{cursor:pointer}
+.vp-handle{cursor:grab; touch-action:none}
+.vp-handle:active{cursor:grabbing}
+.vp-tb{font-weight:700}
+.vp-tm{fill:var(--muted)}
+.vp-tr{fill:var(--red)}
+.vp-tg{fill:var(--good)}
+.vp-ta{fill:var(--accent)}
+.vp-halo{paint-order:stroke; stroke:var(--paper); stroke-width:3.5px; stroke-linejoin:round}
+
+/* matrices et tableaux */
+.vp-mats{display:flex; flex-wrap:wrap; gap:8px 18px; align-items:center; font:13px var(--f-mono); color:var(--ink)}
+.vp-mats > span{display:inline-flex; align-items:center; gap:6px}
+.vp-mat{display:inline-grid; grid-template-columns:repeat(2,auto); gap:1px 10px; padding:2px 7px; border-left:2px solid var(--ink-2); border-right:2px solid var(--ink-2); border-radius:5px; text-align:right; font-variant-numeric:tabular-nums}
+.vp-tab{font-variant-numeric:tabular-nums}
+.vp-tab td.ok{background:var(--good-soft); color:var(--good); font-weight:700}
+.vp-tab td.ko{background:var(--red-soft); color:var(--red); font-weight:700}
+.vp-tab td.zero{color:var(--muted)}
+.vp-badge{display:inline-block; padding:1px 9px; border-radius:999px; font-weight:700; font-size:13px; white-space:nowrap}
+.vp-badge.yes{background:var(--good-soft); color:var(--good)}
+.vp-badge.no{background:var(--red-soft); color:var(--red)}
+.vp-pop{animation:vp-pop .35s ease-out}
+@keyframes vp-pop{from{opacity:.25; transform:translateY(3px)} to{opacity:1; transform:none}}
+.vp-kpis{display:grid; grid-template-columns:repeat(auto-fill,minmax(min(128px,100%),1fr)); gap:6px}
+.vp-kpis > div{border:1px solid var(--line); border-radius:8px; padding:6px 10px; background:var(--paper-2); font-size:12px; color:var(--muted); line-height:1.35}
+.vp-kpis b{display:block; font:700 17px var(--f-mono); color:var(--ink); font-variant-numeric:tabular-nums}
+.vp-kpis > div.hi{border-color:var(--accent-line); background:var(--accent-soft)}
+.vp-kpis > div.hi b{color:var(--accent)}
+@media (prefers-reduced-motion: reduce){ .vp-pop{animation:none} }
