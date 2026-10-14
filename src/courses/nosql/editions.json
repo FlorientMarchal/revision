@@ -1,0 +1,412 @@
+{
+  "docs": [
+    {
+      "nom": "Francofolies",
+      "lieu": "La Rochelle",
+      "annee": 2019,
+      "max_personnes": 12000,
+      "artistes": [
+        {
+          "nom": "Angèle",
+          "pays": "Belgique"
+        },
+        {
+          "nom": "Aya Nakamura",
+          "pays": "Mali"
+        },
+        {
+          "nom": "Christine & The Queens",
+          "pays": "France"
+        },
+        {
+          "nom": "Deluxe",
+          "pays": "France"
+        },
+        {
+          "nom": "Lomepal",
+          "pays": "France"
+        }
+      ]
+    },
+    {
+      "nom": "Francofolies",
+      "lieu": "La Rochelle",
+      "annee": 2022,
+      "max_personnes": 12000,
+      "artistes": [
+        {
+          "nom": "Angèle",
+          "pays": "Belgique"
+        },
+        {
+          "nom": "Clara Luciani",
+          "pays": "France"
+        },
+        {
+          "nom": "Juliette Armanet",
+          "pays": "France"
+        },
+        {
+          "nom": "Orelsan",
+          "pays": "France"
+        },
+        {
+          "nom": "Roméo Elvis",
+          "pays": "Belgique"
+        }
+      ]
+    },
+    {
+      "nom": "Garorock",
+      "lieu": "Marmande",
+      "annee": 2018,
+      "max_personnes": 50000,
+      "artistes": [
+        {
+          "nom": "Angèle",
+          "pays": "Belgique"
+        },
+        {
+          "nom": "Dj Snake",
+          "pays": "France"
+        },
+        {
+          "nom": "Indochine",
+          "pays": "France"
+        },
+        {
+          "nom": "L'Impératrice",
+          "pays": "France"
+        },
+        {
+          "nom": "MGMT",
+          "pays": "USA"
+        },
+        {
+          "nom": "Macklemore",
+          "pays": "USA"
+        },
+        {
+          "nom": "Roméo Elvis",
+          "pays": "Belgique"
+        },
+        {
+          "nom": "The Vaccines",
+          "pays": "Royaume Uni"
+        },
+        {
+          "nom": "Therapie Taxi",
+          "pays": "France"
+        },
+        {
+          "nom": "Tryo",
+          "pays": "France"
+        }
+      ]
+    },
+    {
+      "nom": "Garorock",
+      "lieu": "Marmande",
+      "annee": 2020,
+      "max_personnes": 50000,
+      "artistes": [
+        {
+          "nom": "Black Eyed Peas",
+          "pays": "USA"
+        },
+        {
+          "nom": "Deluxe",
+          "pays": "France"
+        },
+        {
+          "nom": "Izïa",
+          "pays": "France"
+        },
+        {
+          "nom": "L'Impératrice",
+          "pays": "France"
+        },
+        {
+          "nom": "Lomepal",
+          "pays": "France"
+        },
+        {
+          "nom": "PNL",
+          "pays": "France"
+        },
+        {
+          "nom": "Pomme",
+          "pays": "France"
+        },
+        {
+          "nom": "Sean Paul",
+          "pays": "Jamaïque"
+        },
+        {
+          "nom": "The Strokes",
+          "pays": "USA"
+        },
+        {
+          "nom": "Vladimir Cauchemar",
+          "pays": "France"
+        }
+      ]
+    },
+    {
+      "nom": "Garorock",
+      "lieu": "Marmande",
+      "annee": 2021,
+      "max_personnes": 50000,
+      "artistes": [
+        {
+          "nom": "Gorillaz",
+          "pays": "Royaume Uni"
+        },
+        {
+          "nom": "Izïa",
+          "pays": "France"
+        },
+        {
+          "nom": "PNL",
+          "pays": "France"
+        },
+        {
+          "nom": "Pomme",
+          "pays": "France"
+        },
+        {
+          "nom": "Selah Sue",
+          "pays": "Belgique"
+        },
+        {
+          "nom": "Tryo",
+          "pays": "France"
+        },
+        {
+          "nom": "Vianney",
+          "pays": "France"
+        }
+      ]
+    },
+    {
+      "nom": "Les Déferlantes",
+      "lieu": "Argelès-sur-Mer",
+      "annee": 2023,
+      "max_personnes": 35000,
+      "artistes": [
+        {
+          "nom": "Alt-J",
+          "pays": "Royaume Uni"
+        },
+        {
+          "nom": "Big Flo & Oli",
+          "pays": "France"
+        },
+        {
+          "nom": "Deluxe",
+          "pays": "France"
+        },
+        {
+          "nom": "Indochine",
+          "pays": "France"
+        },
+        {
+          "nom": "Izïa",
+          "pays": "France"
+        },
+        {
+          "nom": "Lomepal",
+          "pays": "France"
+        },
+        {
+          "nom": "Phoenix",
+          "pays": "France"
+        },
+        {
+          "nom": "Pomme",
+          "pays": "France"
+        }
+      ]
+    },
+    {
+      "nom": "Les Eurockéennes",
+      "lieu": "Sermamagny, Territoire de Belfort",
+      "annee": 2018,
+      "max_personnes": 35000,
+      "artistes": [
+        {
+          "nom": "Big Flo & Oli",
+          "pays": "France"
+        },
+        {
+          "nom": "Juliette Armanet",
+          "pays": "France"
+        },
+        {
+          "nom": "Lomepal",
+          "pays": "France"
+        },
+        {
+          "nom": "Macklemore",
+          "pays": "USA"
+        },
+        {
+          "nom": "Orelsan",
+          "pays": "France"
+        },
+        {
+          "nom": "The Limiñanas",
+          "pays": "France"
+        },
+        {
+          "nom": "Therapie Taxi",
+          "pays": "France"
+        }
+      ]
+    },
+    {
+      "nom": "Les Eurockéennes",
+      "lieu": "Sermamagny, Territoire de Belfort",
+      "annee": 2023,
+      "max_personnes": 35000,
+      "artistes": [
+        {
+          "nom": "Indochine",
+          "pays": "France"
+        },
+        {
+          "nom": "Lomepal",
+          "pays": "France"
+        },
+        {
+          "nom": "Orelsan",
+          "pays": "France"
+        },
+        {
+          "nom": "Phoenix",
+          "pays": "France"
+        },
+        {
+          "nom": "Pomme",
+          "pays": "France"
+        },
+        {
+          "nom": "Vladimir Cauchemar",
+          "pays": "France"
+        }
+      ]
+    },
+    {
+      "nom": "Rock en Seine",
+      "lieu": "Domaine national de Saint-Cloud",
+      "annee": 2023,
+      "max_personnes": 40000,
+      "artistes": [
+        {
+          "nom": "Billie Eilish",
+          "pays": "USA"
+        },
+        {
+          "nom": "Bonobo",
+          "pays": "Royaume Uni"
+        },
+        {
+          "nom": "Charlotte de Witte",
+          "pays": "Belgique"
+        },
+        {
+          "nom": "Christine & The Queens",
+          "pays": "France"
+        },
+        {
+          "nom": "L'Impératrice",
+          "pays": "France"
+        },
+        {
+          "nom": "Placebo",
+          "pays": "Royaume Uni"
+        },
+        {
+          "nom": "The Murder Capital",
+          "pays": "Irlande"
+        },
+        {
+          "nom": "The Strokes",
+          "pays": "USA"
+        },
+        {
+          "nom": "Tove Lo",
+          "pays": "Suède"
+        },
+        {
+          "nom": "Yeah yeah yeahs",
+          "pays": "USA"
+        }
+      ]
+    },
+    {
+      "nom": "Solidays",
+      "lieu": "Hippodrome de Longchamp",
+      "annee": 2019,
+      "max_personnes": 100000,
+      "artistes": [
+        {
+          "nom": "Angèle",
+          "pays": "Belgique"
+        },
+        {
+          "nom": "Therapie Taxi",
+          "pays": "France"
+        },
+        {
+          "nom": "Vladimir Cauchemar",
+          "pays": "France"
+        }
+      ]
+    },
+    {
+      "nom": "Solidays",
+      "lieu": "Hippodrome de Longchamp",
+      "annee": 2023,
+      "max_personnes": 100000,
+      "artistes": [
+        {
+          "nom": "Angèle",
+          "pays": "Belgique"
+        },
+        {
+          "nom": "Big Flo & Oli",
+          "pays": "France"
+        },
+        {
+          "nom": "Black Eyed Peas",
+          "pays": "USA"
+        },
+        {
+          "nom": "Deluxe",
+          "pays": "France"
+        },
+        {
+          "nom": "Juliette Armanet",
+          "pays": "France"
+        },
+        {
+          "nom": "La Femme",
+          "pays": "France"
+        },
+        {
+          "nom": "Orelsan",
+          "pays": "France"
+        },
+        {
+          "nom": "The Murder Capital",
+          "pays": "Irlande"
+        },
+        {
+          "nom": "Vladimir Cauchemar",
+          "pays": "France"
+        }
+      ]
+    }
+  ]
+}
