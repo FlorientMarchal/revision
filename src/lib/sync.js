@@ -63,10 +63,26 @@ function schedule(course) {
   timer = setTimeout(() => { const list = [...pending]; pending.clear(); pullPush(list); }, 1500);
 }
 
-export async function sendLink(email) {
+/** Envoie l'e-mail de connexion : il contient un code à taper sur le site (et un lien de secours). */
+export async function sendCode(email) {
   const redirect = location.origin + location.pathname;
   const { error } = await supabase.auth.signInWithOtp({ email, options: { emailRedirectTo: redirect } });
   if (error) throw error;
+}
+
+/** Vérifie le code reçu par e-mail : marche quel que soit l'appareil où l'e-mail a été ouvert. */
+export async function verifyCode(email, token) {
+  const { error } = await supabase.auth.verifyOtp({ email, token, type: 'email' });
+  if (error) throw error;
+}
+
+/** Messages d'erreur Supabase les plus courants, en français. */
+export function authMessage(err) {
+  const m = (err && (err.message || String(err))) || '';
+  if (/rate limit|too many|security purposes/i.test(m)) return "Trop d'envois rapprochés : attends quelques minutes avant de redemander un code.";
+  if (/expired|invalid|otp/i.test(m)) return 'Code incorrect ou expiré. Vérifie les chiffres, ou demande un nouveau code.';
+  if (/fetch|network/i.test(m)) return 'Pas de connexion au serveur. Vérifie ta connexion internet.';
+  return m;
 }
 
 export async function signOut() {

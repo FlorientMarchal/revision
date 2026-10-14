@@ -76,3 +76,5 @@ header.shell{flex-wrap:nowrap}
   header.shell:has(.crumb-course) .brand span{display:none}
   .account-btn{padding:0 12px}
 }
+.code-input{flex:0 1 220px!important; font:600 24px/1 var(--f-mono)!important; letter-spacing:.3em; text-align:center}
+.code-form small{font-size:13px}

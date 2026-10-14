@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<meta name="supported-color-schemes" content="light dark">
+<title>Ton code de connexion</title>
+</head>
+<body style="margin:0;padding:0;background:#eef1f4;">
+<div style="display:none;max-height:0;overflow:hidden;opacity:0;">Ton code : {{ .Token }} · valable une heure</div>
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#eef1f4;">
+  <tr><td align="center" style="padding:32px 16px;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:480px;background:#ffffff;border:1px solid #d3d9e2;border-radius:14px;">
+      <tr><td style="padding:28px 32px 0 32px;font-family:'IBM Plex Sans','Segoe UI','Helvetica Neue',Arial,sans-serif;">
+        <table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr>
+          <td style="width:34px;height:34px;background:#1f4fb5;border-radius:9px;text-align:center;vertical-align:middle;color:#ffffff;font:700 18px Georgia,serif;">R</td>
+          <td style="padding-left:10px;font:700 16px 'IBM Plex Sans','Segoe UI',Arial,sans-serif;color:#172033;">Mes révisions</td>
+        </tr></table>
+      </td></tr>
+      <tr><td style="padding:24px 32px 0 32px;font-family:'IBM Plex Sans','Segoe UI','Helvetica Neue',Arial,sans-serif;color:#172033;">
+        <h1 style="margin:0 0 8px 0;font:600 24px/1.25 'Source Serif 4',Georgia,serif;color:#172033;">Ton code de connexion</h1>
+        <p style="margin:0;font-size:15px;line-height:1.55;color:#525d6f;">Recopie ce code sur la page <b style="color:#172033;">Compte</b> du site pour retrouver ta progression.</p>
+      </td></tr>
+      <tr><td align="center" style="padding:24px 32px;">
+        <div style="display:inline-block;padding:16px 28px;background:#e8eef9;border:1px solid #b7c8ec;border-radius:12px;font:700 34px/1 'JetBrains Mono',Menlo,Consolas,monospace;letter-spacing:8px;color:#1f4fb5;">{{ .Token }}</div>
+        <p style="margin:10px 0 0 0;font:13px 'IBM Plex Sans','Segoe UI',Arial,sans-serif;color:#525d6f;">Valable une heure, utilisable une seule fois.</p>
+      </td></tr>
+      <tr><td style="padding:0 32px;"><div style="border-top:1px solid #d3d9e2;height:1px;line-height:1px;font-size:1px;">&nbsp;</div></td></tr>
+      <tr><td style="padding:20px 32px 28px 32px;font-family:'IBM Plex Sans','Segoe UI','Helvetica Neue',Arial,sans-serif;">
+        <p style="margin:0 0 14px 0;font-size:14px;line-height:1.5;color:#525d6f;">Tu lis cet e-mail sur l'appareil où tu révises ? Tu peux aussi te connecter directement :</p>
+        <a href="{{ .ConfirmationURL }}" style="display:inline-block;padding:11px 20px;background:#1f4fb5;border-radius:8px;color:#ffffff;font:600 15px 'IBM Plex Sans','Segoe UI',Arial,sans-serif;text-decoration:none;">Me connecter sur cet appareil</a>
+      </td></tr>
+    </table>
+    <p style="max-width:480px;margin:16px auto 0 auto;font:12px/1.5 'IBM Plex Sans','Segoe UI',Arial,sans-serif;color:#7a8597;">Tu n'as rien demandé ? Ignore cet e-mail : sans le code, personne ne peut se connecter à ton compte.</p>
+  </td></tr>
+</table>
+</body>
+</html>
