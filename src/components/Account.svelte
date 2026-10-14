@@ -2,7 +2,6 @@
   import { configured, session, syncState, lastSync, syncError, signIn, signOut, syncAll } from '../lib/sync.js';
   import { allLocal, merge, replaceAll, progress } from '../lib/progress.js';
   import { get } from 'svelte/store';
-  import { link } from '../lib/router.js';
 
   let email = $state('');
   let busy = $state(false);
@@ -75,5 +74,4 @@
       <input type="file" accept="application/json,.json" hidden bind:this={fileInput} onchange={importData} />
     </div>
   </section>
-  <p><a href={link()}>← Retour aux cours</a></p>
 </main>

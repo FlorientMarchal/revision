@@ -43,7 +43,6 @@ footer.credit p{margin:0}
 .meter i{display:block; height:100%; background:var(--good); transition:width .3s}
 .cc-go{font-weight:700; color:var(--accent)}
 .cc-loading{color:var(--muted); margin:0}
-.home-note{font-size:13px; color:var(--muted); margin:0}
 
 /* progression dans les onglets */
 .chip-ok{color:var(--good); font-weight:800}

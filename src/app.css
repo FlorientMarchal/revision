@@ -46,7 +46,7 @@
 [hidden]{display:none !important}
 html{-webkit-text-size-adjust:100%; text-size-adjust:100%; background:var(--bg)}
 .card, h2{scroll-margin-top:72px}
-body{margin:0; background-color:var(--bg); color:var(--ink); font:16px/1.6 var(--f-body);
+body{margin:0; min-height:100vh; min-height:100dvh; background-color:var(--bg); color:var(--ink); font:16px/1.6 var(--f-body);
   background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
   background-size:24px 24px; background-attachment:fixed;
   -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility}
