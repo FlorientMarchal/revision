@@ -5,7 +5,7 @@ export default {
   short: 'Classification',
   code: 'TW132MI',
   level: 'M1 MIASHS',
-  semester: 'S1 · 2025-2026',
+  semester: 'S1 · 2026-2027',
   teacher: 'Marine Demangeot',
   evals: [
     { label: 'Partiel', date: '2026-10-12', time: '8h15' },
