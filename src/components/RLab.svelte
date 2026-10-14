@@ -1,19 +1,26 @@
 <script>
-  // Labo R : des blocs de code R exécutables dans le navigateur (webR), dans une même session R,
-  // comme les blocs d'un fichier R Markdown. Code de départ : celui de l'enseignante.
+  // Labo de code : des blocs exécutables dans le navigateur, dans une même session, comme les blocs d'un
+  // fichier R Markdown ou d'un notebook. lang = 'r' (webR) ou 'py' (Pyodide). Code de départ : celui de l'enseignant·e.
   import { tick } from 'svelte';
   import { kv, progress, setVal } from '../lib/progress.js';
   import { typeset } from '../lib/math.js';
-  import { runR, resetR, rState, rMessage } from '../lib/webr.js';
+  import { runR, resetR, rState as rSt, rMessage as rMsg } from '../lib/webr.js';
+  import { runPy, resetPy, pyState, pyMessage, provideFiles } from '../lib/pyodide.js';
 
-  let { course, data } = $props();
+  let { course, data, lang = 'r' } = $props();
+  const PY = lang === 'py';
+  const L = PY
+    ? { name: 'Python', labs: 'pylabs', ui: 'pylab', code: 'pycode', done: 'pylab', run: runPy, reset: resetPy, state: pyState, msg: pyMessage }
+    : { name: 'R', labs: 'rlabs', ui: 'rlab', code: 'rcode', done: 'rlab', run: runR, reset: resetR, state: rSt, msg: rMsg };
+  const rState = L.state, rMessage = L.msg;
+  if (PY && data.pyfiles) provideFiles(data.pyfiles);
   const ui = kv(course.id);
   const prog = progress(course.id);
-  const labs = data.rlabs;
+  const labs = data[L.labs];
 
-  let labId = $state(labs.find(l => l.id === ui.get('rlab')) ? ui.get('rlab') : labs[0].id);
+  let labId = $state(labs.find(l => l.id === ui.get(L.ui)) ? ui.get(L.ui) : labs[0].id);
   const lab = $derived(labs.find(l => l.id === labId));
-  const KEY = (l, c) => `rcode:${l}:${c}`;
+  const KEY = (l, c) => `${L.code}:${l}:${c}`;
 
   let codes = $state({});
   let results = $state({});
@@ -29,7 +36,7 @@
   $effect(() => { lab; load(); tick().then(() => body && typeset(body)); });
   $effect(() => { showSol; tick().then(() => body && typeset(body)); });
 
-  function choose(id) { labId = id; ui.set('rlab', id); }
+  function choose(id) { labId = id; ui.set(L.ui, id); }
   function edit(ch, v) { codes = { ...codes, [ch.id]: v }; ui.set(KEY(lab.id, ch.id), v); }
   function restore(ch, v) {
     if (codes[ch.id] && codes[ch.id] !== v && !confirm('Remplacer ton code de ce bloc ?')) return;
@@ -38,18 +45,20 @@
 
   async function run(ch) {
     running = { ...running, [ch.id]: true };
-    const r = await runR(codes[ch.id] || '');
+    let r;
+    try { r = await L.run(codes[ch.id] || ''); }
+    catch (e) { r = { out: [], images: [], error: (e && e.message) || String(e) }; }
     running = { ...running, [ch.id]: false };
     results = { ...results, [ch.id]: r };
   }
   async function runAll() { for (const ch of lab.chunks) if ((codes[ch.id] || '').trim()) await run(ch); }
-  async function reset() { await resetR(); results = {}; }
+  async function reset() { await L.reset(); results = {}; }
 
   function onKey(e, ch) {
     if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') { e.preventDefault(); run(ch); return; }
     if (e.key === 'Tab' && !e.shiftKey) {
       e.preventDefault();
-      const t = e.currentTarget; t.setRangeText('  ', t.selectionStart, t.selectionEnd, 'end'); edit(ch, t.value);
+      const t = e.currentTarget; t.setRangeText(PY ? '    ' : '  ', t.selectionStart, t.selectionEnd, 'end'); edit(ch, t.value);
     }
   }
   const rows = s => Math.min(24, Math.max(3, (s || '').split('\n').length + 1));
@@ -60,10 +69,10 @@
     canvas.getContext('2d').drawImage(img, 0, 0);
     return { update(n) { canvas.width = n.width; canvas.height = n.height; canvas.getContext('2d').drawImage(n, 0, 0); } };
   }
-  const done = id => ($prog['rlab:' + id] || {}).v === 1;
+  const done = id => ($prog[L.done + ':' + id] || {}).v === 1;
 </script>
 
-<div class="chips" role="tablist" aria-label="TP et exercices en R">
+<div class="chips" role="tablist" aria-label="TP et exercices en {L.name}">
   {#each labs as l (l.id)}
     <button class="chip" aria-pressed={l.id === labId} onclick={() => choose(l.id)}>{#if done(l.id)}<span class="chip-ok" aria-label="fait">✓</span>{/if}{l.short}</button>
   {/each}
@@ -77,7 +86,7 @@
     {#if lab.d}<div class="lead">{@html lab.d}</div>{/if}
     <div class="r-tools">
       <button class="btn small" onclick={runAll}>Tout exécuter</button>
-      <button class="btn small" onclick={reset} disabled={$rState === 'off'} title="Efface tous les objets de la session R">Vider la session R</button>
+      <button class="btn small" onclick={reset} disabled={$rState === 'off'} title="Efface tous les objets de la session {L.name}">Vider la session {L.name}</button>
     </div>
   </header>
   {#each lab.chunks as ch (ch.id)}
@@ -90,7 +99,7 @@
       {#if ch.code !== undefined || ch.sol}
       <div class="r-editor">
         <div class="r-bar">
-          <span class="r-src">{ch.src || 'R'}</span>
+          <span class="r-src">{ch.src || L.name}</span>
           <span class="r-btns">
             <button class="btn primary small" onclick={() => run(ch)} disabled={running[ch.id]} title="Ctrl/⌘ + Entrée">{#if running[ch.id]}<span class="r-spin" aria-hidden="true"></span> Calcul…{:else}▶ Exécuter{/if}</button>
             {#if ch.code !== undefined && codes[ch.id] !== ch.code}<button class="btn small" onclick={() => restore(ch, ch.code)}>Code de départ</button>{/if}
@@ -98,11 +107,11 @@
           </span>
         </div>
         <textarea class="r-code" rows={rows(codes[ch.id])} value={codes[ch.id]} oninput={e => edit(ch, e.currentTarget.value)} onkeydown={e => onKey(e, ch)}
-          spellcheck="false" autocapitalize="off" autocomplete="off" aria-label="Code R"></textarea>
+          spellcheck="false" autocapitalize="off" autocomplete="off" aria-label={'Code ' + L.name}></textarea>
       </div>
       {/if}
       {#if running[ch.id]}
-        <p class="r-busy" role="status"><span class="r-spin" aria-hidden="true"></span>{$rMessage || ($rState === 'loading' ? 'Chargement de R…' : 'Exécution en cours…')}</p>
+        <p class="r-busy" role="status"><span class="r-spin" aria-hidden="true"></span>{$rMessage || ($rState === 'loading' ? 'Chargement de ' + L.name + '…' : 'Exécution en cours…')}</p>
       {:else if r}
         <div class="r-out" aria-live="polite">
           <div class="r-text-out">
@@ -116,7 +125,7 @@
       </div>
       {#if ch.sol && showSol[ch.id]}
         <div class="r-sol">
-          <div class="r-bar"><span class="r-src">Corrigé de l'enseignante</span><button class="btn small" onclick={() => restore(ch, ch.sol)}>Copier dans le bloc</button></div>
+          <div class="r-bar"><span class="r-src">{ch.solLabel || lab.solLabel || "Corrigé de l'enseignante"}</span><button class="btn small" onclick={() => restore(ch, ch.sol)}>Copier dans le bloc</button></div>
           {#if ch.solHtml}<div class="r-solhtml">{@html ch.solHtml}</div>{:else}<pre><code>{ch.sol}</code></pre>{/if}
         </div>
       {/if}
@@ -125,7 +134,7 @@
     </section>
   {/each}
   <label class="read-toggle">
-    <input type="checkbox" checked={done(lab.id)} onchange={e => setVal(course.id, 'rlab:' + lab.id, e.currentTarget.checked ? 1 : 0)} />
+    <input type="checkbox" checked={done(lab.id)} onchange={e => setVal(course.id, L.done + ':' + lab.id, e.currentTarget.checked ? 1 : 0)} />
     J'ai fait et compris ce TP / cet exercice
   </label>
 </article>
