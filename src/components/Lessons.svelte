@@ -3,6 +3,7 @@
   import { tick } from 'svelte';
   import { kv, progress, setVal } from '../lib/progress.js';
   import { typeset } from '../lib/math.js';
+  import { reveal, confetti } from '../lib/motion.js';
 
   let { course, data } = $props();
   const ui = kv(course.id);
@@ -20,6 +21,11 @@
     id = lid; ui.set('lesson', lid); pendingAnchor = anchor || null;
     if (!anchor && body && body.getBoundingClientRect().top < 0) body.scrollIntoView({ block: 'start' });
   }
+  function markRead(on) {
+    const all = on && L.length > 1 && L.every(l => l.id === lesson.id || done(l.id));
+    setVal(course.id, 'lesson:' + lesson.id, on ? 1 : 0);
+    if (all) confetti();
+  }
   function goto(e, sid) {
     e.preventDefault();
     const t = document.getElementById(lesson.id + '-' + sid);
@@ -35,6 +41,7 @@
         try { const m = await course.viz(); m.mountViz(body); typeset(body); } catch (e) { console.error(e); }
       }
       if (pendingAnchor) { const t = document.getElementById(pendingAnchor); if (t) t.scrollIntoView({ block: 'start' }); pendingAnchor = null; }
+      reveal(body);
     });
   });
 </script>
@@ -76,7 +83,7 @@
     {/if}
   {/key}
   <label class="read-toggle">
-    <input type="checkbox" checked={done(lesson.id)} onchange={e => setVal(course.id, 'lesson:' + lesson.id, e.currentTarget.checked ? 1 : 0)} />
+    <input type="checkbox" checked={done(lesson.id)} onchange={e => markRead(e.currentTarget.checked)} />
     J'ai lu et compris cette leçon
   </label>
   <nav class="fiche-nav" aria-label="Leçons">

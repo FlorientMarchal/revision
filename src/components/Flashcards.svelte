@@ -1,6 +1,7 @@
 <script>
   import { onMount } from 'svelte';
   import { kv, progress, setVal } from '../lib/progress.js';
+  import { confetti } from '../lib/motion.js';
 
   let { course, data } = $props();
   const ui = kv(course.id);
@@ -16,6 +17,7 @@
   let idx = $state(0);
   let flipped = $state(false);
   let slide = $state('');
+  let good = $state(false);
 
   const isKnown = id => (($prog['card:' + id] || {}).v === 1);
   const scope = $derived(data.cards.filter(c => filter === 'all' || c.ch === filter));
@@ -38,7 +40,10 @@
   function mark(v) {
     if (!card) return;
     const wasLast = idx >= deck.length - 1;
+    const completes = v && !isKnown(card.id) && scope.length > 1 && scope.every(c => c.id === card.id || isKnown(c.id));
     setVal(course.id, 'card:' + card.id, v ? 1 : 0);
+    if (v) { good = false; requestAnimationFrame(() => (good = true)); }
+    if (completes) confetti();
     if (onlyTodo && v) { flipped = false; if (wasLast) idx = 0; } else move(1);
   }
   function shuffle() {
@@ -88,7 +93,7 @@
   </div>
 
   <div class="fc-progress">
-    <div class="fc-track" aria-hidden="true"><i style="width:{scope.length ? (100 * knownCount) / scope.length : 0}%"></i></div>
+    <div class="fc-track" class:fc-bump={good} aria-hidden="true" onanimationend={() => (good = false)}><i style="width:{scope.length ? (100 * knownCount) / scope.length : 0}%"></i></div>
     <div class="fc-meta"><span>{deck.length ? `Carte ${Math.min(idx, deck.length - 1) + 1} / ${deck.length}` : ''}</span><span>{knownCount} / {scope.length} sues</span></div>
   </div>
 

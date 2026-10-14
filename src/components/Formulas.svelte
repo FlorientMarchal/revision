@@ -3,6 +3,7 @@
   import { tick } from 'svelte';
   import { kv } from '../lib/progress.js';
   import { typeset } from '../lib/math.js';
+  import { reveal as revealOnScroll } from '../lib/motion.js';
 
   let { course, data } = $props();
   const ui = kv(course.id);
@@ -20,7 +21,7 @@
   function toggleHide() { hide = !hide; ui.set('formHide', hide); shown = {}; }
   function reveal(k) { shown = { ...shown, [k]: !shown[k] }; }
 
-  $effect(() => { list; hide; shown; tick().then(() => body && typeset(body)); });
+  $effect(() => { list; hide; shown; tick().then(() => { if (body) { typeset(body); revealOnScroll(body); } }); });
 </script>
 
 <div class="form-bar">

@@ -6,7 +6,7 @@ export default {
  "chunks": [
   {
    "id": "intro",
-   "html": "<p><code>{r setup, include=FALSE}\nknitr::opts_chunk$set(echo = TRUE, fig.align = \"center\", fig.width = 7, fig.height = 5)</code></p>\n<p><strong>Objectif du TP.</strong> On simule des données dont on connaît le vrai modèle, on estime un modèle de régression linéaire multiple, puis on vérifie <em>graphiquement et par des tests</em> que les hypothèses du modèle linéaire gaussien sont satisfaites. Comme les vrais paramètres sont connus, on peut aussi comparer les estimations à la vérité.</p>\n<p>Le modèle linéaire gaussien s'écrit\n\\[Y = X\\beta + \\varepsilon, \\qquad \\varepsilon \\sim \\mathcal{N}(0, \\sigma^2 I_n),\\]\nce qui suppose la linéarité de l'espérance en \\(X\\), mais aussi : (H1) \\(X\\) de rang plein (pas de colinéarité parfaite), (H2) variance constante des erreurs (homoscédasticité) et indépendance des erreurs  et (H3) normalité des erreurs.</p>"
+   "html": "<p><strong>Objectif du TP.</strong> On simule des données dont on connaît le vrai modèle, on estime un modèle de régression linéaire multiple, puis on vérifie <em>graphiquement et par des tests</em> que les hypothèses du modèle linéaire gaussien sont satisfaites. Comme les vrais paramètres sont connus, on peut aussi comparer les estimations à la vérité.</p>\n<p>Le modèle linéaire gaussien s'écrit\n\\[Y = X\\beta + \\varepsilon, \\qquad \\varepsilon \\sim \\mathcal{N}(0, \\sigma^2 I_n),\\]\nce qui suppose la linéarité de l'espérance en \\(X\\), mais aussi : (H1) \\(X\\) de rang plein (pas de colinéarité parfaite), (H2) variance constante des erreurs (homoscédasticité) et indépendance des erreurs  et (H3) normalité des erreurs.</p>"
   },
   {
    "id": "s1",
