@@ -102,7 +102,7 @@ figure.viz[data-viz^="py-"]{font-variant-ligatures:none}
 .vy-mc .last{animation:vy-drop .45s cubic-bezier(.3,1.5,.5,1)}
 @keyframes vy-drop{from{transform:translateY(-14px); opacity:0} to{transform:none; opacity:1}}
 .vy-big{font:700 26px var(--f-mono); color:var(--accent); font-variant-numeric:tabular-nums}
-.vy-kpis{display:grid; grid-template-columns:repeat(auto-fill,minmax(120px,1fr)); gap:6px}
+.vy-kpis{display:grid; grid-template-columns:repeat(auto-fit,minmax(110px,1fr)); gap:6px}
 .vy-kpis > div{border:1px solid var(--line); border-radius:8px; padding:6px 8px; background:var(--paper-2); display:grid; gap:1px}
 .vy-kpis small{font-size:11.5px; color:var(--muted)}
 .vy-kpis b{font:700 16px var(--f-mono); font-variant-numeric:tabular-nums}
