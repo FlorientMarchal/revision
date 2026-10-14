@@ -12,6 +12,7 @@
   import Lessons from './Lessons.svelte';
   import Formulas from './Formulas.svelte';
   import Queries from './Queries.svelte';
+  import RLab from './RLab.svelte';
   import { evalList } from '../lib/evals.js';
 
   let { course, tab } = $props();
@@ -36,6 +37,7 @@
     { id: 'outils', label: 'Exercices interactifs', on: !!course.tools },
     { id: 'annales', label: course.examsLabel || 'Annales corrigées', on: (data.exams || []).length },
     { id: 'tp', label: data.labs ? 'TP · labo de code' : 'TP', on: (data.tps || data.labs || []).length },
+    { id: 'r', label: 'R · TP et exercices', on: (data.rlabs || []).length },
   ].filter(t => t.on) : []);
 
   const current = $derived(tabs.find(t => t.id === tab) ? tab : (tabs.find(t => t.id === ui.get('tab', 'fiches')) || tabs[0] || {}).id);
@@ -72,6 +74,7 @@
     {:else if current === 'fiches'}<Fiches {course} {data} />
     {:else if current === 'formules'}<Formulas {course} {data} />
     {:else if current === 'requetes'}<Queries {course} {data} />
+    {:else if current === 'r'}<RLab {course} {data} />
     {:else if current === 'flash'}<Flashcards {course} {data} />
     {:else if current === 'quiz'}<Quiz {course} {data} />
     {:else if current === 'outils'}<Tools {course} />

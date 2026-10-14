@@ -14,8 +14,9 @@ export async function loadCourse(c) {
         head: (e.head || '').replaceAll('src="img/', `src="${base}img/`),
         exos: e.exos.map(x => ({ ...x, intro: (x.intro || '').replaceAll('src="img/', `src="${base}img/`), qs: x.qs.map(q => ({ ...q, q: q.q.replaceAll('src="img/', `src="${base}img/`) })) })),
       }));
+      const lessons = (d.lessons || []).map(l => ({ ...l, sections: l.sections.map(s => ({ ...s, html: s.html.replaceAll('src="img/', `src="${base}img/`) })) }));
       const examQ = exams.reduce((s, e) => s + e.exos.reduce((t, x) => t + x.qs.length, 0), 0);
-      return { ...d, exams, counts: { cards: (d.cards || []).length, quiz: (d.quiz || []).length, fiches: Object.keys(d.fiches || {}).length, examQ } };
+      return { ...d, exams, lessons: d.lessons ? lessons : undefined, counts: { cards: (d.cards || []).length, quiz: (d.quiz || []).length, fiches: Object.keys(d.fiches || {}).length, examQ } };
     });
   }
   return cache[c.id];
