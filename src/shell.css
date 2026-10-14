@@ -311,3 +311,19 @@ table.t td{max-width:420px}
 .r-plot{display:block; max-width:min(100%,720px); height:auto; margin:4px 12px; border:1px solid var(--line); border-radius:6px; background:#fff}
 .r-none{margin:0 12px; font-size:13px; color:var(--muted)}
 .r-after{font-size:14px; color:var(--muted)}
+
+/* Blocs repris du cours en ligne (Régularisation et optimisation) */
+.lesson .comparison, .lesson .advantages-grid, .lesson .two-columns, .lesson .metric-grid, .lesson .parameter-grid, .lesson .mental-model, .lesson .flow, .lesson .sequence{display:grid; grid-template-columns:repeat(auto-fit,minmax(min(210px,100%),1fr)); gap:12px}
+.lesson .comparison-card, .lesson .advantage-card, .lesson .mental-step{border:1px solid var(--line); border-radius:8px; padding:12px 14px; background:var(--paper); display:grid; grid-template-columns:minmax(0,1fr); gap:6px; align-content:start; min-width:0}
+.lesson .comparison-card h3, .lesson .advantage-card h3, .lesson .algo-block h3{margin:0; font-size:16px}
+.lesson .mental-step > span{font:700 12px var(--f-mono); color:var(--accent)}
+.lesson .large-number{font:600 15px var(--f-mono)}
+.lesson .algo-block, .lesson .algo, .lesson .pseudo{border:1px solid var(--line); border-left:4px solid var(--c6); border-radius:8px; padding:12px 14px; background:var(--paper-2); display:grid; grid-template-columns:minmax(0,1fr); gap:6px; min-width:0; overflow-x:auto}
+.lesson .algo-line{font-family:var(--f-mono); font-size:14px}
+.lesson .algo-annot{color:var(--muted); font-size:14px}
+.lesson .synthesis-table, .lesson .table-wrap{max-width:100%; overflow-x:auto}
+.lesson .synthesis-note, .lesson .exercise-hint{color:var(--muted); font-size:14px}
+.lesson ul.refs, .q-item ul.refs{font-size:14px; color:var(--ink-2); display:grid; gap:4px}
+.lesson-sec ol ul, .lesson-sec ul ul{margin-top:4px}
+/* les éléments MathML (positionnés en absolu) de KaTeX restent dans les tableaux qui défilent */
+table.t, .math, .lesson .synthesis-table, .lesson .table-wrap{position:relative}
