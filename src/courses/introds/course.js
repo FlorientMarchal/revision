@@ -8,8 +8,8 @@ export default {
   semester: 'S1 · 2026-2027',
   teacher: 'L. Raddaf, S. Lèbre, G. Richomme, S. Bringay',
   evals: [
-    { label: 'Proba-stat (écrit 1h30)', date: null },
-    { label: 'Python', date: null },
+    { label: 'Partiel', date: null },
+    { label: 'Rattrapage', date: '2027-01-08', time: '9h et 12h' },
   ],
   examInfo: '<b>Trois parties :</b> <b>probabilités et statistique</b> (50 % des points : lois, vecteurs gaussiens, estimateurs et maximum de vraisemblance, LGN, TCL, intervalles, tests et tests multiples), <b>bases de Python</b> (25 % : contrôle, listes, fonctions, dictionnaires ; savoir écrire une version générique <i>et</i> une version « pythonesque ») et <b>Python pour les données</b> (25 % : NumPy, Pandas, Matplotlib, Seaborn). Les onglets <b>Python</b> et <b>R</b> exécutent le code directement dans le navigateur.',
   examsLabel: 'Exercices corrigés',
