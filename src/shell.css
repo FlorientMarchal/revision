@@ -203,7 +203,7 @@ table.t td{max-width:420px}
 .lesson-sec h4{margin:6px 0 0; font-size:16px}
 .lesson-sec p, .lesson-sec ul, .lesson-sec ol{margin:0}
 .lesson-sec li + li{margin-top:4px}
-.box{border:1px solid var(--line); border-left:4px solid var(--bx, var(--accent)); border-radius:8px; padding:12px 14px; background:var(--paper); display:grid; gap:6px}
+.box{border:1px solid var(--line); border-left:4px solid var(--bx, var(--accent)); border-radius:8px; padding:12px 14px; background:var(--paper); display:grid; grid-template-columns:minmax(0,1fr); gap:6px}
 .box-h{font:700 11px var(--f-mono); letter-spacing:.08em; text-transform:uppercase; color:var(--bx, var(--accent))}
 .box p, .box ul, .box ol{margin:0}
 .box.def{--bx:var(--c1)}
