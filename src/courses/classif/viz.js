@@ -956,6 +956,65 @@ VIZ.kmeans = el => {
   V.fit(); E.fit(); reset();
 };
 
+/* ---- Fonctions de coût en fonction de la marge y(⟨w,x⟩+b) : 0/1, logistique, hinge ---- */
+VIZ.loss = el => {
+  el.innerHTML = vizHead('Trois fonctions de coût', 'Déplace le point : m = y(⟨w,x⟩ + b) est positif si x est bien classé, et grand s\'il est loin de l\'hyperplan.') +
+    `<div class="viz-ctrl"><label>m = y(⟨w,x⟩+b) = <b data-o="m"></b> <input type="range" min="-3" max="3" step="0.05" value="-0.5" data-i="m" aria-label="marge m"></label></div><div class="viz-stage"></div>` +
+    vzLeg([['l','--c0','coût 0/1 : 1{m < 0}'],['l','--accent','logistique : log(1 + e^(−m))'],['l','--c3','hinge (SVM) : max(0, 1 − m)']]) +
+    `<div class="metrics viz-metrics" data-o="v"></div><p class="viz-out" data-o="out"></p>`;
+  const F = [m => m < 0 ? 1 : 0, m => Math.log(1 + Math.exp(-m)), m => Math.max(0, 1 - m)];
+  const V = vizCanvas(el.querySelector('.viz-stage'), w => w < 500 ? 0.8 : 0.42, {label: 'Coûts 0/1, logistique et hinge en fonction de la marge'});
+  V.draw = () => {
+    const {ctx, W, H} = V, p = vzPal(), m = +$i(el, 'm').value, col = [p.c0, p.accent, p.c[2]];
+    const S = vzScale(38, W - 12, 22, H - 34, -3, 3, 0, 4);
+    ctx.clearRect(0, 0, W, H);
+    ctx.fillStyle = shade(p.red, 0.07); ctx.fillRect(S.L, S.T, S.X(0) - S.L, S.B - S.T);
+    vzAxes(ctx, S, {xt: [-3, -2, -1, 0, 1, 2, 3], yt: [0, 1, 2, 3, 4], fx: v => fmt(v, 0), xlab: 'm = y(⟨w,x⟩+b)', ylab: 'coût'});
+    txt(ctx, 'mal classé', S.L + 6, S.T + 10, 'left', p.red, 11, 'body', '600'); txt(ctx, 'bien classé', S.R - 4, S.T + 10, 'right', p.good, 11, 'body', '600');
+    ctx.save(); S.clip(ctx);
+    vzPath(ctx, [[S.X(-3), S.Y(1)], [S.X(0), S.Y(1)]], col[0], 2.4); vzPath(ctx, [[S.X(0), S.Y(0)], [S.X(3), S.Y(0)]], col[0], 2.4);
+    [1, 2].forEach(k => { const c = []; for (let x = -3; x <= 3.0001; x += 0.03) c.push([S.X(x), S.Y(F[k](x))]); vzPath(ctx, c, col[k], 2.4); });
+    ctx.restore();
+    ctx.setLineDash([4, 3]); ctx.strokeStyle = p.muted; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(S.X(m), S.T); ctx.lineTo(S.X(m), S.B); ctx.stroke(); ctx.setLineDash([]);
+    F.forEach((f, k) => { const v = f(m); if (v <= 4) dot(ctx, S.X(m), S.Y(v), 5, 0, col[k], p.paper, 1.5); });
+    $q(el, 'm').textContent = fmt(m, 2);
+    $q(el, 'v').innerHTML = [['0/1', fmt(F[0](m), 0)], ['logistique', fmt(F[1](m), 3)], ['hinge', fmt(F[2](m), 2)]].map(([k, v]) => `<div class="metric"><span>${k}</span><b>${v}</b></div>`).join('');
+    $q(el, 'out').innerHTML = m < 0 ? '<b>Mal classé</b> : les trois coûts pénalisent. Le coût 0/1 vaut 1 quelle que soit la distance ; les coûts logistique et hinge augmentent d\'autant plus que le point est loin du mauvais côté.'
+      : m < 1 ? '<b>Bien classé mais proche de l\'hyperplan</b> : le coût 0/1 ne dit rien (0), alors que la logistique et la hinge pénalisent encore un peu. C\'est ce qui éloigne la frontière des points et limite le sur-apprentissage.'
+      : '<b>Bien classé et loin de l\'hyperplan</b> : coût 0/1 et hinge nuls (pour la hinge, le point est hors de la marge), coût logistique presque nul mais jamais exactement 0.';
+  };
+  $i(el, 'm').oninput = () => V.req();
+  V.fit();
+};
+
+/* ---- Critères d'impureté d'un nœud à deux classes ---- */
+VIZ.impurity = el => {
+  el.innerHTML = vizHead('Impureté d\'un nœud à deux classes', 'Règle les effectifs des deux classes dans le nœud ; l\'exemple de départ est la racine de l\'arbre du cours, [27, 18].') +
+    `<div class="viz-ctrl"><label>classe A : <b data-o="a"></b> <input type="range" min="0" max="45" step="1" value="27" data-i="a" aria-label="effectif de la classe A"></label>
+     <label>classe B : <b data-o="b"></b> <input type="range" min="0" max="45" step="1" value="18" data-i="b" aria-label="effectif de la classe B"></label></div><div class="viz-stage"></div>` +
+    vzLeg([['l','--c1','Gini : Σ p_k(1 − p_k)'],['l','--c2','entropie : −Σ p_k log₂ p_k'],['l','--c3','erreur : 1 − max p_k']]) +
+    `<div class="metrics viz-metrics" data-o="v"></div><p class="viz-out" data-o="out"></p>`;
+  const lg = x => x > 0 ? x*Math.log2(x) : 0;
+  const F = [q => 2*q*(1 - q), q => -lg(q) - lg(1 - q), q => 1 - Math.max(q, 1 - q)];
+  const V = vizCanvas(el.querySelector('.viz-stage'), w => w < 500 ? 0.75 : 0.4, {label: 'Gini, entropie et erreur de classification en fonction de la proportion de la classe A'});
+  V.draw = () => {
+    const {ctx, W, H} = V, p = vzPal(), col = p.c, a = +$i(el, 'a').value, b = +$i(el, 'b').value, n = a + b, q = n ? a/n : 0.5;
+    const S = vzScale(38, W - 12, 22, H - 34, 0, 1, 0, 1.05);
+    ctx.clearRect(0, 0, W, H);
+    vzAxes(ctx, S, {xt: [0, 0.25, 0.5, 0.75, 1], yt: [0, 0.25, 0.5, 0.75, 1], xlab: 'p_A (proportion de A dans le nœud)', ylab: 'impureté'});
+    F.forEach((f, k) => { const c = []; for (let x = 0; x <= 1.0001; x += 0.005) c.push([S.X(x), S.Y(f(Math.min(1, x)))]); vzPath(ctx, c, col[k], 2.4); });
+    if (n){ ctx.setLineDash([4, 3]); ctx.strokeStyle = p.muted; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(S.X(q), S.T); ctx.lineTo(S.X(q), S.B); ctx.stroke(); ctx.setLineDash([]);
+      F.forEach((f, k) => dot(ctx, S.X(q), S.Y(f(q)), 5, 0, col[k], p.paper, 1.5)); }
+    $q(el, 'a').textContent = a; $q(el, 'b').textContent = b;
+    $q(el, 'v').innerHTML = (n ? [['p_A', fmt(q, 3)], ['Gini', fmt(F[0](q), 3)], ['Entropie', fmt(F[1](q), 3)], ['Erreur', fmt(F[2](q), 3)]] : [['nœud vide', '—']]).map(([k, v]) => `<div class="metric"><span>${k}</span><b>${v}</b></div>`).join('');
+    $q(el, 'out').innerHTML = !n ? 'Le nœud est vide.' : (a === 0 || b === 0) ? '<b>Nœud pur</b> : une seule classe, les trois critères valent 0. C\'est une feuille de l\'arbre maximal.'
+      : Math.abs(q - 0.5) < 0.02 ? '<b>Mélange maximal</b> (50 % / 50 %) : Gini = 0,5, entropie = 1 bit, erreur = 0,5. Les trois critères sont maximaux.'
+      : `Gini = 1 − p_A² − p_B² = 1 − ${fmt(q, 3)}² − ${fmt(1 - q, 3)}² = <b>${fmt(F[0](q), 3)}</b>. Les trois critères sont nuls pour un nœud pur et maximaux à 50 % / 50 % ; Gini et entropie sont strictement concaves, l'erreur est linéaire par morceaux.`;
+  };
+  ['a', 'b'].forEach(k => $i(el, k).oninput = () => V.req());
+  V.fit();
+};
+
 function mountViz(root){
   root.querySelectorAll('[data-viz]').forEach(el => { const f = VIZ[el.dataset.viz]; if (f && !el.dataset.ready){ el.dataset.ready = '1'; try{ f(el); }catch(e){ el.textContent = ''; console.error(e); } } });
 }
