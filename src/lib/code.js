@@ -24,9 +24,33 @@ export function tokens(src) {
   return out;
 }
 
-/** HTML coloré (à placer dans un <pre>). */
-export function highlight(src) {
-  return tokens(src).map(([t, s]) => (t === 'w' || t === 'p' || t === 'i') ? esc(s) : `<span class="hl-${t}">${esc(s)}</span>`).join('');
+// Mots-clés supplémentaires pour la coloration seule (la comparaison des requêtes n'en tient pas compte).
+const EXTRA = {
+  R: new Set('function if else for while repeat in return library require TRUE FALSE NULL NA Inf'.split(' ')),
+  Python: new Set('def return if elif else for while in not and or import from as class lambda True False None with pass break continue yield try except'.split(' ')),
+  JavaScript: new Set('var let const function return for in if else new this'.split(' ')),
+};
+
+/** HTML coloré (à placer dans un <pre>). lang : 'R', 'Python', 'JavaScript'… (facultatif). */
+export function highlight(src, lang) {
+  const words = String(lang || '').split(/[^A-Za-z]+/);
+  const key = Object.keys(EXTRA).find(k => words.includes(k));
+  const extra = key ? EXTRA[key] : null;
+  const hashComments = key === 'R' || key === 'Python';
+  const html = tokens(src).map(([t, s]) => {
+    if (extra && t === 'i' && extra.has(s)) t = 'k';
+    else if (extra && t === 'k' && !extra.has(s) && key !== 'JavaScript') t = 'i';
+    return (t === 'w' || t === 'p' || t === 'i') ? esc(s) : `<span class="hl-${t}">${esc(s)}</span>`;
+  }).join('');
+  // commentaires « # … » (R, Python) : on enveloppe la fin de ligne
+  return hashComments ? html.split('\n').map(line => {
+    const i = line.indexOf('#');
+    if (i < 0) return line;
+    const before = line.slice(0, i);
+    // pas un # à l'intérieur d'une chaîne colorée
+    if ((before.match(/<span class="hl-s">/g) || []).length !== (before.match(/<\/span>/g) || []).length) return line;
+    return before + '<span class="hl-c">' + line.slice(i).replace(/<[^>]+>/g, '') + '</span>';
+  }).join('\n') : html;
 }
 
 // Forme normalisée d'un jeton pour la comparaison : mots-clés sans casse, guillemets unifiés.

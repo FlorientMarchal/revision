@@ -1,0 +1,91 @@
+// Mémo de code du cours d'introduction à la science des données : lignes reprises des notebooks corrigés
+// (bases de Python, NumPy, Pandas, Matplotlib, Seaborn) et des TP de statistique en R.
+const I = (n, code, note) => ({ n, code, note });
+
+export const codesheet = [
+  { part: 'Python', lang: 'Python', t: 'Structures de contrôle', src: 'notebooks de bases de Python', items: [
+    I('Boucle for avec range(début, fin exclue, pas)', 'for i in range(1, 11, 1):\n    print(i)'),
+    I('Boucle while', 'i = 1\nwhile i <= 10:\n    print(i)\n    i += 1   # ou i = i + 1'),
+    I('Parcours par indice', 'for i in range(len(y)):\n    print("élément d\'indice {} = {}".format(i, y[i]))'),
+  ] },
+  { part: 'Python', lang: 'Python', t: 'Fonctions et modules', src: 'notebooks de bases de Python', items: [
+    I('Fonction documentée', 'def saisie_liste( n ):\n    """\n    Saisie et retourne une liste de n valeurs\n    """\n    lis = []\n    for i in range(0, n, 1):\n        val = input(str((i+1))+"ème valeur : ")\n        lis.append( val )\n    return lis'),
+    I('Importer un module', 'from exemple_fonctions1 import *'),
+    I('Mesurer un temps d\'exécution', 'import timeit\nnb_repet = 100\ntemps_exec = timeit.timeit(stmt="x=1",setup="",number=nb_repet)'),
+    I('Nombre aléatoire', 'random.uniform(-1, 1)'),
+  ] },
+  { part: 'Python', lang: 'Python', t: 'Listes, ensembles, chaînes', src: 'notebooks de bases de Python', items: [
+    I('Liste en compréhension', 'squares = [elt**2 for elt in lis]'),
+    I('Compréhension avec condition', 'lis = [i**2 for i in range(11) if (i%2 == 0)]'),
+    I('Version « pythonesque » d\'un test', 'return lis == [ elt for elt in reversed(lis)]'),
+    I('Copie d\'une liste (tranche ou copy)', 'lis2 = lis[:]\nlis3 = lis.copy()', '<code>lis2 = lis</code> ne copie pas : les deux noms désignent la même liste.'),
+    I('Ensemble des modalités', 'modalites = set(lis)\nprint("nombre de modalités = ", len(modalites))'),
+    I('Découper un texte en mots', 'import re\nliste_mots = re.split(r\'[\\W]+\', zen)'),
+    I('Recoller une liste de caractères', 'return "".join([substitute(lettre,dictionnaire_codage) for lettre in texte])'),
+  ] },
+  { part: 'Python', lang: 'Python', t: 'Dictionnaires et nouveaux types', src: 'notebooks de bases de Python', items: [
+    I('Compter les mots', 'dico = {}\nfor mot in liste_mots:\n    mot = mot.lower()\n    if mot in dico:\n        dico[mot] += 1\n    else:\n        dico[mot] = 1'),
+    I('Parcourir les couples triés', 'print(sorted(dico.items()))'),
+    I('Type énuméré', 'from enum import Enum\nclass Etat(Enum):\n    LIBRE = 1\n    EMPRUNTE = 2'),
+    I('Classe', 'class Livre:\n    def __init__( self, numL, titre, auteur, etat):\n        self.numL = numL\n        self.titre = titre\n        self.auteur = auteur\n        self.etat = etat'),
+    I('Filtrer des objets', 'return [livre for livre in biblio if livre.etat == Etat.EMPRUNTE]'),
+  ] },
+  { part: 'NumPy', lang: 'Python', t: 'NumPy', src: 'notebook NumPy (météo)', items: [
+    I('Créer des tableaux', 'temperatures = np.array([18, 21, 19, 24, 22])\nprint(np.arange(0, 24, 3))\nprint(np.linspace(10, 30, 5))\nprint(np.zeros(7, dtype=int))'),
+    I('Changer de forme', 'grille = np.arange(16).reshape(4, 4)'),
+    I('Agréger par ligne ou par colonne', 'print("Somme par jour (axis=0) :", pluie.sum(axis=0))\nprint("Somme par ville (axis=1) :", pluie.sum(axis=1))\nprint(temperatures_villes.mean(axis=1))'),
+    I('Indice du maximum', 'print(np.argmax(temperatures_villes, axis=1))'),
+    I('Remplacer selon une condition', 'temperature_plafonnee = np.where(temperature_semaine > 30, 30, temperature_semaine)'),
+    I('Générateur aléatoire', 'rng = np.random.default_rng(42)\nprint(rng.random((3, 3)))'),
+  ] },
+  { part: 'Pandas', lang: 'Python', t: 'Pandas : lire et explorer', src: 'notebook Pandas (vélos)', items: [
+    I('Lire un CSV', 'data = pd.read_csv("locations_velos.csv")'),
+    I('Aperçu et résumé', 'data.head()\ndata.describe(include=\'all\')'),
+    I('Valeurs manquantes', 'data.isna().sum()\ndata.dropna().head()\ndata.fillna(value={"satisfaction": 0})'),
+    I('Renommer, supprimer, ajouter une colonne', 'data.rename(columns={"prix_eur": "cout_eur"})\ndata.drop(columns=["meteo"])\ndata.assign(categorie_duree=duree_cat)'),
+    I('Sélectionner une ligne', 'catalogue_df.loc["cargo"]\ncatalogue_df.iloc[2]'),
+    I('Découper une variable en classes', 'duree_cat = pd.cut(\n    data["duree_min"],\n    bins=[0, 30, 60, np.inf],\n    labels=["courte", "moyenne", "longue"]\n)'),
+  ] },
+  { part: 'Pandas', lang: 'Python', t: 'Pandas : agréger et joindre', src: 'notebooks Pandas', items: [
+    I('Moyenne par groupe', 'prix_station = data.groupby("station")["prix_eur"].mean()\nprint(prix_station.idxmax())'),
+    I('Tableau croisé', 'data.pivot_table(\n    values="prix_eur",\n    index="type_velo",\n    columns="abonne",\n    aggfunc="mean"\n)'),
+    I('Effectifs croisés', 'data.pivot_table(index="type_velo", columns="meteo", aggfunc="size", fill_value=0)'),
+    I('Empiler deux tables', 'tous_les_velos = pd.concat([catalogue_df, nouveaux_velos])'),
+    I('Jointure', 'print(pd.merge(participants, inscriptions, on="participant"))'),
+    I('Trier', 'df_trie = df.sort_values(by="Consommation_GWh", ascending=False)'),
+    I('Remplacer une valeur', 'df.replace("Fevrier", "Février", inplace=True)'),
+  ] },
+  { part: 'Graphiques', lang: 'Python', t: 'Matplotlib', src: 'notebook Matplotlib', items: [
+    I('Courbe', 'plt.plot(x, y)\nplt.title("…")\nplt.xlabel("…")\nplt.ylabel("…")\nplt.show()'),
+    I('Plusieurs graphiques', 'fig = plt.figure()\nax = fig.add_subplot(2, 2, i + 1)'),
+    I('Taille de figure', 'fig, ax = plt.subplots(figsize=(10, 5))'),
+    I('Barres et camembert', 'plt.bar(jours, entrees)\nplt.pie(depenses, labels=postes, autopct="%1.1f%%", startangle=90)'),
+    I('Barres d\'erreur', 'plt.errorbar(\n    heures,\n    temperature_mesuree,\n    yerr=incertitude,\n    fmt="o"\n)'),
+    I('Légende', 'plt.legend(loc="upper right")'),
+  ] },
+  { part: 'Graphiques', lang: 'Python', t: 'Seaborn', src: 'notebook Seaborn (mobilité)', items: [
+    I('Histogramme et densité', 'sns.histplot(x=y, kde=True)'),
+    I('Densités par groupe', 'sns.kdeplot(\n    data=mobilite,\n    x="duree_min",\n    hue="mode",\n    fill=False,\n    common_norm=False\n)'),
+    I('Boîtes par catégorie', 'g = sns.catplot(\n    data=mobilite,\n    x="mode",\n    y="duree_min",\n    hue="moment",\n    kind="box",\n    height=5,\n    aspect=1.4\n)'),
+    I('Violons', 'sns.violinplot(\n    data=mobilite,\n    x="mode",\n    y="duree_min",\n    inner="quartile"\n)'),
+    I('Nuage + régression + marges', 'sns.jointplot(\n    data=mobilite,\n    x="distance_km",\n    y="duree_min",\n    kind="reg",\n    height=7\n)'),
+    I('Matrice de nuages', 'sns.pairplot(\n    variables.sample(450, random_state=1),\n    hue="mode",\n    height=2.2\n)'),
+    I('Grille de facettes', 'grid = sns.FacetGrid(\n    mobilite,\n    row="abonnement",\n    col="meteo",\n    margin_titles=True,\n    height=2.5\n)\ngrid.map_dataframe(sns.kdeplot, x="satisfaction", fill=True)'),
+    I('Thème', 'sns.set_theme(context="notebook", style=s, palette=my_colors)'),
+  ] },
+  { part: 'R', lang: 'R', t: 'Lois en R : d, p, q, r', src: 'exercices en R', items: [
+    I('Loi de Poisson', 'dpois(2, 3); ppois(2, 3); 1 - dpois(0, 3)'),
+    I('Loi binomiale', 'dbinom(2, 10, 0.2); 1 - dbinom(0, 10, 0.2)'),
+    I('Loi exponentielle', '1 - pexp(1, rate = 2); pexp(1, 2) - pexp(0.5, 2)'),
+    I('Loi normale (écart-type !)', 'pnorm(115, mean = 100, sd = 15)'),
+    I('Log-vraisemblance', 'logv <- function(lambda) sum(dexp(x, rate = lambda, log = TRUE))'),
+  ] },
+  { part: 'R', lang: 'R', t: 'Simulation, LGN et TCL', src: 'TP de statistique', items: [
+    I('Moyennes successives (LGN)', 'X <- rexp(n, rate = lambda)\nY <- cumsum(X) / (1:n)\nplot(1:n, Y, type = "l", xlab = "k", ylab = "Y_k")'),
+    I('N échantillons en lignes (TCL)', 'X <- matrix(rexp(N * n, rate = lambda), nrow = N)'),
+    I('Histogramme + densité N(0, 1)', 'hist(Z, freq = FALSE, breaks = 15)\ncurve(dnorm(x), add = TRUE, col = "red")'),
+    I('Vecteur gaussien (mvtnorm)', 'library(mvtnorm)'),
+    I('Densité en 3D', 'persp(x1, x2, densite, theta = 40, phi = 25)'),
+    I('Covariance empirique', 'var(cbind(U,V))'),
+  ] },
+];

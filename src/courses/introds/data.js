@@ -183,3 +183,5 @@ const quizStat = [
   Q('shapiro', 'tests', 'Quelle fonction R teste la normalité d\'un échantillon ?', ['t.test', 'chisq.test', 'shapiro.test', 'cor.test'], 2, 'Test de Shapiro-Wilk.'),
 ];
 export const quiz = [...quizStat, ...quizPy, ...quizData];
+
+export * from './codesheet.js';
