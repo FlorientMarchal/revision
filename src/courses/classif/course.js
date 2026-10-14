@@ -8,8 +8,8 @@ export default {
   semester: 'S1 · 2025-2026',
   teacher: 'Marine Demangeot',
   evals: [
-    { label: 'Partiel', date: '2026-10-12' },
-    { label: 'Rattrapage', date: null },
+    { label: 'Partiel', date: '2026-10-12', time: '8h15' },
+    { label: 'Rattrapage', date: '2027-01-06', time: '14h' },
   ],
   topics: ['KNN', 'régression logistique', 'arbres CART', 'SVM', 'clustering'],
   load: () => import('./data.js'),

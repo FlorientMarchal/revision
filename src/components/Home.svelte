@@ -41,7 +41,7 @@
         <p class="cc-topics">{c.topics.join(' · ')}</p>
         {#if c.evals}
           <ul class="cc-evals" aria-label="Évaluations">
-            {#each evalList(c) as e}<li class:next={e.next} class:past={e.past}><b>{e.label}</b>{#if e.when}<span>{e.when}</span>{:else}<span class="tbd">date à venir</span>{/if}</li>{/each}
+            {#each evalList(c) as e}<li class:next={e.next} class:past={e.past}><b>{e.label}</b>{#if e.when}<span>{e.when}{#if e.time} · {e.time}{/if}</span>{:else}<span class="tbd">date à venir</span>{/if}</li>{/each}
           </ul>
         {/if}
         {#if s}
