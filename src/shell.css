@@ -327,3 +327,10 @@ table.t td{max-width:420px}
 .lesson-sec ol ul, .lesson-sec ul ul{margin-top:4px}
 /* les éléments MathML (positionnés en absolu) de KaTeX restent dans les tableaux qui défilent */
 table.t, .math, .lesson .synthesis-table, .lesson .table-wrap{position:relative}
+/* blocs de code et sorties dans les leçons (cours de science des données) */
+.lesson pre.code, .lesson pre.code-out, .exam pre.code{margin:8px 0; padding:10px 12px; border-radius:6px; font:13px/1.5 var(--f-mono); overflow-x:auto; tab-size:4; max-width:100%}
+.lesson pre.code{background:var(--paper-2); border:1px solid var(--line)}
+.lesson pre.code code{border:0; background:none; padding:0; font:inherit}
+.lesson pre.code-out{margin-top:-4px; background:transparent; border:1px dashed var(--line-strong); color:var(--ink-2, var(--ink))}
+.lesson pre.code + pre.code-out::before{content:"Sortie"; display:block; font:600 10.5px var(--f-mono); letter-spacing:.06em; text-transform:uppercase; color:var(--line-strong); margin-bottom:2px}
+.exam-note{font-size:13px; color:var(--ink-2, var(--ink)); border-left:3px solid var(--line-strong); padding-left:10px}
