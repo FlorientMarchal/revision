@@ -4,6 +4,7 @@
   import { tick } from 'svelte';
   import { kv, progress, setVal } from '../lib/progress.js';
   import { typeset } from '../lib/math.js';
+  import { lens } from '../lib/motion-components.js';
   import { runR, resetR, rState as rSt, rMessage as rMsg } from '../lib/webr.js';
   import { runPy, resetPy, pyState, pyMessage, provideFiles } from '../lib/pyodide.js';
 
@@ -26,6 +27,7 @@
   let results = $state({});
   let running = $state({});
   let showSol = $state({});
+  let flash = $state({});   // état bref après exécution : 'ok' (coche) ou 'err' (croix) sur le bouton
   let body = $state(null);
 
   function load() {
@@ -50,6 +52,8 @@
     catch (e) { r = { out: [], images: [], error: (e && e.message) || String(e) }; }
     running = { ...running, [ch.id]: false };
     results = { ...results, [ch.id]: r };
+    flash = { ...flash, [ch.id]: r.error ? 'err' : 'ok' };
+    setTimeout(() => { if (flash[ch.id]) flash = { ...flash, [ch.id]: '' }; }, 1500);
   }
   async function runAll() { for (const ch of lab.chunks) if ((codes[ch.id] || '').trim()) await run(ch); }
   async function reset() { await L.reset(); results = {}; }
@@ -72,7 +76,7 @@
   const done = id => ($prog[L.done + ':' + id] || {}).v === 1;
 </script>
 
-<div class="chips" role="tablist" aria-label="TP et exercices en {L.name}">
+<div class="chips" role="tablist" aria-label="TP et exercices en {L.name}" use:lens>
   {#each labs as l (l.id)}
     <button class="chip" aria-pressed={l.id === labId} onclick={() => choose(l.id)}>{#if done(l.id)}<span class="chip-ok" aria-label="fait">✓</span>{/if}{l.short}</button>
   {/each}
@@ -101,7 +105,7 @@
         <div class="r-bar">
           <span class="r-src">{ch.src || L.name}</span>
           <span class="r-btns">
-            <button class="btn primary small" onclick={() => run(ch)} disabled={running[ch.id]} title="Ctrl/⌘ + Entrée">{#if running[ch.id]}<span class="r-spin" aria-hidden="true"></span> Calcul…{:else}▶ Exécuter{/if}</button>
+            <button class="btn primary small mc-run" class:is-run={running[ch.id]} class:is-done={!running[ch.id] && flash[ch.id] === 'ok'} class:is-err={!running[ch.id] && flash[ch.id] === 'err'} onclick={() => run(ch)} disabled={running[ch.id]} title="Ctrl/⌘ + Entrée"><span class="mc-run-ic" aria-hidden="true"><svg viewBox="0 0 16 16"><path class="i-play" d="M5 3.2v9.6L12.6 8z" /><circle class="i-spin" cx="8" cy="8" r="5.6" pathLength="1" /><path class="i-ok" d="M3.6 8.4l3 3 5.8-6.6" pathLength="1" /><path class="i-err" d="M5 5l6 6M11 5l-6 6" pathLength="1" /></svg></span>{running[ch.id] ? 'Calcul…' : 'Exécuter'}</button>
             {#if ch.code !== undefined && codes[ch.id] !== ch.code}<button class="btn small" onclick={() => restore(ch, ch.code)}>Code de départ</button>{/if}
             {#if ch.sol}<button class="btn small" aria-pressed={!!showSol[ch.id]} onclick={() => (showSol = { ...showSol, [ch.id]: !showSol[ch.id] })}>{showSol[ch.id] ? 'Masquer le corrigé' : 'Voir le corrigé'}</button>{/if}
           </span>
@@ -115,10 +119,10 @@
       {:else if r}
         <div class="r-out" aria-live="polite">
           <div class="r-text-out">
-            {#each r.out as o}<pre class="r-{o.type}">{o.text}</pre>{/each}
+            {#each r.out as o, n}<pre class="r-{o.type}" style:--n={Math.min(n, 12)}>{o.text}</pre>{/each}
             {#if r.error}<pre class="r-error">Erreur : {r.error}</pre>{/if}
           </div>
-          {#each r.images as img}<canvas class="r-plot" use:bitmap={img}></canvas>{/each}
+          {#each r.images as img, n}<canvas class="r-plot" style:--n={Math.min(n, 6)} use:bitmap={img}></canvas>{/each}
           {#if !r.out.length && !r.error && !r.images.length}<p class="r-none">Exécuté, sans sortie.</p>{/if}
         </div>
       {/if}

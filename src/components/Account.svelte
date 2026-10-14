@@ -51,7 +51,7 @@
     {:else if $session}
       <p class="lead">Progression liée à <b>{$session.email}</b>. Elle est enregistrée sur cet appareil et synchronisée automatiquement.</p>
       <dl class="sync-info">
-        <div><dt>État</dt><dd class="st-{$syncState}">{({ idle: 'en attente', syncing: 'synchronisation…', ok: 'à jour', error: 'erreur' })[$syncState] || $syncState}</dd></div>
+        <div><dt>État</dt><dd class="st-{$syncState} sync-st"><span class="sync-ic" aria-hidden="true"><svg viewBox="0 0 20 20"><circle class="s-ring" cx="10" cy="10" r="7" pathLength="1" /><path class="s-ok" d="M6.2 10.4l2.6 2.6 5-5.6" pathLength="1" /><path class="s-err" d="M10 5.8v5M10 13.6v.4" pathLength="1" /></svg></span>{({ idle: 'en attente', syncing: 'synchronisation…', ok: 'à jour', error: 'erreur' })[$syncState] || $syncState}</dd></div>
         <div><dt>Dernière synchronisation</dt><dd>{fmtDate($lastSync)}</dd></div>
       </dl>
       {#if $syncError}<p class="err-msg">{$syncError}</p>{/if}
@@ -59,8 +59,7 @@
     {:else}
       <p class="lead">Entre ton adresse e-mail pour retrouver ta progression sur tous tes appareils : utilise la même partout. Aucun e-mail n'est envoyé, pas de mot de passe.</p>
       <form class="login" onsubmit={login}>
-        <label for="email">Adresse e-mail</label>
-        <div class="row"><input id="email" type="email" required autocomplete="email" bind:value={email} placeholder="prenom.nom@exemple.fr" /><button class="btn primary" disabled={busy}>{busy ? 'Connexion…' : 'Continuer'}</button></div>
+        <div class="row"><div class="fl-field"><input id="email" type="email" required autocomplete="email" bind:value={email} placeholder="prenom.nom@exemple.fr" /><label for="email">Adresse e-mail</label><i class="fl-line" aria-hidden="true"></i></div><button class="btn primary mc-run" class:is-run={busy} disabled={busy}><span class="mc-run-ic" aria-hidden="true"><svg viewBox="0 0 16 16"><path class="i-play i-line" d="M3 8h9M8.5 4.5 12 8l-3.5 3.5" /><circle class="i-spin" cx="8" cy="8" r="5.6" pathLength="1" /></svg></span>{busy ? 'Connexion…' : 'Continuer'}</button></div>
         <small class="muted">L'adresse sert seulement d'identifiant : elle reste dans ton navigateur, le serveur n'en reçoit qu'une empreinte chiffrée.</small>
       </form>
     {/if}
