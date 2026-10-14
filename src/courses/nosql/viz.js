@@ -142,7 +142,7 @@ function clusterViz(el) {
         <rect x="${b.x + b.w - 52}" y="${b.y + 6}" width="44" height="7" rx="3" class="nq-lbg"/><rect x="${b.x + b.w - 52}" y="${b.y + 6}" width="0" height="7" rx="3" class="nq-lfg" data-l="${k}"/>
         <rect x="${b.x}" y="${b.y}" width="${b.w}" height="${b.h}" fill="transparent" class="nq-hit"/></g>`;
     });
-    stage.innerHTML = svg(W, H, g + '<g data-l="pk"></g>', 'Clients et machines du cluster');
+    stage.innerHTML = svg(W, H, g + '<g data-l="pk"></g>', 'Clients et machines du cluster', 'nq-mid');
     layer = stage.querySelector('[data-l=pk]'); pk = [];
     qa(stage, '[data-m]').forEach(m => { m.onclick = () => { const k = +m.dataset.m; if (down.has(k)) down.delete(k); else down.add(k); draw(); }; });
     el.querySelector('[data-o=n]').textContent = n + (n > 1 ? ' machines' : ' machine');
@@ -221,7 +221,7 @@ function capViz(el) {
   };
   const stage = el.querySelector('[data-s=stage]');
   const W = 360, H = 220, N1 = [92, 150], N2 = [268, 150], AL = [92, 32], BO = [268, 32];
-  stage.innerHTML = svg(W, H, '<g data-l="scene"></g><g data-l="pk"></g>', 'Deux nœuds répliqués et une coupure réseau');
+  stage.innerHTML = svg(W, H, '<g data-l="scene"></g><g data-l="pk"></g>', 'Deux nœuds répliqués et une coupure réseau', 'nq-mid');
   const scene = stage.querySelector('[data-l=scene]'), layer = stage.querySelector('[data-l=pk]');
   const person = ([x, y], name) => `<g class="nq-person"><circle cx="${x - 40}" cy="${y - 6}" r="8"/><path d="M${x - 53},${y + 16} q13,-20 26,0 z"/><text x="${x - 24}" y="${y + 2}" class="vz-t">${name}</text></g>`;
   const N = 6;
@@ -311,7 +311,7 @@ function familiesViz(el) {
       const Ed = [['a1', 'b1', 'a écrit', 1], ['a1', 'b2', 'a écrit', 1], ['a2', 'b3', 'a écrit', 0], ['b1', 'g1', 'genre', 0], ['b2', 'g1', 'genre', 0], ['b3', 'g2', 'genre', 0]];
       let g = Ed.map(([a, b, l, hit], i) => `<line x1="${P[a][0]}" y1="${P[a][1]}" x2="${P[b][0]}" y2="${P[b][1]}" class="nq-ge ${hit ? 'hit' : ''}" ${d(i)} pathLength="1"/>${i < 3 ? `<text x="${(P[a][0] + P[b][0]) / 2 + 6}" y="${(P[a][1] + P[b][1]) / 2 - 4}" class="vz-t vz-s nq-gl">${l}</text>` : ''}`).join('');
       g += Object.entries(P).map(([k, [x, y, t]]) => `<g class="nq-gn ${k[0]} ${['a1', 'b1', 'b2'].includes(k) ? 'hit' : ''}" ${d(k === 'a1' ? 0 : 1)}><rect x="${x - 50}" y="${y - 15}" width="100" height="30" rx="${k[0] === 'a' ? 15 : 6}"/><text x="${x}" y="${y + 4}" text-anchor="middle">${esc(t.length > 17 ? t.slice(0, 16) + '…' : t)}</text></g>`).join('');
-      h = `<div class="nq-graph${Q}">${svg(370, 180, g, 'Graphe auteurs, ouvrages, genres')}<div class="viz-leg"><span><i class="sw sw-o" style="--sw:var(--c1)"></i>auteur</span><span><i class="sw" style="--sw:var(--c3)"></i>ouvrage</span><span><i class="sw" style="--sw:var(--c4)"></i>genre</span></div></div>`;
+      h = `<div class="nq-graph${Q}">${svg(370, 180, g, 'Graphe auteurs, ouvrages, genres', 'nq-mid')}<div class="viz-leg"><span><i class="sw sw-o" style="--sw:var(--c1)"></i>auteur</span><span><i class="sw" style="--sw:var(--c3)"></i>ouvrage</span><span><i class="sw" style="--sw:var(--c4)"></i>genre</span></div></div>`;
     }
     stage.innerHTML = `<div class="nq-famcard ${RM() ? '' : 'nq-in'}">${h}</div>`;
     const f = F[cur];
@@ -616,7 +616,7 @@ function traversalViz(el) {
       const badge = k === start ? '★' : shown(k) ? depth[k] : '';
       return `<g class="nq-tv ${ty} ${cl}" data-v="${k}" role="button" tabindex="0" aria-label="Partir de ${n}"><rect x="${x - 44}" y="${y - 20}" width="88" height="40" class="nq-hit2"/><rect x="${x - 40}" y="${y - 12}" width="80" height="24" rx="12" class="nq-tc"/><text x="${x}" y="${y + 4}" text-anchor="middle" class="nq-tn2">${n}</text>${badge !== '' ? `<g class="nq-badge ${!RM() && shown(k) && depth[k] === reached ? 'nq-in' : ''}"><circle cx="${x + 38}" cy="${y - 11}" r="9"/><text x="${x + 38}" y="${y - 7.5}" text-anchor="middle">${badge}</text></g>` : ''}</g>`;
     }).join('');
-    el.querySelector('[data-s=stage]').innerHTML = svg(360, 240, g, 'Graphe des continents, pays et capitales');
+    el.querySelector('[data-s=stage]').innerHTML = svg(360, 240, g, 'Graphe des continents, pays et capitales', 'nq-mid');
     qa(el, '[data-v]').forEach(n => { const f = () => { start = n.dataset.v; reached = -1; draw(); }; n.onclick = f; n.onkeydown = e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); f(); } }; });
     const res = Object.keys(depth).filter(ok).sort((a, b) => depth[a] - depth[b]);
     el.querySelector('[data-s=res]').innerHTML = reached < 0 ? '' : `<table class="nq-t"><thead><tr><th>name</th><th>type</th><th>depth</th></tr></thead><tbody>${res.map(v => `<tr class="nq-in"><td>${V[v][0]}</td><td>${V[v][1]}</td><td>${depth[v]}</td></tr>`).join('') || '<tr><td colspan="3" class="nq-empty">résultat vide</td></tr>'}</tbody></table>`;
@@ -762,7 +762,7 @@ function indexViz(el) {
     g += L2.map(([, y, x, ks]) => `<text x="${x}" y="170" text-anchor="middle" class="nq-keyt" data-n3="${y}">_key ${ks.join(', ')}</text>`).join('');
     g += `<text x="6" y="200" class="vz-t vz-s">documents (stockage : chaque ouverture = une entrée-sortie)</text>`;
     g += DOCS.map((d, i) => `<g class="nq-dk" data-d="${d.k}"><rect x="${8 + i * 70}" y="206" width="64" height="50" rx="6"/><text x="${40 + i * 70}" y="220" text-anchor="middle" class="nq-dt2">${d.k}</text><text x="${40 + i * 70}" y="234" text-anchor="middle" class="nq-dt3">${d.a.split(' ').pop()}</text><text x="${40 + i * 70}" y="248" text-anchor="middle" class="nq-dt3">${d.y}</text></g>`).join('');
-    el.querySelector('[data-s=stage]').innerHTML = svg(360, 260, g, 'Arbre de l\'index et documents');
+    el.querySelector('[data-s=stage]').innerHTML = svg(360, 260, g, 'Arbre de l\'index et documents', 'nq-mid');
     el.querySelector('[data-o=stats]').innerHTML = '';
     el.querySelector('[data-o=out]').innerHTML = 'Appuie sur ▶ Exécuter.';
   };

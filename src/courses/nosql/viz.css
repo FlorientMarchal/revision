@@ -247,3 +247,4 @@ g.nq-in{transform-box:fill-box; transform-origin:center}
 .nq-tv.start .nq-tn2{fill:var(--paper)}
 .nq-badge circle{fill:var(--ink)} .nq-badge text{font:700 10px var(--f-mono); fill:var(--paper)}
 .nq-tv.res .nq-badge circle{fill:var(--good)}
+.vz-svg.nq-mid{max-width:560px; margin-inline:auto}

@@ -94,7 +94,7 @@ function qnorm(p) {
 const pct = x => fmt(100 * x, 1) + ' %';
 const pval = p => (p < 0.0001 ? '&lt; 0,0001' : fmt(p, 4));
 /** Lettre chapeau dans un texte SVG (le chapeau combinant s'affiche mal dans certaines polices). */
-const shat = (c, sub = '') => `${c}<tspan dx="-0.5em" dy="-0.5em" font-size="0.9em">ˆ</tspan><tspan dx="0.12em" dy="0.5em">${sub}</tspan>`;
+const shat = (c, sub = '') => `${c}<tspan dx="-0.5em" dy="-0.28em" font-size="0.9em">ˆ</tspan><tspan dx="0.12em" dy="0.28em">${sub}</tspan>`;
 const playLbl = on => (on ? '❚❚ Pause' : '▶ Lancer');
 
 /* ================================================================== 1. moindres carrés : les carrés des résidus */
@@ -435,7 +435,7 @@ function colinViz(el) {
     `<div class="viz-ctrl"><label>ρ = <b data-o="rho"></b><input type="range" min="0" max="0.99" step="0.01" value="${rho}" data-i="rho" aria-label="corrélation entre x1 et x2"></label>
      <span class="viz-btns"><button type="button" class="btn small primary" data-i="play">▶ Rejouer les ${NS} échantillons</button></span></div>
      <div class="grid2 rl-g2"><div>${svg(250, 250, '<g data-l="x"></g>', 'Nuage des deux covariables', 'rl-small')}</div><div>${svg(300, 300, '<g data-l="b"></g>', 'Nuage des estimations de beta1 et beta2')}</div></div>
-     <div class="metrics rl-metrics"><div class="metric"><span>corrélation r</span><b data-o="r"></b></div><div class="metric"><span>VIF = 1/(1 − r²)</span><b data-o="vif"></b></div><div class="metric"><span>écart-type de <span class="rl-hat">β</span>₁</span><b data-o="sd"></b></div><div class="metric"><span>κ(X) (colonnes centrées)</span><b data-o="kap"></b></div></div>
+     <div class="metrics rl-metrics"><div class="metric"><span>r observé</span><b data-o="r"></b></div><div class="metric"><span>VIF = 1/(1 − r²)</span><b data-o="vif"></b></div><div class="metric"><span>écart-type de <span class="rl-hat">β</span>₁</span><b data-o="sd"></b></div><div class="metric"><span>κ(X) centré</span><b data-o="kap"></b></div></div>
      <p class="viz-out" data-o="out"></p>`;
   const draw = () => {
     const c = Math.sqrt(1 - rho * rho), x1 = z1, x2 = z1.map((v, i) => rho * v + c * z2[i]);
@@ -492,9 +492,9 @@ function diagViz(el) {
   el.innerHTML = head('Lire les graphiques de résidus', 'Choisis un scénario : les points glissent vers leur nouvelle position. À gauche résidus contre valeurs ajustées (avec tendance lissée), à droite le QQ-plot normal.') +
     `<div class="viz-ctrl"><span class="vz-seg" role="group" aria-label="scénario">${Object.entries(SC).map(([k, v]) => `<button type="button" class="chip" data-s="${k}">${v.lab}</button>`).join('')}</span>
      <button type="button" class="btn small" data-i="new">Nouvel échantillon</button></div>
-     <div class="grid2 rl-g2"><div>${svg(320, 250, '<g data-l="r"></g>', 'Résidus en fonction des valeurs ajustées')}</div><div>${svg(320, 250, '<g data-l="q"></g>', 'QQ-plot normal des résidus standardisés')}</div></div>
+     <div class="grid2 rl-g2"><div>${svg(320, 262, '<g data-l="r"></g>', 'Résidus en fonction des valeurs ajustées')}</div><div>${svg(320, 262, '<g data-l="q"></g>', 'QQ-plot normal des résidus standardisés')}</div></div>
      <p class="viz-out" data-o="out"></p>`;
-  const W = 320, H = 250, L = 34, R = 312, T = 14, B = 222;
+  const W = 320, H = 262, L = 34, R = 312, T = 14, B = 222;
   const compute = () => {
     const r = rng(seed), xs = Array.from({ length: n }, () => 10 * r()), zs = xs.map(() => gauss(r));
     const ts = xs.map(() => { const g = gauss(r), c = (gauss(r) ** 2 + gauss(r) ** 2) / 2; return g / Math.sqrt(c) * 0.7; });
@@ -564,7 +564,7 @@ function cookViz(el) {
     // barres de Cook
     const CH = 130, cb = 108, ct = 12, dm = Math.max(1.2, ...D) * 1.08, bw = (R - L) / n, Yc = v => cb - Math.min(v, dm) / dm * (cb - ct);
     let c = line(L, cb, R, cb, 'class="vz-axis"') + line(L, Yc(4 / n), R, Yc(4 / n), 'class="rl-thr"') + line(L, Yc(1), R, Yc(1), 'class="rl-crit"');
-    c += tx(R, Yc(1) - 4, 'D = 1', 'end', 'vz-s rl-tcrit') + tx(R, Yc(4 / n) - 4, '4/n', 'end', 'vz-s rl-tthr');
+    c += tx(L + 2, Yc(1) - 4, 'D = 1', 'start', 'vz-s rl-tcrit') + tx(L + 50, Yc(4 / n) - 4, '4/n', 'start', 'vz-s rl-tthr');
     const order = xs.map((x, i) => [x, i]).sort((a, b) => a[0] - b[0]);
     order.forEach(([, i], k) => { const x0 = L + k * bw + bw * 0.18; c += `<rect x="${x0.toFixed(1)}" y="${Yc(D[i]).toFixed(1)}" width="${(bw * 0.64).toFixed(1)}" height="${(cb - Yc(D[i])).toFixed(1)}" class="${i === n - 1 ? 'rl-barP' : 'rl-barc'}"/>`; if (i === n - 1) c += tx(x0 + bw * 0.32, cb + 14, 'P', 'middle', 'rl-tP'); });
     c += tx(L, CH - 4, 'distance de Cook Dᵢ (points rangés selon x)', 'start', 'vz-s');
