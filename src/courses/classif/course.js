@@ -7,6 +7,10 @@ export default {
   level: 'M1 MIASHS',
   semester: 'S1 · 2025-2026',
   teacher: 'Marine Demangeot',
+  evals: [
+    { label: 'Partiel', date: '2026-10-12' },
+    { label: 'Rattrapage', date: null },
+  ],
   topics: ['KNN', 'régression logistique', 'arbres CART', 'SVM', 'clustering'],
   load: () => import('./data.js'),
   viz: () => import('./viz.js'),

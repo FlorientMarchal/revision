@@ -8,6 +8,8 @@
   import Tools from './Tools.svelte';
   import Annales from './Annales.svelte';
   import TP from './TP.svelte';
+  import TPLab from './TPLab.svelte';
+  import { evalList } from '../lib/evals.js';
 
   let { course, tab } = $props();
   const ui = kv(course.id);
@@ -26,8 +28,8 @@
     { id: 'flash', label: 'Flashcards', on: (data.cards || []).length },
     { id: 'quiz', label: 'QCM', on: (data.quiz || []).length },
     { id: 'outils', label: 'Exercices interactifs', on: !!course.tools },
-    { id: 'annales', label: 'Annales corrigées', on: (data.exams || []).length },
-    { id: 'tp', label: 'TP', on: (data.tps || []).length },
+    { id: 'annales', label: course.examsLabel || 'Annales corrigées', on: (data.exams || []).length },
+    { id: 'tp', label: data.labs ? 'TP · labo de code' : 'TP', on: (data.tps || data.labs || []).length },
   ].filter(t => t.on) : []);
 
   const current = $derived(tabs.find(t => t.id === tab) ? tab : (tabs.find(t => t.id === ui.get('tab', 'fiches')) || tabs[0] || {}).id);
@@ -35,9 +37,15 @@
 </script>
 
 <section class="course-head">
-  <p class="eyebrow">{course.code} · {course.level} · {course.semester}</p>
+  <p class="eyebrow">{[course.code, course.level, course.semester].filter(Boolean).join(' · ')}</p>
   <h1>{course.title}</h1>
   <p class="sub">{course.topics.join(' / ')}</p>
+  {#if course.evals}
+    <ul class="cc-evals" aria-label="Évaluations">
+      {#each evalList(course) as e}<li class:next={e.next} class:past={e.past}><b>{e.label}</b>{#if e.when}<span>{e.when}</span>{:else}<span class="tbd">date à venir</span>{/if}</li>{/each}
+    </ul>
+  {/if}
+  {#if course.examInfo}<p class="exam-info">{@html course.examInfo}</p>{/if}
 </section>
 
 {#if error}
@@ -56,7 +64,7 @@
     {:else if current === 'quiz'}<Quiz {course} {data} />
     {:else if current === 'outils'}<Tools {course} />
     {:else if current === 'annales'}<Annales {course} {data} />
-    {:else if current === 'tp'}<TP {data} />
+    {:else if current === 'tp'}{#if data.labs}<TPLab {course} {data} />{:else}<TP {data} />{/if}
     {/if}
   </main>
 {/if}

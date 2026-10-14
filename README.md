@@ -21,6 +21,14 @@ npm run dev
 - `src/components/` : les écrans (accueil, cours, fiches, flashcards, QCM, annales, TP, compte).
 - `src/lib/progress.js` : progression locale ; `src/lib/sync.js` : connexion et synchronisation Supabase.
 
+## Labo de TP (cours de visualisation)
+
+`src/courses/visu/labs.js` décrit les TP : énoncé résumé, extraits de code et fichier de départ de chaque exercice. **Règle : on n'y met que le code fourni par l'enseignant**, recopié tel quel des supports (seules l'indentation et les lignes coupées par la mise en page du PDF sont retouchées, et c'est signalé). Les fichiers de départ sont dans `src/courses/visu/start/`, les fichiers de données dans `public/courses/visu/tp/<tp>/` sous leur nom d'origine. `scripts/tp-libs.mjs` (lancé avant `dev` et `build`) copie `d3.min.js` et `jquery.min.js` à côté, pour que les balises `<script src="d3.min.js">` des TP marchent telles quelles. L'aperçu tourne dans une iframe isolée (`sandbox`), avec une `<base>` qui pointe vers le dossier du TP.
+
+## Dates d'évaluation
+
+Dans `course.js` : `evals: [{ label: 'Partiel', date: 'AAAA-MM-JJ' }, { label: 'Rattrapage', date: null }]`. L'accueil classe les cours par prochaine évaluation.
+
 ## Ajouter un cours
 
 Déposer les PDF du cours, des annales et des TP, puis créer `src/courses/<id>/course.js` et `data.js` sur le modèle de `classif`.

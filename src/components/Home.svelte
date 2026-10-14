@@ -4,6 +4,8 @@
   import { summarize, pct } from '../lib/summary.js';
   import { link } from '../lib/router.js';
   import { session, configured } from '../lib/sync.js';
+  import { evalList, byEval } from '../lib/evals.js';
+  const courses = [...COURSES].sort(byEval);
 
   import { onMount } from 'svelte';
   let loaded = $state({});
@@ -27,21 +29,27 @@
   </section>
 
   <div class="course-grid">
-    {#each COURSES as c (c.id)}
+    {#each courses as c (c.id)}
       {@const d = loaded[c.id]}
       {@const s = d ? summarize(maps[c.id] || {}, d) : null}
       <a class="course-card" href={link('c', c.id)}>
         <div class="cc-head">
-          <span class="cc-code">{c.code} · {c.level}</span>
+          <span class="cc-code">{[c.code, c.level].filter(Boolean).join(' · ')}</span>
           <span class="cc-sem">{c.semester}</span>
         </div>
         <h2>{c.title}</h2>
         <p class="cc-topics">{c.topics.join(' · ')}</p>
+        {#if c.evals}
+          <ul class="cc-evals" aria-label="Évaluations">
+            {#each evalList(c) as e}<li class:next={e.next} class:past={e.past}><b>{e.label}</b>{#if e.when}<span>{e.when}</span>{:else}<span class="tbd">date à venir</span>{/if}</li>{/each}
+          </ul>
+        {/if}
         {#if s}
           <dl class="cc-stats">
+            {#if s.labs}<div><dt>Exercices de TP réussis</dt><dd><b>{s.labsDone}</b> / {s.labs}</dd><span class="meter"><i style="width:{pct(s.labsDone, s.labs)}%"></i></span></div>{/if}
             <div><dt>Flashcards sues</dt><dd><b>{s.known}</b> / {s.cards}</dd><span class="meter"><i style="width:{pct(s.known, s.cards)}%"></i></span></div>
             <div><dt>Fiches lues</dt><dd><b>{s.fiches}</b> / {s.chapters}</dd><span class="meter"><i style="width:{pct(s.fiches, s.chapters)}%"></i></span></div>
-            <div><dt>Questions d'annales réussies</dt><dd><b>{s.examOk}</b> / {s.examQ}</dd><span class="meter"><i style="width:{pct(s.examOk, s.examQ)}%"></i></span></div>
+            {#if s.examQ}<div><dt>Questions d'annales réussies</dt><dd><b>{s.examOk}</b> / {s.examQ}</dd><span class="meter"><i style="width:{pct(s.examOk, s.examQ)}%"></i></span></div>{/if}
             <div><dt>QCM : bonnes réponses</dt><dd><b>{s.quizRight}</b> / {s.quiz}</dd><span class="meter"><i style="width:{pct(s.quizRight, s.quiz)}%"></i></span></div>
           </dl>
         {:else}

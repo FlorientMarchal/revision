@@ -2,3 +2,5 @@ node_modules
 dist
 .DS_Store
 .claude
+public/courses/*/tp/*/d3.min.js
+public/courses/*/tp/*/jquery.min.js
