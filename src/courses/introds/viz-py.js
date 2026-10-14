@@ -906,7 +906,7 @@ function cesarViz(el) {
     <div class="vy-ces" style="flex:1 1 260px">
       <div class="vy-chips"><button type="button" class="chip" data-x="ave">« Ave Caesar ! »</button><button type="button" class="chip" data-x="tp">message du TP</button></div>
       <label class="qs" for="${'ces' + (++UID)}" style="font-size:13px;color:var(--muted)">texte</label><textarea id="${'ces' + UID}" spellcheck="false">Ave Caesar !</textarea>
-      <div class="vy-codel" data-o="call"></div>
+      <div class="vy-codel" data-o="call" style="font-size:11px;padding:8px"></div>
       <div class="outt" data-o="out" aria-live="polite"></div>
       <p class="viz-out" data-o="calc"></p></div></div>`;
   const ta = $(el, 'textarea'), rg = $(el, 'input[type=range]');
@@ -920,7 +920,7 @@ function cesarViz(el) {
     const k = ((sel % 26) + 26) % 26, a0 = (k * step - 90 - step / 2) * Math.PI / 180, a1 = (k * step - 90 + step / 2) * Math.PI / 180, ro = R1 + 15, ri = R2 - 15;
     $(el, '[data-o=hl]').setAttribute('d', `M${C + ro * Math.cos(a0)},${C + ro * Math.sin(a0)} A${ro},${ro} 0 0 1 ${C + ro * Math.cos(a1)},${C + ro * Math.sin(a1)} L${C + ri * Math.cos(a1)},${C + ri * Math.sin(a1)} A${ri},${ri} 0 0 0 ${C + ri * Math.cos(a0)},${C + ri * Math.sin(a0)}z`);
     const txt = ta.value, out = [...txt].map(c => sh(c, d));
-    $(el, '[data-o=call]').innerHTML = hl('codage_par_substitution(texte,') + '\n' + hl(`    cree_dictionnaire_codage_par_decalage(${d}))`);
+    $(el, '[data-o=call]').innerHTML = hl('codage_par_substitution(texte,') + '\n' + hl(`  cree_dictionnaire_codage_par_decalage(${d}))`);
     $(el, '[data-o=out]').innerHTML = out.map((c, i) => `<span style="animation-delay:${reduced() ? 0 : Math.min(i, 60) * 0.012}s">${esc(c)}</span>`).join('');
     const j = (((k + d) % 26) + 26) % 26;
     $(el, '[data-o=ctr]').textContent = `${A[k]} → ${A[j]}`;

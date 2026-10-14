@@ -214,7 +214,7 @@ figure.viz[data-viz^="py-"]{font-variant-ligatures:none}
 .vy-pd th{background:var(--paper-2); color:var(--muted); font-weight:600}
 .vy-pd th.ix{text-align:left}
 .vy-pd tr.sel td, .vy-pd tr.sel th{background:var(--accent-soft); color:var(--accent); font-weight:700}
-.vy-pd tr.scan th{box-shadow:inset 0 0 0 2px var(--warn)}
+.vy-pd tr.scan th{box-shadow:inset 0 0 0 2px var(--warn)} .vy-pd tr.scan td, .vy-pd tr.scan th{background:var(--warn-soft)}
 .vy-pd tr.in{animation:vy-in .4s ease-out}
 .vy-pd td.vk{font-weight:700}
 .vy-pd tr.k0 td.vk{color:var(--c1)} .vy-pd tr.k1 td.vk{color:var(--c2)} .vy-pd tr.k2 td.vk{color:var(--c3)} .vy-pd tr.k3 td.vk{color:var(--c6)}
@@ -282,3 +282,6 @@ figure.viz[data-viz^="py-"]{font-variant-ligatures:none}
   .vy-vars .v.chg, .vy-out .new, .vy-res .vy-cell > b, .vy-mem .arr, .vy-mem .arr2, .vy-mem .hot, .vy-mc .last, .vy-dict .ent.hit, .vy-ces .outt span, .vy-tab .c.fill, .vy-pd tr.in,
   .vy-fig g.cellg, .vy-ch .draw, .vy-ch .grow, .vy-ch .growx, .vy-ch .fade, .vy-ch .spin{animation:none !important}
 }
+
+/* pas de ligatures (<= reste <=, comme sur papier) */
+figure.viz[data-viz^="py-"] *{font-variant-ligatures:none}
