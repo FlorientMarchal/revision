@@ -23,11 +23,7 @@ export const chapters = [
 /* ------------------------------------------------------------------ labos */
 export const rlabs = [tpVec, tpLim, rExos];
 export const rlabsLabel = 'R · TP de stat';
-// Jeux de données pas encore fournis : le notebook reste lisible, mais les cellules qui lisent le fichier échoueront.
-const MISSING = { pandas: 'locations_velos.csv', pandas2: 'consommation_electrique.csv', sns: 'mobilite_urbaine.csv' };
-export const pylabs = pylabsAll.map(l => MISSING[l.id]
-  ? { ...l, d: `<p class="r-error-box"><b>Données manquantes :</b> le fichier <code>${MISSING[l.id]}</code> n'est pas encore sur le site ; les blocs qui le lisent afficheront une erreur. Les autres blocs fonctionnent.</p>` + (l.d || '') }
-  : l);
+export const pylabs = pylabsAll;
 export const pylabsLabel = 'Python · notebooks';
 // Fichiers que les notebooks ouvrent par leur nom : copiés dans la session Python quand le code les cite.
 const base = import.meta.env.BASE_URL + 'courses/introds/data/';

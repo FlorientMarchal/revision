@@ -1,0 +1,121 @@
+station,type_velo,meteo,duree_min,distance_km,prix_eur,abonne,satisfaction
+Port Marianne,Electrique,Pluie,46.0,18.1,15.44,oui,5.0
+Comedie,Cargo,Nuageux,37.0,7.3,18.66,oui,5.0
+Port Marianne,Electrique,Pluie,38.0,14.4,14.32,oui,4.0
+Antigone,Ville,Soleil,43.0,5.4,8.44,oui,2.0
+Gare,Ville,Pluie,72.0,8.7,10.76,oui,1.0
+Port Marianne,Cargo,Soleil,,1.3,21.54,oui,3.0
+Port Marianne,Ville,Soleil,41.0,6.5,8.28,oui,3.0
+Antigone,Electrique,Soleil,30.0,11.9,13.2,oui,
+Comedie,Electrique,Soleil,29.0,3.0,13.06,oui,3.0
+Antigone,Ville,Soleil,74.0,12.3,10.92,non,1.0
+Comedie,Ville,Soleil,52.0,9.3,9.16,oui,2.0
+Comedie,Ville,Nuageux,43.0,3.8,8.44,oui,1.0
+Comedie,Ville,Soleil,35.0,6.0,7.8,oui,5.0
+Comedie,Ville,Nuageux,20.0,6.2,6.6,oui,5.0
+Port Marianne,Electrique,Soleil,41.0,7.8,14.74,oui,5.0
+Gare,Electrique,Nuageux,59.0,5.9,17.26,oui,3.0
+Comedie,Cargo,Soleil,34.0,4.7,18.12,oui,5.0
+Comedie,Electrique,Soleil,37.0,6.8,14.18,oui,5.0
+Gare,Electrique,Pluie,38.0,3.9,14.32,non,
+Gare,Cargo,Soleil,44.0,2.8,19.92,oui,
+Gare,Ville,Nuageux,,7.8,5.8,oui,5.0
+Port Marianne,Ville,Nuageux,37.0,11.5,7.96,oui,3.0
+Port Marianne,Electrique,Nuageux,25.0,1.9,12.5,oui,3.0
+Antigone,Ville,Soleil,60.0,8.0,9.8,non,5.0
+Port Marianne,Ville,Nuageux,27.0,5.4,7.16,oui,5.0
+Gare,Electrique,Soleil,54.0,4.1,16.56,non,5.0
+Comedie,Ville,Nuageux,72.0,11.4,10.76,non,1.0
+Gare,Cargo,Pluie,36.0,5.9,18.48,non,1.0
+Comedie,Electrique,Pluie,30.0,14.0,13.2,oui,3.0
+Port Marianne,Electrique,Soleil,46.0,4.9,15.44,non,3.0
+Comedie,Ville,Soleil,42.0,9.5,8.36,oui,2.0
+Gare,Ville,Soleil,22.0,7.1,6.76,non,2.0
+Comedie,Ville,Soleil,51.0,5.0,9.08,oui,3.0
+Port Marianne,Ville,Nuageux,82.0,10.4,11.56,non,4.0
+Comedie,Electrique,Nuageux,37.0,7.4,14.18,non,4.0
+Antigone,Ville,Soleil,38.0,10.4,8.04,oui,1.0
+Port Marianne,Ville,Pluie,21.0,7.8,6.68,oui,2.0
+Antigone,Ville,Nuageux,48.0,3.7,8.84,oui,2.0
+Port Marianne,Electrique,Soleil,17.0,7.6,11.38,non,2.0
+Port Marianne,Ville,Nuageux,,8.2,6.6,non,5.0
+Port Marianne,Ville,Pluie,68.0,11.8,10.44,non,3.0
+Antigone,Cargo,Soleil,24.0,4.4,16.32,oui,3.0
+Antigone,Electrique,Nuageux,64.0,7.8,17.96,non,5.0
+Antigone,Electrique,Nuageux,72.0,1.1,19.08,non,3.0
+Port Marianne,Electrique,Nuageux,47.0,10.6,15.58,oui,4.0
+Gare,Electrique,Soleil,53.0,3.7,16.42,non,5.0
+Port Marianne,Ville,Nuageux,81.0,0.8,11.48,oui,5.0
+Port Marianne,Electrique,Nuageux,38.0,7.8,14.32,oui,2.0
+Gare,Electrique,Nuageux,30.0,12.4,13.2,oui,3.0
+Gare,Cargo,Nuageux,15.0,1.9,14.7,oui,1.0
+Antigone,Ville,Soleil,43.0,3.6,8.44,non,4.0
+Port Marianne,Electrique,Nuageux,72.0,5.0,19.08,non,2.0
+Comedie,Ville,Pluie,61.0,3.5,9.88,oui,1.0
+Comedie,Ville,Pluie,23.0,9.5,6.84,non,1.0
+Comedie,Ville,Soleil,25.0,4.8,7.0,non,1.0
+Gare,Ville,Soleil,32.0,5.1,7.56,oui,1.0
+Comedie,Electrique,Nuageux,48.0,10.3,15.72,oui,
+Antigone,Ville,Soleil,38.0,5.0,8.04,oui,3.0
+Antigone,Cargo,Nuageux,46.0,9.7,20.28,oui,2.0
+Port Marianne,Electrique,Pluie,48.0,4.1,15.72,oui,5.0
+Antigone,Electrique,Soleil,36.0,3.2,14.04,oui,3.0
+Gare,Electrique,Soleil,41.0,0.8,14.74,non,
+Port Marianne,Electrique,Soleil,,15.4,15.44,oui,3.0
+Port Marianne,Ville,Nuageux,40.0,6.7,8.2,non,4.0
+Antigone,Ville,Soleil,52.0,9.0,9.16,non,4.0
+Antigone,Ville,Soleil,79.0,7.9,11.32,non,2.0
+Gare,Ville,Soleil,54.0,8.6,9.32,oui,4.0
+Antigone,Ville,Nuageux,43.0,8.2,8.44,oui,3.0
+Comedie,Cargo,Nuageux,8.0,15.6,13.44,non,4.0
+Antigone,Ville,Soleil,50.0,3.8,9.0,oui,
+Port Marianne,Electrique,Soleil,5.0,1.8,9.7,oui,4.0
+Port Marianne,Ville,Soleil,14.0,4.0,6.12,non,3.0
+Gare,Cargo,Soleil,59.0,2.7,22.62,non,1.0
+Gare,Electrique,Soleil,56.0,11.0,16.84,oui,5.0
+Antigone,Ville,Soleil,39.0,11.3,8.12,oui,5.0
+Gare,Electrique,Soleil,8.0,4.2,10.12,non,3.0
+Antigone,Cargo,Soleil,35.0,2.4,18.3,oui,3.0
+Comedie,Cargo,Nuageux,28.0,6.6,17.04,non,1.0
+Comedie,Electrique,Nuageux,55.0,13.6,16.7,oui,3.0
+Comedie,Ville,Soleil,87.0,0.8,11.96,non,3.0
+Gare,Ville,Soleil,46.0,10.1,8.68,oui,4.0
+Comedie,Cargo,Nuageux,,3.7,16.68,oui,3.0
+Gare,Electrique,Soleil,19.0,12.2,11.66,oui,1.0
+Port Marianne,Ville,Soleil,,3.7,8.28,oui,1.0
+Port Marianne,Cargo,Soleil,38.0,6.9,18.84,non,3.0
+Port Marianne,Electrique,Soleil,19.0,2.0,11.66,oui,4.0
+Antigone,Electrique,Pluie,44.0,4.1,15.16,oui,5.0
+Comedie,Ville,Soleil,19.0,13.5,6.52,non,5.0
+Antigone,Ville,Soleil,64.0,11.3,10.12,oui,
+Antigone,Ville,Nuageux,63.0,6.4,10.04,oui,
+Port Marianne,Ville,Nuageux,64.0,4.5,10.12,oui,5.0
+Gare,Cargo,Soleil,33.0,0.8,17.94,oui,3.0
+Comedie,Ville,Soleil,52.0,6.4,9.16,non,5.0
+Antigone,Electrique,Pluie,39.0,7.9,14.46,oui,4.0
+Gare,Ville,Soleil,34.0,7.7,7.72,non,2.0
+Antigone,Electrique,Nuageux,35.0,7.6,13.9,oui,3.0
+Gare,Ville,Soleil,16.0,3.5,6.28,non,3.0
+Gare,Ville,Nuageux,13.0,7.7,6.04,oui,2.0
+Comedie,Ville,Nuageux,58.0,7.8,9.64,non,4.0
+Port Marianne,Ville,Nuageux,38.0,13.2,8.04,non,2.0
+Port Marianne,Cargo,Nuageux,46.0,15.5,20.28,oui,4.0
+Gare,Electrique,Soleil,62.0,7.5,17.68,oui,3.0
+Comedie,Ville,Soleil,7.0,4.9,5.56,non,3.0
+Antigone,Electrique,Soleil,26.0,7.7,12.64,non,4.0
+Gare,Cargo,Nuageux,,5.6,20.28,oui,1.0
+Antigone,Ville,Soleil,50.0,5.0,9.0,non,3.0
+Comedie,Electrique,Soleil,34.0,7.8,13.76,oui,1.0
+Comedie,Electrique,Soleil,63.0,3.8,17.82,oui,1.0
+Antigone,Ville,Nuageux,46.0,10.4,8.68,non,5.0
+Comedie,Electrique,Pluie,18.0,7.6,11.52,oui,5.0
+Antigone,Electrique,Soleil,23.0,9.0,12.22,oui,4.0
+Gare,Cargo,Soleil,58.0,7.3,22.44,oui,5.0
+Comedie,Ville,Nuageux,51.0,5.1,9.08,oui,4.0
+Port Marianne,Cargo,Nuageux,5.0,4.2,12.9,oui,1.0
+Antigone,Ville,Nuageux,69.0,7.1,10.52,oui,
+Port Marianne,Electrique,Pluie,54.0,5.8,16.56,oui,2.0
+Port Marianne,Electrique,Pluie,69.0,8.9,18.66,oui,4.0
+Antigone,Ville,Nuageux,34.0,8.0,7.72,oui,1.0
+Port Marianne,Ville,Nuageux,36.0,2.6,7.88,oui,4.0
+Comedie,Electrique,Soleil,19.0,8.3,11.66,non,5.0
