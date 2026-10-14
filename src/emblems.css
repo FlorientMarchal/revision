@@ -1,1 +1,104 @@
-/* Emblèmes animés des cours. */
+/* Emblèmes animés des cours (src/components/Emblem.svelte, formes dans src/lib/emblems/).
+   Le balisage décrit l'image finale ; les animations « d'entrée » (.a-*) partent d'un état initial et y reviennent.
+   - en-tête (hero) : l'entrée se joue à l'affichage, puis de petites boucles (.l-*) prennent le relais ;
+   - carte (card)   : image finale au repos, l'entrée se rejoue au survol / focus de la carte .course-card.
+   Couleurs : uniquement les variables du thème (clair et « ardoise »). */
+
+.emblem{display:inline-block; flex:none; line-height:0; vertical-align:middle; max-width:100%}
+.emblem svg{display:block; width:100%; height:100%; overflow:visible}
+.emblem-hero{width:160px; height:120px; --sw:1.8px}
+.emblem-card{width:56px; height:56px; --sw:2.3px}
+@media (max-width:420px){ .emblem-hero{width:144px; height:108px} }
+
+/* ---- feuille ---- */
+.emblem .em-sheet{fill:var(--paper); stroke:var(--line); stroke-width:1}
+.emblem .em-grid{fill:none; stroke:var(--line); stroke-width:.6; opacity:.75}
+.emblem .em-margin{fill:none; stroke:var(--margin); stroke-width:1; opacity:.8}
+
+/* ---- encre ---- */
+.emblem .em-l{fill:none; stroke-width:var(--sw); stroke-linecap:round; stroke-linejoin:round}
+.emblem .em-thin{stroke-width:calc(var(--sw) * .6)}
+.emblem .em-thick{stroke-width:calc(var(--sw) * 1.5)}
+.emblem .em-dash{stroke-dasharray:3 3}
+.emblem .em-t{font-family:var(--f-mono); font-weight:600; fill:var(--ink)}
+.emblem .s-ink{stroke:var(--ink)} .emblem .s-acc{stroke:var(--accent)} .emblem .s-red{stroke:var(--red)}
+.emblem .s-mut{stroke:var(--muted)} .emblem .s-line{stroke:var(--line-strong)} .emblem .s-good{stroke:var(--good)} .emblem .s-warn{stroke:var(--warn)}
+.emblem .s-c1{stroke:var(--c1)} .emblem .s-c2{stroke:var(--c2)} .emblem .s-c3{stroke:var(--c3)} .emblem .s-c4{stroke:var(--c4)} .emblem .s-c5{stroke:var(--c5)} .emblem .s-c6{stroke:var(--c6)}
+.emblem .f-ink{fill:var(--ink)} .emblem .f-acc{fill:var(--accent)} .emblem .f-red{fill:var(--red)} .emblem .f-mut{fill:var(--muted)}
+.emblem .f-soft{fill:var(--accent-soft)} .emblem .f-paper{fill:var(--paper)} .emblem .f-good{fill:var(--good)} .emblem .f-warn{fill:var(--warn)}
+.emblem .f-c1{fill:var(--c1)} .emblem .f-c2{fill:var(--c2)} .emblem .f-c3{fill:var(--c3)} .emblem .f-c4{fill:var(--c4)} .emblem .f-c5{fill:var(--c5)} .emblem .f-c6{fill:var(--c6)}
+.emblem .f-redwash{fill:var(--red); fill-opacity:.13}
+.emblem .f-none{fill:none}
+
+/* ---- géométrie des animations ---- */
+.emblem .a-draw{stroke-dasharray:1 2}
+.emblem .a-pop, .emblem .a-gy, .emblem .a-gx, .emblem .l-ripple, .emblem .l-breath, .emblem .l-spin, .emblem .a-spin{transform-box:fill-box; transform-origin:center}
+.emblem .a-gy{transform-origin:center bottom}
+.emblem .a-gx{transform-origin:left center}
+.emblem .a-rot, .emblem .a-grow{transform-box:view-box; transform-origin:var(--ox,0) var(--oy,0)}
+
+/* ---- entrée : jouée en en-tête, ou dans une carte survolée / focalisée ---- */
+:is(.emblem-hero, .emblem.e-play, .emblem-card:hover, .course-card:hover .emblem-card, .course-card:focus-visible .emblem-card, .course-card:focus-within .emblem-card) :is(.a-draw, .a-pop, .a-fade, .a-gy, .a-gx, .a-move, .a-rot, .a-grow, .a-spin){
+  animation-duration:var(--t,.6s); animation-delay:var(--d,0s); animation-fill-mode:both;
+  animation-timing-function:var(--e, cubic-bezier(.25,.8,.25,1)); animation-iteration-count:1}
+:is(.emblem-hero, .emblem.e-play, .emblem-card:hover, .course-card:hover .emblem-card, .course-card:focus-visible .emblem-card, .course-card:focus-within .emblem-card) .a-draw{animation-name:em-draw}
+:is(.emblem-hero, .emblem.e-play, .emblem-card:hover, .course-card:hover .emblem-card, .course-card:focus-visible .emblem-card, .course-card:focus-within .emblem-card) .a-pop{animation-name:em-pop; --e:cubic-bezier(.34,1.56,.64,1)}
+:is(.emblem-hero, .emblem.e-play, .emblem-card:hover, .course-card:hover .emblem-card, .course-card:focus-visible .emblem-card, .course-card:focus-within .emblem-card) .a-fade{animation-name:em-fade}
+:is(.emblem-hero, .emblem.e-play, .emblem-card:hover, .course-card:hover .emblem-card, .course-card:focus-visible .emblem-card, .course-card:focus-within .emblem-card) .a-gy{animation-name:em-gy}
+:is(.emblem-hero, .emblem.e-play, .emblem-card:hover, .course-card:hover .emblem-card, .course-card:focus-visible .emblem-card, .course-card:focus-within .emblem-card) .a-gx{animation-name:em-gx}
+:is(.emblem-hero, .emblem.e-play, .emblem-card:hover, .course-card:hover .emblem-card, .course-card:focus-visible .emblem-card, .course-card:focus-within .emblem-card) .a-move{animation-name:em-move}
+:is(.emblem-hero, .emblem.e-play, .emblem-card:hover, .course-card:hover .emblem-card, .course-card:focus-visible .emblem-card, .course-card:focus-within .emblem-card) .a-rot{animation-name:em-rot}
+:is(.emblem-hero, .emblem.e-play, .emblem-card:hover, .course-card:hover .emblem-card, .course-card:focus-visible .emblem-card, .course-card:focus-within .emblem-card) .a-grow{animation-name:em-grow}
+:is(.emblem-hero, .emblem.e-play, .emblem-card:hover, .course-card:hover .emblem-card, .course-card:focus-visible .emblem-card, .course-card:focus-within .emblem-card) .a-spin{animation-name:em-spin}
+
+@keyframes em-draw{0%{stroke-dashoffset:1; opacity:0} 4%{opacity:1} 100%{stroke-dashoffset:0}}
+@keyframes em-pop{from{transform:scale(0); opacity:0}}
+@keyframes em-fade{from{opacity:0}}
+@keyframes em-gy{from{transform:scaleY(0)}}
+@keyframes em-gx{from{transform:scaleX(0)}}
+@keyframes em-move{from{transform:translate(var(--x0,0px), var(--y0,0px)); opacity:var(--o0,1)}}
+@keyframes em-rot{from{transform:rotate(var(--r0,0deg)); opacity:var(--o0,1)}}
+@keyframes em-grow{from{transform:scale(var(--s0,0)); opacity:var(--o0,1)}}
+@keyframes em-spin{from{transform:translate(var(--x0,0px), var(--y0,0px)) rotate(var(--r0,-360deg)); opacity:var(--o0,1)}}
+
+/* ---- boucles d'attente (en-tête seulement) ---- */
+.emblem-hero :is(.l-pulse, .l-ripple, .l-blink, .l-travel, .l-spin, .l-bob, .l-breath, .l-sway){
+  animation-duration:var(--lt,3s); animation-delay:var(--ld,3s); animation-iteration-count:infinite; animation-fill-mode:both; animation-timing-function:ease-in-out}
+.emblem-hero .l-pulse{animation-name:em-l-pulse}
+.emblem-hero .l-ripple{animation-name:em-l-ripple; animation-timing-function:cubic-bezier(.2,.6,.3,1)}
+.emblem-hero .l-blink{animation-name:em-l-blink; animation-timing-function:steps(1,end)}
+.emblem-hero .l-travel{animation-name:em-l-travel; animation-timing-function:cubic-bezier(.45,.05,.55,.95)}
+.emblem-hero .l-spin{animation-name:em-l-spin; animation-timing-function:linear}
+.emblem-hero .l-bob{animation-name:em-l-bob}
+.emblem-hero .l-breath{animation-name:em-l-breath}
+.emblem-hero .l-sway{animation-name:em-l-sway; transform-box:view-box; transform-origin:var(--ox,0) var(--oy,0)}
+.emblem .l-travel{stroke-dasharray:.09 2; stroke-dashoffset:.1; opacity:0}
+.emblem .l-ripple{opacity:0}
+.emblem-card .l-travel, .emblem-card .l-ripple{display:none}
+
+@keyframes em-l-pulse{0%,100%{opacity:1} 50%{opacity:.45}}
+@keyframes em-l-ripple{0%{transform:scale(1); opacity:0} 8%{opacity:.85} 70%,100%{transform:scale(2.6); opacity:0}}
+@keyframes em-l-blink{0%{opacity:1} 50%{opacity:0}}
+@keyframes em-l-travel{0%{stroke-dashoffset:.1; opacity:0} 4%{opacity:1} 64%{opacity:1} 70%,100%{stroke-dashoffset:-1; opacity:0}}
+@keyframes em-l-spin{to{transform:rotate(360deg)}}
+@keyframes em-l-bob{0%,100%{transform:translateY(0)} 50%{transform:translateY(-1.6px)}}
+@keyframes em-l-breath{0%,100%{transform:scale(1)} 50%{transform:scale(1.06)}}
+@keyframes em-l-sway{0%,100%{transform:rotate(0)} 50%{transform:rotate(var(--sw-a,2deg))}}
+
+/* hors écran : tout se met en pause (Emblem.svelte pose .e-paused via IntersectionObserver) */
+.emblem.e-paused *{animation-play-state:paused !important}
+
+@media (prefers-reduced-motion: reduce){
+  .emblem *{animation:none !important}
+  .emblem .l-travel, .emblem .l-ripple{display:none}
+}
+
+/* ---- détails propres à certains emblèmes ---- */
+.emblem .em-ring{stroke-width:calc(var(--sw) * 3.2); stroke-linecap:butt}
+.emblem .em-brace{fill:var(--accent); font-weight:700}
+.emblem-hero .em-brace{font-size:11px}
+.emblem-card .em-brace{font-size:8.5px}
+.emblem .em-lab{font-size:8.5px; fill:var(--accent)}
+.emblem .em-code{font-size:8.5px; fill:var(--ink); font-weight:500}
+.emblem .em-prompt{fill:var(--accent); font-weight:700}
+.emblem .em-hair{stroke-width:.8px; stroke-opacity:.6}
