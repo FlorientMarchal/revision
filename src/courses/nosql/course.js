@@ -8,7 +8,7 @@ export default {
   semester: 'S1 · 2026-2027',
   teacher: 'Killian Stefanini',
   evals: [
-    { label: 'Examen (QCM + TP, 1h)', date: '2026-11-09', time: '8h45' },
+    { label: 'Partiel', date: '2026-11-09', time: '8h45' },
     { label: 'Rattrapage', date: '2027-01-05', time: '14h' },
   ],
   examInfo: '<b>Examen le 9 novembre :</b> un QCM et un TP, 1h au total. 18h de cours, TD et TP du 8 octobre au 6 novembre. <i>Le site ne couvre pour l\'instant que le début du cours</i> (support des CM et TP 1).',
