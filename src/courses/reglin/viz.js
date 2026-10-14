@@ -471,6 +471,7 @@ function colinViz(el) {
     $(el, '[data-o=out]').innerHTML = `Var(<span class="rl-hat">β</span>₁) = σ² [(XᵀX)⁻¹]₂₂ est multipliée par VIF = <b>${fmt(vif, vif > 100 ? 0 : 2)}</b> par rapport à des covariables non corrélées. ` +
       (vif > 10 ? '<b class="rl-bad">Colinéarité sévère</b> : le nuage des <span class="rl-hat">β</span> s\'étire le long de la droite <span class="rl-hat">β</span>₁ + <span class="rl-hat">β</span>₂ ≈ 2. Le modèle sait que la <i>somme</i> des effets vaut 2, mais ne sait plus les séparer : les estimations individuelles sont instables, de signes parfois faux, alors que les prévisions restent bonnes.'
         : vif > 5 ? '<b class="rl-warnt">Colinéarité notable</b> (VIF > 5) : l\'ellipse s\'allonge et s\'incline, les estimations deviennent négativement corrélées.'
+          : vif > 1.5 ? 'Colinéarité modérée : le nuage reste centré sur la vraie valeur (1, 1) mais s\'étire déjà en biais, conformément à l\'ellipse de confiance à 95 % σ²(XᵀX)⁻¹. Pousse ρ au-delà de 0,9.'
           : 'Peu de colinéarité : le nuage reste rond et serré autour de la vraie valeur (1, 1), en accord avec l\'ellipse de confiance à 95 % σ²(XᵀX)⁻¹.');
   };
   const btn = $(el, '[data-i=play]');
