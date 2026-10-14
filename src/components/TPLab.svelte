@@ -3,6 +3,7 @@
   // un éditeur qui part de ses fichiers de départ, et un aperçu qui exécute la page avec ses données.
   import { onMount, tick } from 'svelte';
   import { kv, progress, setVal } from '../lib/progress.js';
+  import { lens } from '../lib/motion-components.js';
 
   let { course, data } = $props();
   const ui = kv(course.id);
@@ -41,6 +42,12 @@
   let copied = $state('');
   let ran = $state(false);
   let wide = $state(false);
+  let runSt = $state('');   // '' | 'run' | 'done' : le bouton passe de ▶ à la roue puis à la coche
+  let runT = null;
+  function runDone() {
+    if (runSt !== 'run') return;
+    runSt = 'done'; clearTimeout(runT); runT = setTimeout(() => (runSt = ''), 1400);
+  }
 
   $effect(() => {
     const x = exo;
@@ -71,6 +78,7 @@
     logs = [];
     srcdoc = '';
     await tick();
+    runSt = 'run'; clearTimeout(runT); runT = setTimeout(runDone, 2500);
     srcdoc = build(code);
     ran = true;
   }
@@ -136,7 +144,7 @@
   const nDone = l => l.exos.filter(x => done(x.id)).length;
 </script>
 
-<div class="chips" role="tablist" aria-label="TP">
+<div class="chips" role="tablist" aria-label="TP" use:lens>
   {#each labs as l (l.id)}
     <button class="chip" aria-pressed={l.id === labId} onclick={() => chooseLab(l.id)}>{l.short}{#if nDone(l)}<span class="chip-count">{nDone(l)}/{l.exos.length}</span>{/if}</button>
   {/each}
@@ -145,7 +153,7 @@
 <section class="card lab-intro">
   <h2>{lab.t}</h2>
   {@html lab.d}
-  <div class="chips lab-exos" role="tablist" aria-label="Exercices">
+  <div class="chips lab-exos" role="tablist" aria-label="Exercices" use:lens>
     {#each lab.exos as x (x.id)}
       <button class="chip" aria-pressed={x.id === exo.id} onclick={() => chooseExo(x.id)}>{#if done(x.id)}<span class="chip-ok" aria-label="terminé">✓</span>{/if}{x.short}</button>
     {/each}
@@ -153,7 +161,7 @@
 </section>
 
 <div class="lab" class:lab-wide={wide}>
-  <article class="card lab-steps">
+  {#key exo.id}<article class="card lab-steps">
     <header>
       <h2>{exo.t}</h2>
       {#if exo.goal}<p class="lead">{@html exo.goal}</p>{/if}
@@ -173,7 +181,7 @@
               <div class="snippet-bar">
                 <span>Code fourni{#if s.src} · {s.src}{/if}</span>
                 <span class="snippet-btns">
-                  <button class="btn small" onclick={() => copy(s.code, exo.id + si)}>{copied === exo.id + si ? 'Copié ✓' : 'Copier'}</button>
+                  <button class="btn small mc-copy" class:is-copied={copied === exo.id + si} onclick={() => copy(s.code, exo.id + si)}>{copied === exo.id + si ? 'Copié ✓' : 'Copier'}</button>
                   <button class="btn small" onclick={() => insert(s.code)} title="Insère le code à l'endroit du curseur dans l'éditeur">Insérer</button>
                 </span>
               </div>
@@ -193,13 +201,13 @@
       <input type="checkbox" checked={done(exo.id)} onchange={e => setVal(course.id, 'tp:' + exo.id, e.currentTarget.checked ? 1 : 0)} />
       J'ai réussi cet exercice
     </label>
-  </article>
+  </article>{/key}
 
   <section class="card lab-run" aria-label="Éditeur et aperçu">
     <div class="lab-bar">
       <b class="lab-file">{exo.save || 'exercice.html'}</b>
       <span class="lab-btns">
-        <button class="btn primary" onclick={run} title="Ctrl/⌘ + Entrée">▶ Exécuter</button>
+        <button class="btn primary mc-run" class:is-run={runSt === 'run'} class:is-done={runSt === 'done'} onclick={run} title="Ctrl/⌘ + Entrée"><span class="mc-run-ic" aria-hidden="true"><svg viewBox="0 0 16 16"><path class="i-play" d="M5 3.2v9.6L12.6 8z" /><circle class="i-spin" cx="8" cy="8" r="5.6" pathLength="1" /><path class="i-ok" d="M3.6 8.4l3 3 5.8-6.6" pathLength="1" /></svg></span>{runSt === 'done' ? 'Exécuté' : 'Exécuter'}</button>
         <button class="btn small" onclick={reset}>{exo.start.html !== undefined ? 'Fichier de départ' : 'Repartir de l\'exo précédent'}</button>
         <button class="btn small" onclick={download}>Télécharger</button>
       </span>
@@ -209,7 +217,7 @@
     <p class="lab-hint">Ton code est enregistré sur cet appareil. <kbd>Tab</kbd> indente, <kbd>Ctrl</kbd>/<kbd>⌘</kbd> + <kbd>Entrée</kbd> exécute.</p>
     <div class="lab-out">
       {#if ran}
-        <iframe bind:this={frame} title="Aperçu de la page" sandbox={SANDBOX} {srcdoc}></iframe>
+        <iframe bind:this={frame} title="Aperçu de la page" sandbox={SANDBOX} {srcdoc} onload={runDone}></iframe>
       {:else}
         <div class="lab-empty">Clique sur <b>▶ Exécuter</b> pour voir ta page.</div>
       {/if}

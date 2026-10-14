@@ -3,8 +3,8 @@
 </script>
 
 <p class="lead">L'essentiel des corrections de TP : ce qu'il faut retenir pour l'examen et les fonctions R à reconnaître.</p>
-{#each data.tps as t}
-  <article class="card fiche">
+{#each data.tps as t, n}
+  <article class="card fiche tp-card" style:--i={Math.min(n, 6)}>
     <header><h2>{t.t}</h2></header>
     <p class="lead">{t.d}</p>
     <div class="grid2">

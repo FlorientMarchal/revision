@@ -1,9 +1,9 @@
 <script>
   // Le cours en entier : une leçon par chapitre, avec sommaire, encadrés, démonstrations et illustrations.
-  import { tick } from 'svelte';
+  import { tick, onMount } from 'svelte';
   import { kv, progress, setVal } from '../lib/progress.js';
   import { typeset } from '../lib/math.js';
-  import { reveal, confetti } from '../lib/motion.js';
+  import { reveal, confetti, burst, transition, onEnter, readingBar } from '../lib/motion.js';
 
   let { course, data } = $props();
   const ui = kv(course.id);
@@ -17,15 +17,27 @@
   const lesson = $derived(L[i]);
   const done = lid => ($prog['lesson:' + lid] || {}).v === 1;
 
+  // changement de leçon : la page tourne dans le sens de la lecture (suivante → depuis la droite)
   function show(lid, anchor) {
-    id = lid; ui.set('lesson', lid); pendingAnchor = anchor || null;
-    if (!anchor && body && body.getBoundingClientRect().top < 0) body.scrollIntoView({ block: 'start' });
+    if (lid === id) return;
+    const dir = L.findIndex(l => l.id === lid) > i ? 'r' : 'l';
+    transition('lesson', async () => {
+      id = lid; ui.set('lesson', lid); pendingAnchor = anchor || null;
+      await tick();
+      if (!anchor && body && body.getBoundingClientRect().top < 0) body.scrollIntoView({ block: 'start' });
+    }, { dir, fallbackEl: () => body });
   }
-  function markRead(on) {
+  function markRead(on, el) {
     const all = on && L.length > 1 && L.every(l => l.id === lesson.id || done(l.id));
     setVal(course.id, 'lesson:' + lesson.id, on ? 1 : 0);
-    if (all) confetti();
+    if (on) burst(el);
+    if (all) setTimeout(confetti, 180);
   }
+  let stopInk = () => {};
+  onMount(() => {
+    const bar = readingBar(() => body);
+    return () => { bar(); stopInk(); };
+  });
   function goto(e, sid) {
     e.preventDefault();
     const t = document.getElementById(lesson.id + '-' + sid);
@@ -42,13 +54,14 @@
       }
       if (pendingAnchor) { const t = document.getElementById(pendingAnchor); if (t) t.scrollIntoView({ block: 'start' }); pendingAnchor = null; }
       reveal(body);
+      stopInk(); stopInk = onEnter(body, '.lesson-sec', 'ink-on', 90);
     });
   });
 </script>
 
-<div class="chips" role="tablist" aria-label="Leçons">
+<div class="chips lesson-chips" role="tablist" aria-label="Leçons">
   {#each L as l, k (l.id)}
-    <button class="chip" aria-pressed={l.id === id} onclick={() => show(l.id)}>
+    <button class="chip" aria-pressed={l.id === id} onclick={() => show(l.id)} style="--k:{k}" data-ripple>
       {#if done(l.id)}<span class="chip-ok" aria-label="lue">✓</span>{/if}<span class="chip-n">{k + 1}</span>{l.short}
     </button>
   {/each}
@@ -58,14 +71,14 @@
   {#key id}
     <header class="lesson-head">
       <span class="tag">Leçon {i + 1}/{L.length}{#if lesson.src} · {lesson.src}{/if}</span>
-      <h2>{lesson.t}</h2>
+      <h2 class="lesson-t">{#if /\\[(\[]|[<&]/.test(lesson.t)}{lesson.t}{:else}{#each lesson.t.split(/\s+/) as w, k}{#if k} {/if}<span class="w"><span style="--k:{k}">{w}</span></span>{/each}{/if}</h2>
       {#if lesson.sub}<p class="lead">{lesson.sub}</p>{/if}
     </header>
     <nav class="lesson-toc" aria-label="Sommaire">
       <b>Sommaire</b>
       <ol>
         {#each lesson.sections as s, k}
-          <li><a href={'#' + lesson.id + '-' + s.id} onclick={e => goto(e, s.id)}><span class="toc-n">{String(k + 1).padStart(2, '0')}</span><span><b>{s.t}</b>{#if s.sub}<small>{s.sub}</small>{/if}</span></a></li>
+          <li style="--k:{k}"><a href={'#' + lesson.id + '-' + s.id} onclick={e => goto(e, s.id)}><span class="toc-n">{String(k + 1).padStart(2, '0')}</span><span><b>{s.t}</b>{#if s.sub}<small>{s.sub}</small>{/if}</span></a></li>
         {/each}
       </ol>
     </nav>
@@ -83,11 +96,11 @@
     {/if}
   {/key}
   <label class="read-toggle">
-    <input type="checkbox" checked={done(lesson.id)} onchange={e => markRead(e.currentTarget.checked)} />
+    <input type="checkbox" checked={done(lesson.id)} onchange={e => markRead(e.currentTarget.checked, e.currentTarget)} />
     J'ai lu et compris cette leçon
   </label>
-  <nav class="fiche-nav" aria-label="Leçons">
-    {#if i > 0}<button class="btn" onclick={() => show(L[i - 1].id)}><small>← Leçon précédente</small>{L[i - 1].t}</button>{/if}
-    {#if i < L.length - 1}<button class="btn next" onclick={() => show(L[i + 1].id)}><small>Leçon suivante →</small>{L[i + 1].t}</button>{/if}
+  <nav class="fiche-nav lesson-nav" aria-label="Leçons">
+    {#if i > 0}<button class="btn prev" onclick={() => show(L[i - 1].id)} data-ripple><small><span class="arr" aria-hidden="true">←</span> Leçon précédente</small>{L[i - 1].t}</button>{/if}
+    {#if i < L.length - 1}<button class="btn next" onclick={() => show(L[i + 1].id)} data-ripple><small>Leçon suivante <span class="arr" aria-hidden="true">→</span></small>{L[i + 1].t}</button>{/if}
   </nav>
 </article>
