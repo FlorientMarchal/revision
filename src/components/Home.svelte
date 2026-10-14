@@ -20,7 +20,7 @@
     <p class="eyebrow">Fiches · flashcards · QCM · annales corrigées</p>
     <h1>Mes cours</h1>
     {#if configured && !$session}
-      <p class="lead">Ta progression est enregistrée sur cet appareil. <a href={link('compte')}>Connecte-toi</a> pour la retrouver sur tous tes appareils.</p>
+      <p class="lead">Ta progression est enregistrée sur cet appareil. <a href={link('compte')}>Entre ton adresse e-mail</a> pour la retrouver sur tous tes appareils.</p>
     {:else if !configured}
       <p class="lead">Ta progression est enregistrée sur cet appareil.</p>
     {/if}

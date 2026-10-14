@@ -27,13 +27,11 @@ Déposer les PDF du cours, des annales et des TP, puis créer `src/courses/<id>/
 
 ## Synchronisation de la progression
 
-La progression est enregistrée dans le navigateur, puis synchronisée avec Supabase quand on est connecté (code à 6 chiffres reçu par e-mail, sans mot de passe).
+La progression est enregistrée dans le navigateur, puis synchronisée avec Supabase quand on a saisi son adresse e-mail (page Compte). Pas de compte, pas de mot de passe, aucun e-mail envoyé : l'adresse sert d'identifiant et le serveur n'en reçoit que l'empreinte SHA-256. Qui connaît l'adresse peut donc lire et modifier la progression associée ; c'est accepté, ces données ne sont pas sensibles.
 
 1. Créer un projet sur https://supabase.com.
-2. SQL Editor : exécuter `supabase/schema.sql` (table `progress` et règles d'accès par utilisateur).
-3. Authentication → URL Configuration : mettre `https://florientmarchal.github.io/revision/` comme *Site URL* et dans *Redirect URLs* (ajouter aussi `http://localhost:5173/revision/` pour le développement).
-4. Authentication → Emails : coller `supabase/emails/magic-link.html` dans le modèle *Magic Link* et `supabase/emails/confirm-signup.html` dans *Confirm signup* (ces modèles affichent le code `{{ .Token }}`, que le modèle par défaut n'affiche pas).
-5. Renseigner l'URL du projet et la clé `anon` / `public` dans `src/config.js`. Ne jamais y mettre la clé `service_role`.
+2. SQL Editor : exécuter `supabase/schema.sql` (table `progress_by_key`, sans accès direct, et fonctions `get_progress` / `save_progress`).
+3. Renseigner l'URL du projet et la clé publique (`sb_publishable_…`) dans `src/config.js`. Ne jamais y mettre la clé `service_role` / secrète.
 
 ## Crédits
 
