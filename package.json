@@ -4,7 +4,9 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "predev": "node scripts/tp-libs.mjs",
+    "prebuild": "node scripts/tp-libs.mjs"
   },
   "repository": {
     "type": "git",
@@ -17,6 +19,8 @@
   "homepage": "https://github.com/FlorientMarchal/revision#readme",
   "devDependencies": {
     "@sveltejs/vite-plugin-svelte": "^4.0.4",
+    "d3": "^7.9.0",
+    "jquery": "^3.7.1",
     "svelte": "^5.57.2",
     "vite": "^5.4.21"
   },

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="fr">
+	<head>
+		<meta charset="UTF-8" />
+		<title>Diagramme en barres JS</title>
+	</head>
+	<body>
+		<svg width="500" height="500">
+			<g transform="translate(100,50)">
+
+				<!--Axe X-->
+				<line x1="-10" y1="410" x2="320" y2="410" stroke="gray" />
+				<line x1="20" y1="410" x2="20" y2="420" stroke="gray" />
+				<line x1="70" y1="410" x2="70" y2="420" stroke="gray" />
+				<line x1="120" y1="410" x2="120" y2="420" stroke="gray" />
+				<line x1="170" y1="410" x2="170" y2="420" stroke="gray" />
+				<line x1="220" y1="410" x2="220" y2="420" stroke="gray" />
+				<line x1="270" y1="410" x2="270" y2="420" stroke="gray" />
+				<path d="M 315,405 L 320,410 L 315,415" fill="none" stroke="gray" stroke-linecap="round" />
+
+				<!--Ettiquettes axe X-->
+				<text x="15" y="437" fill="gray" >A</text>
+				<text x="65" y="437" fill="gray" >B</text>
+				<text x="115" y="437" fill="gray" >C</text>
+				<text x="165" y="437" fill="gray" >D</text>
+				<text x="215" y="437" fill="gray" >E</text>
+				<text x="265" y="437" fill="gray" >F</text>
+
+				<!--Axe Y-->
+				<line x1="-10" y1="-20" x2="-10" y2="410" stroke="gray" />
+				<line x1="-10" y1="0" x2="-20" y2="0" stroke="gray" />
+				<line x1="-10" y1="100" x2="-20" y2="100" stroke="gray" />
+				<line x1="-10" y1="200" x2="-20" y2="200" stroke="gray" />
+				<line x1="-10" y1="300" x2="-20" y2="300" stroke="gray" />
+				<line x1="-10" y1="400" x2="-20" y2="400" stroke="gray" />
+				<path d="M -15,-15 L -10,-20 L -5,-15" fill="none" stroke="gray" stroke-linecap="round" />
+
+				<!--Ettiquettes axe Y-->
+				<text x="-50" y="5" fill="gray" >400</text>
+				<text x="-50" y="105" fill="gray" >300</text>
+				<text x="-50" y="205" fill="gray" >200</text>
+				<text x="-50" y="305" fill="gray" >100</text>
+				<text x="-33" y="405" fill="gray" >0</text>
+
+			</g>
+		</svg>
+	</body>
+</html>

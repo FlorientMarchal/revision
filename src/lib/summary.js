@@ -9,6 +9,8 @@ export function summarize(map, d) {
     if (!k.startsWith('exam:')) continue;
     if (e.v === 'ok') examOk++; else if (e.v === 'revoir') examTodo++;
   }
+  const labs = (d.labs || []).flatMap(l => l.exos);
+  const labsDone = labs.filter(x => v('tp:' + x.id) === 1).length;
   const seen = quiz.filter(q => v('quiz:' + q.id)).length;
   const right = quiz.filter(q => (v('quiz:' + q.id) || {}).last === 1).length;
   return {
@@ -16,6 +18,7 @@ export function summarize(map, d) {
     fiches, chapters: chapters.length,
     examOk, examTodo, examQ: d.counts ? d.counts.examQ : 0,
     quizSeen: seen, quizRight: right, quiz: quiz.length,
+    labsDone, labs: labs.length,
     best: v('best:quiz:all'),
   };
 }

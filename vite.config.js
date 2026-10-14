@@ -9,4 +9,7 @@ export default defineConfig({
     onwarn: (w, h) => { if (w.code !== 'state_referenced_locally') h(w); },
   })],
   build: { chunkSizeWarningLimit: 900 },
+  // l'aperçu des TP tourne dans une iframe isolée (origine « null ») qui charge les fichiers JSON des TP
+  server: { cors: true },
+  preview: { cors: true },
 });

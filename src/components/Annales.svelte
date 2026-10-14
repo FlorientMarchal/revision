@@ -19,7 +19,16 @@
   function choose(e) { id = e; ui.set('exam', e); openAll = null; }
   function setStatus(xi, qi, v) { setVal(course.id, `exam:${id}:${xi}:${qi}`, st(xi, qi) === v ? null : v); }
 
-  $effect(() => { id; openAll; tick().then(() => typeset(body)); });
+  $effect(() => {
+    id; openAll;
+    tick().then(async () => {
+      if (!body) return;
+      typeset(body);
+      if (course.viz && body.querySelector('[data-viz]')) {
+        try { const m = await course.viz(); m.mountViz(body); } catch (e) { console.error(e); }
+      }
+    });
+  });
 </script>
 
 <div class="chips" id="ex-chips">

@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="fr">
+	<head>
+		<meta charset="UTF-8" />
+		<title>Diagramme en lignes D3</title>
+		<script type="text/javascript" src="d3.min.js"></script>
+
+		<script type="text/javascript">
+
+			function maxData(d){
+				var m = 0;
+				for (var i=0; i<d.length; i++){
+					for (var j=0; j<d[i]["valeurs"].length; j++){
+						if(d[i]["valeurs"][j] > m){
+							m = d[i]["valeurs"][j];
+						}
+					}
+				}
+				return m;
+			}
+
+			function nbValParLigne(d){
+				return d[0]["valeurs"].length;
+			}
+
+			d3.json("exo3.json").then(function(data) {
+
+				// Echelle X
+				var scaleX = d3.scaleLinear();
+				scaleX.domain([1,nbValParLigne(data)]);
+				scaleX.range([0,450]);
+
+				// Echelle Y
+				var scaleY = d3.scaleLinear();
+				scaleY.domain([0,maxData(data)]);
+				scaleY.range([450,0]);
+
+				// Création des axes X et Y
+				var xAxis = d3.axisBottom(scaleX);
+				var yAxis = d3.axisLeft(scaleY);
+
+				// Récupération du SVG
+				var svg = d3.select("#vis");
+
+				// Ajout de l'axes X au SVG
+				var gxAxis = svg.append("g");
+				gxAxis.call(xAxis);
+				gxAxis.attr("transform","translate(30,460)");
+
+				// Ajout de l'axes Y au SVG
+				var gyAxis = svg.append("g");
+				gyAxis.call(yAxis);
+				gyAxis.attr("transform","translate(30,10)");
+
+				// Lignes
+				var gLignes = svg.append("g");
+				gLignes.attr("transform","translate(30,10)");
+				for (var j=0; j<data.length; j++){
+					// TODO : ajouter ici le code permettant de créer des lignes
+				}
+
+			});
+
+		</script>
+	</head>
+	<body>
+		<svg id="vis" width="500" height="500"></svg>
+	</body>
+</html>
