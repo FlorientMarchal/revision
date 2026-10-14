@@ -11,6 +11,10 @@ export function summarize(map, d) {
   }
   const labs = (d.labs || []).flatMap(l => l.exos);
   const labsDone = labs.filter(x => v('tp:' + x.id) === 1).length;
+  const lessons = d.lessons || [];
+  const lessonsRead = lessons.filter(l => v('lesson:' + l.id) === 1).length;
+  const rq = (d.queries || []).flatMap(q => q.exos);
+  const rqOk = rq.filter(x => v('rq:' + x.id) === 'ok').length;
   const seen = quiz.filter(q => v('quiz:' + q.id)).length;
   const right = quiz.filter(q => (v('quiz:' + q.id) || {}).last === 1).length;
   return {
@@ -19,6 +23,8 @@ export function summarize(map, d) {
     examOk, examTodo, examQ: d.counts ? d.counts.examQ : 0,
     quizSeen: seen, quizRight: right, quiz: quiz.length,
     labsDone, labs: labs.length,
+    lessonsRead, lessons: lessons.length, hasFiches: chapters.length > 0 && Object.keys(d.fiches || {}).length > 0,
+    rqOk, rq: rq.length,
     best: v('best:quiz:all'),
   };
 }

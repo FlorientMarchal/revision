@@ -48,7 +48,9 @@
           <dl class="cc-stats">
             {#if s.labs}<div><dt>Exercices de TP réussis</dt><dd><b>{s.labsDone}</b> / {s.labs}</dd><span class="meter"><i style="width:{pct(s.labsDone, s.labs)}%"></i></span></div>{/if}
             <div><dt>Flashcards sues</dt><dd><b>{s.known}</b> / {s.cards}</dd><span class="meter"><i style="width:{pct(s.known, s.cards)}%"></i></span></div>
-            <div><dt>Fiches lues</dt><dd><b>{s.fiches}</b> / {s.chapters}</dd><span class="meter"><i style="width:{pct(s.fiches, s.chapters)}%"></i></span></div>
+            {#if s.rq}<div><dt>Requêtes réussies</dt><dd><b>{s.rqOk}</b> / {s.rq}</dd><span class="meter"><i style="width:{pct(s.rqOk, s.rq)}%"></i></span></div>{/if}
+            {#if s.hasFiches}<div><dt>Fiches lues</dt><dd><b>{s.fiches}</b> / {s.chapters}</dd><span class="meter"><i style="width:{pct(s.fiches, s.chapters)}%"></i></span></div>
+            {:else if s.lessons}<div><dt>Leçons lues</dt><dd><b>{s.lessonsRead}</b> / {s.lessons}</dd><span class="meter"><i style="width:{pct(s.lessonsRead, s.lessons)}%"></i></span></div>{/if}
             {#if s.examQ}<div><dt>Questions d'annales réussies</dt><dd><b>{s.examOk}</b> / {s.examQ}</dd><span class="meter"><i style="width:{pct(s.examOk, s.examQ)}%"></i></span></div>{/if}
             <div><dt>QCM : bonnes réponses</dt><dd><b>{s.quizRight}</b> / {s.quiz}</dd><span class="meter"><i style="width:{pct(s.quizRight, s.quiz)}%"></i></span></div>
           </dl>

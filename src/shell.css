@@ -241,3 +241,31 @@ table.t td{max-width:420px}
   .form-group{break-inside:avoid; box-shadow:none}
 }
 .lesson-sec code, .box code{overflow-wrap:anywhere}
+
+/* Module « Requêtes » : saisie, solution côte à côte, résultat attendu */
+.rq-set{display:grid; gap:12px}
+.rq-head{display:grid; gap:6px}
+.rq-head h2{margin:0}
+.rq-schema{display:grid; gap:8px}
+.rq{display:grid; gap:12px}
+.rq-q{display:flex; gap:12px; align-items:flex-start}
+.rq-q > div{min-width:0}
+.rq-q p{margin:0}
+.rq-n{flex:none; font:700 12px/1 var(--f-mono); color:var(--accent); background:var(--accent-soft); border:1px solid var(--accent-line, var(--line)); border-radius:4px; padding:5px 7px; margin-top:1px}
+.rq.rq-ok{border-left:4px solid var(--good)}
+.rq.rq-todo{border-left:4px solid var(--red)}
+.rq-input{width:100%; box-sizing:border-box; font:14px/1.5 var(--f-mono); padding:10px 12px; border:1px solid var(--line-strong); border-radius:8px; background:var(--paper); color:var(--ink); resize:vertical; tab-size:2}
+.rq-input:focus{outline:2px solid var(--accent); outline-offset:1px}
+.rq-compare h4{margin:0 0 6px; font-size:14px}
+.rq-input, .rq-code{font-variant-ligatures:none; font-feature-settings:'liga' 0, 'calt' 0}
+.rq-code{margin:0; padding:10px 12px; border-radius:8px; background:var(--paper-2); border:1px solid var(--line); font:13px/1.55 var(--f-mono); white-space:pre-wrap; overflow-wrap:anywhere; tab-size:2}
+.rq-data{max-height:420px; overflow:auto; margin-top:8px}
+.rq-miss{margin:0; font-size:14px; display:flex; flex-wrap:wrap; gap:6px; align-items:baseline}
+.rq-miss code{font:600 12.5px var(--f-mono); padding:1px 6px; border-radius:5px; background:var(--warn-soft); color:var(--ink)}
+.rq-miss.ok{color:var(--good)}
+.rq-res{margin-top:8px}
+.rq-res td{text-align:left}
+.hl-k{color:var(--c1); font-weight:700}
+.hl-s{color:var(--c5)}
+.hl-n{color:var(--c3)}
+.hl-c{color:var(--muted); font-style:italic}
