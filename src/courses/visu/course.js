@@ -5,7 +5,7 @@ export default {
   code: 'TW113MI',
   short: 'Visualisation',
   level: 'M1 MIASHS',
-  semester: 'S1 · 2025-2026',
+  semester: 'S1 · 2026-2027',
   teacher: 'Arnaud Sallaberry',
   evals: [
     { label: 'Partiel', date: '2026-11-02', time: '9h15' },
