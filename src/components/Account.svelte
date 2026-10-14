@@ -2,6 +2,7 @@
   import { configured, session, syncState, lastSync, syncError, signIn, signOut, syncAll } from '../lib/sync.js';
   import { allLocal, merge, replaceAll, progress } from '../lib/progress.js';
   import { get } from 'svelte/store';
+  import { link } from '../lib/router.js';
 
   let email = $state('');
   let busy = $state(false);
@@ -42,6 +43,7 @@
 </script>
 
 <main class="panel account">
+  <a class="back-link" href={link()}>← Retour aux cours</a>
   <section class="card">
     <h2>Synchronisation de la progression</h2>
     {#if !configured}
@@ -74,4 +76,5 @@
       <input type="file" accept="application/json,.json" hidden bind:this={fileInput} onchange={importData} />
     </div>
   </section>
+  <p><a href={link()}>← Retour aux cours</a></p>
 </main>
