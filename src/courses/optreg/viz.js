@@ -64,7 +64,7 @@ function solve(A, b) {
 const inv2 = (M, g) => { const d = M[0][0] * M[1][1] - M[0][1] * M[1][0]; return [(M[1][1] * g[0] - M[0][1] * g[1]) / d, (-M[1][0] * g[0] + M[0][0] * g[1]) / d]; };
 
 /* ------------------------------------------------------------------ courbes de niveau (marching squares) */
-function contourSegs(f, xr, yr, levels, N = 70) {
+function contourSegs(f, xr, yr, levels, N = 110) {
   const ny = Math.max(20, Math.round(N * (yr[1] - yr[0]) / (xr[1] - xr[0]))), dx = (xr[1] - xr[0]) / N, dy = (yr[1] - yr[0]) / ny;
   const V = []; for (let j = 0; j <= ny; j++) { const row = []; for (let i = 0; i <= N; i++) row.push(f([xr[0] + i * dx, yr[0] + j * dy])); V.push(row); }
   return levels.map(lv => {
@@ -227,7 +227,7 @@ function momViz(el) {
     title: 'Gradient, momentum et Nesterov au coude à coude', hint: 'Les trois méthodes partent du même point avec le même pas α. Règle le coefficient de momentum β et compare les trajectoires et les courbes d\'erreur.',
     funcs: { q, r }, funcKeys: ['q', 'r'], methods: [M_GD, M_MOM, M_NAG], params: [{ id: 'alpha', lab: 'pas α', min: 0.005, max: 0.08, step: 0.001, val: 0.035 }, { id: 'beta', lab: 'momentum β', min: 0, max: 0.98, step: 0.01, val: 0.8, fmt: v => fmt(v, 2) }], maxIt: 300, errK: 60, ms: 50,
     info: (F, P, S) => {
-      const k = S.map(s => (s.div ? '∞' : s.done && F.f(s.x) - F.fmin < 1e-10 ? s.k : '>' + s.k));
+      const k = S.map(s => (s.div ? 'divergence' : s.done && F.f(s.x) - F.fmin < 1e-10 ? s.k : s.k ? 'plus de ' + s.k : '…'));
       return `Nombre d'itérations pour atteindre f − f* &lt; 10⁻¹⁰ : gradient ${k[0]}, momentum ${k[1]}, Nesterov ${k[2]}. La vitesse v accumule les gradients passés (moyenne exponentielle de poids βⁱ) : elle <b>accélère</b> le long de la vallée, où le gradient garde la même direction, et <b>amortit</b> le zigzag en travers, où il change de signe. ` +
         (P.beta > 0.93 ? 'Avec β proche de 1, l\'inertie est trop forte : la bille dépasse et tourne autour du minimum. ' : P.beta < 0.2 ? 'Avec β ≈ 0, on retrouve la descente de gradient. ' : '') + 'Nesterov évalue le gradient au point anticipé x̃ = x + β(x − x_prec) : il freine plus tôt et oscille moins.';
     },
@@ -245,7 +245,7 @@ function cdViz(el) {
     title: 'Descente par coordonnées : l\'escalier', hint: 'Chaque pas de CD minimise exactement f le long d\'un seul axe (alternativement x puis y). Augmente la corrélation c entre les variables et observe l\'escalier s\'allonger.',
     funcs: { F }, funcKeys: ['F'], methods: [GD1L, M_CD], params: [{ id: 'c', lab: 'corrélation c', min: 0, max: 0.95, step: 0.01, val: 0.7, rebuild: true, fmt: v => fmt(v, 2) }], maxIt: 200, errK: 30, ms: 220,
     info: (Fn, P, S) => `f(x, y) = ½(x² + 2c·xy + y²). Chaque itération de CD ne touche qu'une coordonnée et se déplace <b>parallèlement à un axe</b>, jamais en diagonale. ` +
-      (P.c < 0.05 ? 'Avec c = 0, la fonction est séparable : deux pas de CD suffisent pour atteindre le minimum exact !' : `Avec c = ${fmt(P.c, 2)}, les courbes de niveau sont des ellipses inclinées : CD avance en zigzag, d'autant plus lentement que c est proche de 1 (chaque balayage multiplie l'erreur par c² = ${fmt(P.c * P.c, 2)}). `) +
+      (P.c < 0.05 ? 'Avec c = 0, la fonction est séparable : deux pas de CD suffisent pour atteindre le minimum exact !' : `Avec c = ${fmt(P.c, 2)}, les courbes de niveau sont des ellipses inclinées : CD avance en zigzag, d'autant plus lentement que c est proche de 1 (chaque balayage multiplie la distance à l'optimum par c² = ${fmt(P.c * P.c, 2)}). `) +
       ` Une itération de CD (une coordonnée) coûte environ d fois moins qu'un gradient complet : c'est ce qui la rend intéressante en grande dimension, notamment pour le Lasso (seuillage doux coordonnée par coordonnée).`,
   });
 }
@@ -270,7 +270,7 @@ function raceViz(el) {
     funcs: { F }, funcKeys: ['F'], methods: [M_GD, M_SGD, M_CD, M_NEWTON], params: [{ id: 'alpha', lab: 'pas α (GD, SGD)', min: 0.1, max: 3, step: 0.05, val: 1.2 }], maxIt: 400, errK: 40, ms: 110, tol: 1e-12,
     info: (Fn, P, S) => {
       const k = S.map(s => (s.done && Fn.f(s.x) - Fn.fmin < 1e-12 ? s.k : null));
-      return `Newton atteint la précision machine en ${k[3] != null ? k[3] : '…'} itérations (convergence quadratique : le nombre de bons chiffres double à chaque pas), le gradient en ${k[0] != null ? k[0] : 'plus de ' + S[0].k}, la descente par coordonnées en ${k[2] != null ? k[2] : 'plus de ' + S[2].k} demi-pas en escalier. SGD (pas décroissant α/(1 + k/40), un seul exemple par pas) avance vite au début puis <b>tremble</b> autour de l'optimum : son erreur stagne vers 10⁻³–10⁻⁵. Mais compare les <b>coûts</b> : un pas de SGD coûte 1 gradient d'exemple, un pas de GD en coûte n = 40, un pas de Newton demande en plus la Hessienne et la résolution d'un système (O(d³)).`;
+      return `Newton atteint la précision machine en ${k[3] != null ? k[3] : '…'} itérations (convergence quadratique : le nombre de bons chiffres double à chaque pas), le gradient en ${k[0] != null ? k[0] : S[0].k ? 'plus de ' + S[0].k : '…'}, la descente par coordonnées en ${k[2] != null ? k[2] : S[2].k ? 'plus de ' + S[2].k : '…'} demi-pas en escalier. SGD (pas décroissant α/(1 + k/40), un seul exemple par pas) avance vite au début puis <b>tremble</b> autour de l'optimum : son erreur stagne vers 10⁻³–10⁻⁵. Mais compare les <b>coûts</b> : un pas de SGD coûte 1 gradient d'exemple, un pas de GD en coûte n = 40, un pas de Newton demande en plus la Hessienne et la résolution d'un système (O(d³)).`;
     },
   });
 }
@@ -321,7 +321,7 @@ function sgdViz(el) {
     $(el, '[data-o=cost]').textContent = `${B} gradient${B > 1 ? 's' : ''}`; $(el, '[data-o=var]').textContent = sci(noiseVar(w));
     $(el, '[data-o=err]').textContent = `${sci(fF(wg) - fmin)} / ${sci(fF(w) - fmin)}`;
     el.querySelectorAll('[data-d]').forEach(b => b.setAttribute('aria-pressed', String((b.dataset.d === '1') === decay)));
-    $(el, '[data-o=out]').innerHTML = `Itération ${k}. Le gradient de mini-lot est <b>sans biais</b> (en moyenne, les flèches fines pointent comme la flèche noire −α∇f), mais il est bruité : sa variance est divisée par environ B (exactement (1/B)·(n − B)/(n − 1)·tr S en tirant sans remise). ` +
+    $(el, '[data-o=out]').innerHTML = `Itération ${k}. Le gradient de mini-lot est <b>sans biais</b> (en moyenne, les flèches fines pointent comme la flèche épaisse −α∇f), mais il est bruité : sa variance est divisée par environ B (exactement (1/B)·(n − B)/(n − 1)·tr S en tirant sans remise). ` +
       (B === n ? 'Avec B = n, SGD redevient la descente de gradient.' : B === 1 ? 'Avec B = 1 (SGD pur), chaque pas coûte 40 fois moins qu\'un pas de GD, mais la trajectoire est erratique.' : '') +
       (decay ? ' Le pas décroissant amortit le bruit : SGD finit par se stabiliser près de w*.' : ' Avec un pas constant, SGD ne converge pas : il <b>erre</b> indéfiniment dans une zone autour de w* dont la taille dépend de α et de B.');
   };
@@ -343,7 +343,7 @@ function sgdViz(el) {
 /* ================================================================== 6. Newton en dimension 1 : le modèle quadratique */
 function newtonViz(el) {
   const FN = {
-    exp: { lab: 'f(x) = eˣ − 2x', f: x => Math.exp(x) - 2 * x, d1: x => Math.exp(x) - 2, d2: x => Math.exp(x), xr: [-2.5, 2.5], yr: [-0.5, 6], x0: -1.8, xs: Math.log(2), txt: 'Fonction strictement convexe : depuis n\'importe quel point, Newton converge, et très vite près de x* = ln 2 : regarde la colonne d\'erreur, l\'exposant double à chaque pas (convergence quadratique).' },
+    exp: { lab: 'f(x) = eˣ − 2x', f: x => Math.exp(x) - 2 * x, d1: x => Math.exp(x) - 2, d2: x => Math.exp(x), xr: [-2.5, 2.5], yr: [-0.5, 6], x0: -0.6, xs: Math.log(2), txt: 'Fonction strictement convexe : Newton converge (un premier saut peut être long là où f″ est petite), et très vite près de x* = ln 2 : regarde la colonne d\'erreur, l\'exposant double à chaque pas (convergence quadratique).' },
     sq: { lab: 'f(x) = √(1 + x²)', f: x => Math.sqrt(1 + x * x), d1: x => x / Math.sqrt(1 + x * x), d2: x => (1 + x * x) ** -1.5, xr: [-4, 4], yr: [0.5, 4.6], x0: 0.9, xs: 0, txt: 'Convexe, mais la courbure s\'effondre loin de 0 : le pas de Newton vaut exactement x ↦ −x³. Depuis |x₀| &lt; 1 on converge (très vite) ; depuis |x₀| &gt; 1 les itérés <b>explosent</b>. Essaie x₀ = 0,9 puis x₀ = 1,1 : la convergence de Newton n\'est que <b>locale</b>, d\'où les versions amorties (avec recherche linéaire).' },
     nc: { lab: 'f non convexe', f: x => x ** 4 / 4 - x * x + 0.35 * x, d1: x => x ** 3 - 2 * x + 0.35, d2: x => 3 * x * x - 2, xr: [-2.4, 2.4], yr: [-1.6, 2.2], x0: 0.35, xs: null, txt: 'Là où f″(x) &lt; 0, le modèle quadratique est une parabole tournée vers le bas : son point critique est un <b>maximum</b>, et Newton y saute, il peut donc <b>monter</b>. Newton cherche un point où f′ = 0, pas forcément un minimum : il faut une Hessienne définie positive.' },
   };
@@ -405,6 +405,7 @@ function geomViz(el) {
   const solveL2 = tt => { if (Math.hypot(...wh) <= tt) return { w: wh.slice(), lam: 0 }; let a = 0, b = 1e6; for (let i = 0; i < 100; i++) { const m = (a + b) / 2; if (Math.hypot(...ridge(m)) > tt) a = m; else b = m; } const m = (a + b) / 2; return { w: ridge(m), lam: m }; };
   const solveL1 = tt => {
     if (Math.abs(wh[0]) + Math.abs(wh[1]) <= tt) return { w: wh.slice(), lam: 0 };
+    if (tt < 1e-9) return { w: [0, 0], lam: Infinity };
     const V = [[tt, 0], [0, tt], [-tt, 0], [0, -tt]]; let best = null;
     for (let e = 0; e < 4; e++) {
       const P = V[e], Q = V[(e + 1) % 4], d = [Q[0] - P[0], Q[1] - P[1]], r = [P[0] - wh[0], P[1] - wh[1]];
@@ -436,7 +437,7 @@ function geomViz(el) {
     [0.25, 1, 2.5, 5, 9].forEach(f_ => { g += `<path d="${ellipse(Math.max(q0, 0.05) * f_ / 1)}" class="or-ell"/>`; });
     if (q0 > 1e-9) g += `<path d="${ellipse(q0)}" class="or-ell-hit"/>`;
     g += `<path d="${poly(pathPts().map(p => [X(p[0]), Y(p[1])]))}" class="or-rpath"/>`;
-    g += `<circle cx="${X(wh[0])}" cy="${Y(wh[1])}" r="22" class="or-hit"/><circle cx="${X(wh[0])}" cy="${Y(wh[1])}" r="6" class="or-ols"/>` + tx(X(wh[0]) + 9, Y(wh[1]) - 8, 'ŵ (MCO)', 'start', 'or-tols');
+    g += `<circle cx="${X(wh[0])}" cy="${Y(wh[1])}" r="22" class="or-hit"/><circle cx="${X(wh[0])}" cy="${Y(wh[1])}" r="6" class="or-ols"/>` + (X(wh[0]) > fr.W - 80 ? tx(X(wh[0]) - 9, Y(wh[1]) - 8, 'ŵ (MCO)', 'end', 'or-tols') : tx(X(wh[0]) + 9, Y(wh[1]) - 8, 'ŵ (MCO)', 'start', 'or-tols'));
     const sparse = w.some(v => v === 0) && q0 > 1e-9;
     g += `<circle cx="${X(w[0])}" cy="${Y(w[1])}" r="${sparse ? 9 : 7}" class="or-sol${sparse ? ' or-sol-sp' : ''}"/>`;
     $(el, '[data-l=g]').innerHTML = g;
@@ -505,7 +506,7 @@ function pathViz(el) {
     $(el, '[data-o=l]').textContent = fmt(LL[li], 2); $(el, '[data-o=a]').textContent = fmt(alpha, 2);
     el.querySelectorAll('[data-a]').forEach(b => b.setAttribute('aria-pressed', String(+b.dataset.a === alpha)));
     $(el, '[data-o=out]').innerHTML = `Objectif : ‖y − Xw‖² + λα‖w‖₁ + λ(1 − α)/2 ‖w‖², résolu par descente de coordonnées (seuillage doux). À λ = ${sci(10 ** LL[li])} : <b>${nz} coefficient${nz > 1 ? 's' : ''} nul${nz > 1 ? 's' : ''}</b>. ` +
-      (alpha === 0 ? 'Ridge rétrécit tous les coefficients en douceur (facteur dᵢ/(dᵢ + λ) dans chaque direction propre) mais n\'en annule aucun.' : alpha === 1 ? 'Le Lasso annule les coefficients un par un quand λ grandit : les chemins sont affines par morceaux et touchent 0 à des λ précis. Entre x₁ et x₂ corrélées, il favorise l\'une plus que l\'autre.' : 'L\'Elastic Net annule aussi des coefficients (partie L1) mais traite plus équitablement les variables corrélées (partie L2) : comparer w₁/w₂ et w₄/w₅ avec le Lasso.');
+      (alpha === 0 ? 'Ridge rétrécit tous les coefficients en douceur (facteur dᵢ/(dᵢ + λ) dans chaque direction propre) mais n\'en annule aucun.' : alpha === 1 ? 'Le Lasso annule les coefficients un par un quand λ grandit : les chemins sont affines par morceaux en λ (courbés ici par l\x27échelle log) et touchent 0 à des λ précis. Entre x₁ et x₂ corrélées, il favorise l\'une plus que l\'autre.' : 'L\'Elastic Net annule aussi des coefficients (partie L1) mais traite plus équitablement les variables corrélées (partie L2) : comparer w₁/w₂ et w₄/w₅ avec le Lasso.');
   };
   const loop = looper(el, 40, () => { if (li >= NL - 1) return false; li++; $(el, '[data-i=l]').value = li; draw(); });
   $(el, '[data-i=l]').oninput = e => { loop.stop(); li = +e.target.value; draw(); };
@@ -540,13 +541,13 @@ function bvViz(el) {
   const sets = Array.from({ length: Mset }, (_, m) => { const r = rng(300 + m), xs = Array.from({ length: n }, () => 2 * r() - 1); return { xs, ys: xs.map(x => TRUEF(x) + sig * gauss(r)) }; });
   const LG = Array.from({ length: 33 }, (_, i) => -6 + 8 * i / 32);
   const stats = li => { const fits = sets.map(st => ridgePoly(st.xs, st.ys, 10 ** LG[li])), P = fits.map(f => grid.map(f)), mean = grid.map((_, g) => P.reduce((t, p) => t + p[g], 0) / Mset);
-    const b2 = grid.reduce((t, x, g) => t + (mean[g] - TRUEF(x)) ** 2, 0) / grid.length, v = grid.reduce((t, x, g) => t + P.reduce((s_, p) => s_ + (p[g] - mean[g]) ** 2, 0) / Mset, 0) / grid.length; return { fits, mean, b2, v }; };
+    const b2 = grid.reduce((t, x, g) => t + (mean[g] - TRUEF(x)) ** 2, 0) / grid.length, v = grid.reduce((t, x, g) => t + P.reduce((s_, p) => s_ + (p[g] - mean[g]) ** 2, 0) / Mset, 0) / grid.length; return { fits, mean, b2: Math.max(0, b2 - v / (Mset - 1)), v: v * Mset / (Mset - 1) }; }; // estimations sans biais (la moyenne de 25 ajustements garde var/25)
   const ALL = LG.map((_, i) => stats(i));
   let li = 20, shown = Mset;
   const cid = 'orbv' + (++UID);
   el.innerHTML = head('Biais et variance : ce que fait la régularisation', `Un polynôme de degré ${DEG} est ajusté par Ridge sur ${Mset} jeux d'entraînement différents (${n} points chacun). Fais varier λ : peu régularisé, les courbes s'agitent (variance) ; trop régularisé, elles ratent la vraie fonction (biais).`) +
     `<div class="viz-ctrl"><label>log₁₀ λ = <b data-o="l"></b><input type="range" min="0" max="${LG.length - 1}" step="1" value="${li}" data-i="l" aria-label="logarithme de lambda"></label>
-     <span class="viz-btns"><button type="button" class="btn small primary" data-i="play">${playLbl(false)} Tirer les ${Mset} jeux</button></span></div>
+     <span class="viz-btns"><button type="button" class="btn small primary" data-i="play">▶ Tirer les ${Mset} jeux</button></span></div>
      <div class="grid2 or-g2"><div class="or-cell">${svg(360, 240, '<g data-l="f"></g>', 'Ajustements sur plusieurs jeux d\'entraînement')}</div><div class="or-cell">${svg(360, 240, '<g data-l="c"></g>', 'Biais au carré, variance et erreur totale selon lambda')}</div></div>
      <div class="viz-leg"><span><i class="sw sw-d" style="--sw:var(--ink)"></i>vraie fonction</span><span><i class="sw sw-lt" style="--sw:var(--c1)"></i>un ajustement par jeu</span><span><i class="sw sw-l" style="--sw:var(--c2)"></i>moyenne des ajustements</span></div>
      <p class="viz-out" data-o="out"></p>`;
@@ -559,7 +560,7 @@ function bvViz(el) {
     g += '</g>';
     $(el, '[data-l=f]').innerHTML = g;
     // courbes biais², variance, total
-    const L = 40, R = 352, T = 12, B = 210, Xl = i => L + i / (LG.length - 1) * (R - L), tot = ALL.map(a => a.b2 + a.v + sig * sig), ymax = 0.8, Yv = v => B - Math.min(v, ymax) / ymax * (B - T);
+    const L = 40, R = 352, T = 12, B = 210, Xl = i => L + i / (LG.length - 1) * (R - L), tot = ALL.map(a => a.b2 + a.v + sig * sig), ymax = 0.9, Yv = v => B - Math.min(v, ymax) / ymax * (B - T);
     let c = `<path d="M${L},${T}V${B}H${R}" class="vz-axis"/>`;
     [0.2, 0.4, 0.6, 0.8].forEach(v => { c += line(L, Yv(v), R, Yv(v), 'class="vz-grid"') + tx(L - 4, Yv(v) + 4, fmt(v, 1), 'end', 'vz-s'); });
     [-6, -4, -2, 0, 2].forEach(e => { c += tx(Xl((e + 6) / 8 * (LG.length - 1)), B + 15, `10${String(e).split('').map(ch => SUP[ch]).join('')}`, 'middle', 'vz-s'); });
@@ -576,7 +577,7 @@ function bvViz(el) {
       (li < best - 3 ? 'λ trop petit : le polynôme suit le bruit de chaque échantillon (sur-apprentissage), les courbes divergent surtout aux bords. La variance domine.' : li > best + 3 ? 'λ trop grand : toutes les courbes se ressemblent (faible variance) mais sont trop « raides » pour suivre la vraie fonction : sous-apprentissage, le biais domine.' : 'Zone du compromis : on accepte un peu de biais pour réduire fortement la variance, et l\'erreur totale est minimale.');
   };
   const btn = $(el, '[data-i=play]');
-  const loop = looper(el, 120, () => { if (shown >= Mset) return false; shown++; draw(); }, on => { btn.textContent = `${playLbl(on)} Tirer les ${Mset} jeux`; });
+  const loop = looper(el, 120, () => { if (shown >= Mset) return false; shown++; draw(); }, on => { btn.textContent = `${on ? '❚❚ Pause' : '▶ Tirer'} les ${Mset} jeux`; });
   $(el, '[data-i=l]').oninput = e => { loop.stop(); shown = Mset; li = +e.target.value; draw(); };
   btn.onclick = () => { if (loop.on) { loop.stop(); return; } shown = 0; loop.start(); };
   draw();
@@ -601,7 +602,7 @@ function cvViz(el) {
      <div class="or-folds" data-o="folds"></div>
      <div class="grid2 or-g2"><div class="or-cell">${svg(360, 240, '<g data-l="f"></g>', 'Données, plis et ajustement')}</div><div class="or-cell">${svg(360, 240, '<g data-l="c"></g>', 'Erreur de validation croisée selon lambda')}</div></div>
      <p class="viz-out" data-o="out"></p>`;
-  const FC = j => COL[[1, 2, 3, 4, 5][j]];
+  const FC = j => ['var(--c1)', 'var(--c2)', 'var(--c3)', 'var(--c6)', 'var(--c4)'][j];
   const draw = () => {
     const lam = 10 ** LG[li], { X, Y, g: ax } = polyAxes(30, 352, 10, 214, -2.2, 2.2);
     let g = `<defs><clipPath id="${cid}"><rect x="30" y="10" width="322" height="204"/></clipPath></defs>` + ax + `<g clip-path="url(#${cid})">`;
@@ -611,7 +612,7 @@ function cvViz(el) {
     xs.forEach((x, i) => { const test = k >= 0 && fold[i] === k; g += `<circle cx="${X(x).toFixed(1)}" cy="${Y(ys[i]).toFixed(1)}" r="${test ? 6 : 4}" class="or-cvpt${k >= 0 && !test ? ' or-dim' : ''}${test ? ' or-test' : ''}" style="fill:${FC(fold[i])}"/>`; });
     g += tx(36, 22, k >= 0 ? `pli ${k + 1} mis de côté (gros points) : entraînement sur les 4 autres` : 'ajustement sur toutes les données', 'start', 'vz-s');
     $(el, '[data-l=f]').innerHTML = g;
-    const L = 40, R = 352, T = 12, B = 210, Xl = i => L + i / (LG.length - 1) * (R - L), ymax = 0.8, Yv = v => B - Math.min(v, ymax) / ymax * (B - T);
+    const L = 40, R = 352, T = 12, B = 210, Xl = i => L + i / (LG.length - 1) * (R - L), ymax = 0.9, Yv = v => B - Math.min(v, ymax) / ymax * (B - T);
     let c = `<path d="M${L},${T}V${B}H${R}" class="vz-axis"/>`;
     [0.2, 0.4, 0.6, 0.8].forEach(v => { c += line(L, Yv(v), R, Yv(v), 'class="vz-grid"') + tx(L - 4, Yv(v) + 4, fmt(v, 1), 'end', 'vz-s'); });
     [-6, -4, -2, 0, 2].forEach(e => { c += tx(Xl((e + 6) / 8 * (LG.length - 1)), B + 15, `10${String(e).split('').map(ch => SUP[ch]).join('')}`, 'middle', 'vz-s'); });

@@ -52,3 +52,5 @@
 .vp-kpis > div.hi{border-color:var(--accent-line); background:var(--accent-soft)}
 .vp-kpis > div.hi b{color:var(--accent)}
 @media (prefers-reduced-motion: reduce){ .vp-pop{animation:none} }
+.vz-svg.vp-svg{overflow:hidden}
+.vp-tab{font-size:13px} .vp-tab th, .vp-tab td{padding:4px 7px}
