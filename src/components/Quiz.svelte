@@ -1,6 +1,8 @@
 <script>
   import { kv, progress, setVal, setBest, getVal } from '../lib/progress.js';
   import { inlineMath } from '../lib/math.js';
+  import { confetti } from '../lib/motion.js';
+  import Ring from './Ring.svelte';
 
   let { course, data } = $props();
   const prog = progress(course.id);
@@ -37,9 +39,14 @@
   }
   function next() {
     i += 1;
-    if (i >= list.length && list.length && filter !== 'failed') setBest(course.id, 'best:quiz:' + filter, Math.round((100 * score) / list.length));
+    if (i >= list.length && list.length) {
+      const p = Math.round((100 * score) / list.length);
+      if (filter !== 'failed') setBest(course.id, 'best:quiz:' + filter, p);
+      if (p >= 60) confetti(p === 100 ? 70 : 40);
+    }
     prepare();
   }
+  const verdict = p => p === 100 ? 'Sans faute !' : p >= 80 ? 'Excellent travail !' : p >= 60 ? 'Bien joué !' : p >= 40 ? 'Pas mal, encore un effort.' : 'On continue : chaque erreur est une leçon.';
   start(filter === 'failed' ? 'all' : filter);
 </script>
 
@@ -54,11 +61,16 @@
     <h2>Aucune question</h2>
     <p class="lead">{filter === 'failed' ? 'Tu n\'as plus de question ratée. Bravo !' : 'Pas de question pour cette sélection.'}</p>
   {:else if i >= list.length}
+    {@const p = Math.round((100 * score) / list.length)}
     <div class="qz-score">
-      <div class="eyebrow">Terminé</div>
-      <h2>{score} / {list.length} ({Math.round((100 * score) / list.length)} %)</h2>
-      {#if filter !== 'failed'}<p class="lead">Meilleur score sur cette sélection : {Math.max(best || 0, Math.round((100 * score) / list.length))} %.</p>{/if}
-      <div class="row" style="margin-top:14px">
+      <Ring value={p} size={92} stroke={8} label="Score" />
+      <div class="qz-score-txt">
+        <div class="eyebrow">Série terminée</div>
+        <h2>{verdict(p)}</h2>
+        <p class="qz-score-n"><b>{score}</b> bonne{score > 1 ? 's' : ''} réponse{score > 1 ? 's' : ''} sur {list.length}</p>
+        {#if filter !== 'failed'}<p class="lead">Meilleur score sur cette sélection : {Math.max(best || 0, p)} %.</p>{/if}
+      </div>
+      <div class="row qz-score-btns">
         <button class="btn primary" onclick={() => start(filter)}>Recommencer</button>
         {#if failedCount && filter !== 'failed'}<button class="btn" onclick={() => start('failed')}>Revoir mes erreurs ({failedCount})</button>{/if}
       </div>
@@ -66,6 +78,7 @@
   {:else}
     <div class="row" style="justify-content:space-between"><span class="eyebrow" style="margin:0">{chName(q.ch)}</span><span class="stat">Question {i + 1}/{list.length} · score {score}</span></div>
     <div class="bar thin"><i style="width:{(100 * i) / list.length}%"></i></div>
+    {#key list[i]}<div class="qz-body">
     <h3 class="qz-q" style="margin-top:10px">{@html inlineMath(q.q)}</h3>
     <div class="opts">
       {#each opts as { o, k } (k)}
@@ -73,8 +86,9 @@
       {/each}
     </div>
     {#if picked !== null}
-      <div class="exp"><b>{picked === q.ans ? 'Bonne réponse.' : 'Raté.'}</b> {@html inlineMath(q.exp)}</div>
-      <div class="row" style="margin-top:12px"><button class="btn primary" onclick={next}>Question suivante →</button></div>
+      <div class="exp" class:exp-ok={picked === q.ans} class:exp-ko={picked !== q.ans}><b>{picked === q.ans ? 'Bonne réponse.' : 'Raté.'}</b> {@html inlineMath(q.exp)}</div>
+      <div class="row" style="margin-top:12px"><button class="btn primary" onclick={next}>{i + 1 < list.length ? 'Question suivante →' : 'Voir mon score →'}</button></div>
     {/if}
+    </div>{/key}
   {/if}
 </div>

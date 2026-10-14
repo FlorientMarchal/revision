@@ -2,6 +2,7 @@
   import { tick } from 'svelte';
   import { kv, progress, setVal } from '../lib/progress.js';
   import { typeset } from '../lib/math.js';
+  import { reveal, confetti } from '../lib/motion.js';
 
   let { course, data } = $props();
   const ui = kv(course.id);
@@ -14,6 +15,11 @@
   const i = $derived(chapters.findIndex(c => c.id === ch));
   const read = $derived(($prog['fiche:' + ch] || {}).v === 1);
 
+  function markRead(on) {
+    const all = on && chapters.length > 1 && chapters.every(c => c.id === ch || ($prog['fiche:' + c.id] || {}).v === 1);
+    setVal(course.id, 'fiche:' + ch, on ? 1 : 0);
+    if (all) confetti();
+  }
   async function show(id, anchor) {
     ch = id; ui.set('ficheCh', id); pendingAnchor = anchor || null;
     if (!anchor && body && body.getBoundingClientRect().top < 0) body.scrollIntoView({ block: 'start' });
@@ -28,6 +34,7 @@
         try { const m = await course.viz(); m.mountViz(body); typeset(body); } catch (e) { console.error(e); }
       }
       if (pendingAnchor) { const t = document.getElementById(pendingAnchor); if (t) t.scrollIntoView({ block: 'start' }); pendingAnchor = null; }
+      reveal(body);
     });
   });
 </script>
@@ -57,7 +64,7 @@
     {@html data.fiches[ch] || ''}
   {/key}
   <label class="read-toggle">
-    <input type="checkbox" checked={read} onchange={e => setVal(course.id, 'fiche:' + ch, e.currentTarget.checked ? 1 : 0)} />
+    <input type="checkbox" checked={read} onchange={e => markRead(e.currentTarget.checked)} />
     J'ai lu et compris ce chapitre
   </label>
   <nav class="fiche-nav" aria-label="Chapitres">

@@ -15,5 +15,6 @@ export default {
   examsLabel: 'Exercices corrigés',
   topics: ['probabilités', 'estimation', 'intervalles et tests', 'Python', 'NumPy · Pandas', 'Matplotlib · Seaborn'],
   load: () => import('./data.js'),
+  viz: () => import('./viz.js'),
   credit: '<p><b>Source du cours.</b> Fiche de révision personnelle tirée du cours <i>Introduction à la science des données</i> (TW121MI, M1 MIASHS, Université Paul-Valéry Montpellier 3) : diapositives de probabilités (L. Raddaf) et de statistique (S. Lèbre), tests et corrections de tests multiples, fiche d\'exercices et son corrigé, TD et TP (vraisemblance, lois limites, vecteurs gaussiens), évaluation 2023 ; notebooks corrigés de bases de Python (G. Richomme) et de Python pour les données (S. Bringay). Les notions, énoncés, codes et jeux de données appartiennent à leurs auteurs. Les corrigés marqués « proposé » ont été rédigés pour ce site.</p>',
 };

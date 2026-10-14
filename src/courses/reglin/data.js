@@ -218,4 +218,17 @@ export const exams = [
   },
 ];
 
+// Illustrations interactives (viz.js), placées dans les sections du cours.
+export const vizPlacements = [
+  { lesson: 'm1', section: 'modele', name: 'rl-ols', where: 'end' },
+  { lesson: 'm1', section: 'residus', name: 'rl-proj', where: { after: 'donc à \\(\\hat Y\\).</p>' } },
+  { lesson: 'm1', section: 'r2', name: 'rl-r2', where: 'end' },
+  { lesson: 'm2', section: 'student', name: 'rl-student', where: 'end' },
+  { lesson: 'm2', section: 'fisher', name: 'rl-fisher', where: 'end' },
+  { lesson: 'm2', section: 'prevision', name: 'rl-ic', where: 'end' },
+  { lesson: 'v1', section: 'rang', name: 'rl-colin', where: 'end' },
+  { lesson: 'v1', section: 'adequation', name: 'rl-diag', where: 'end' },
+  { lesson: 'v1', section: 'adequation', name: 'rl-cook', where: 'end' },
+];
+
 export * from './codesheet.js';

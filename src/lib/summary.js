@@ -30,3 +30,12 @@ export function summarize(map, d) {
 }
 
 export const pct = (a, b) => (b ? Math.round((100 * a) / b) : 0);
+
+/** Progression globale d'un cours (en %), sur les mêmes indicateurs que la carte de l'accueil. */
+export function overall(s) {
+  if (!s) return 0;
+  const parts = [[s.labsDone, s.labs], [s.known, s.cards], [s.rqOk, s.rq], s.hasFiches ? [s.fiches, s.chapters] : [s.lessonsRead, s.lessons], [s.examOk, s.examQ], [s.quizRight, s.quiz]];
+  let a = 0, b = 0;
+  for (const [x, y] of parts) if (y) { a += Math.min(x, y); b += y; }
+  return pct(a, b);
+}

@@ -1,0 +1,78 @@
+/* Illustrations « lois limites, intervalles et tests » (viz-lim.js). Toutes les classes sont préfixées vl-. */
+.vl-svg{max-width:560px; margin:0 auto; touch-action:pan-y; -webkit-tap-highlight-color:transparent; user-select:none; -webkit-user-select:none}
+.vl-svg text{font-variant-numeric:tabular-nums}
+.vl-svg .vl-b{font-weight:700}
+.vl-drag{cursor:grab}
+.vl-drag:active{cursor:grabbing}
+.vl-handle{cursor:grab}
+
+/* points qui tombent / apparaissent */
+@keyframes vl-pop{from{opacity:0; transform:translateY(-16px) scale(.6)} to{opacity:1; transform:none}}
+.vl-pop{animation:vl-pop .45s cubic-bezier(.2,.8,.3,1.2) both; transform-box:fill-box; transform-origin:center}
+@keyframes vl-in{from{opacity:0; transform:translateY(-6px)} to{opacity:1; transform:none}}
+.vl-fade{animation:vl-in .35s ease-out both}
+@keyframes vl-pulse{0%{transform:scale(1)} 40%{transform:scale(1.08)} 100%{transform:scale(1)}}
+
+/* badge de décision */
+.vl-badges{display:flex; flex-wrap:wrap; gap:8px; align-items:center}
+.vl-badge{display:inline-flex; align-items:center; gap:6px; border-radius:999px; padding:6px 14px; font-weight:700; font-size:14px; border:1px solid var(--line-strong); background:var(--paper-2); color:var(--ink); min-height:36px}
+.vl-badge.vl-rej{background:var(--red-soft); border-color:var(--red); color:var(--red)}
+.vl-badge.vl-ok{background:var(--good-soft); border-color:var(--good-line); color:var(--good)}
+.vl-badge.vl-warn{background:var(--warn-soft); border-color:var(--warn); color:var(--warn)}
+.vl-badge.vl-bump{animation:vl-pulse .4s ease-out}
+.vl-mono{font-family:var(--f-mono); font-variant-numeric:tabular-nums}
+
+/* jauge de couverture */
+.vl-meter{position:relative; height:14px; border-radius:7px; background:var(--paper-2); border:1px solid var(--line); overflow:hidden}
+.vl-meter > i{position:absolute; left:0; top:0; bottom:0; width:0; background:var(--good); opacity:.8; transition:width .3s ease-out}
+.vl-meter > b{position:absolute; top:-2px; bottom:-2px; width:2px; background:var(--ink)}
+.vl-meter-row{display:grid; grid-template-columns:auto minmax(80px,1fr); gap:6px 10px; align-items:center; font-size:13px; color:var(--muted)}
+
+/* tableau 2 × 2 des erreurs */
+.vl-cm{display:grid; grid-template-columns:auto minmax(0,1fr) minmax(0,1fr); gap:4px; font-size:13px; max-width:460px}
+.vl-cm > span{border-radius:6px; padding:6px 8px; min-height:40px; display:flex; flex-direction:column; justify-content:center; border:1px solid var(--line); background:var(--paper-2)}
+.vl-cm > span.h{border:none; background:none; color:var(--muted); font-weight:600; min-height:0; padding:2px 4px; text-align:center; align-items:center}
+.vl-cm > span.ok{background:var(--good-soft); border-color:var(--good-line); color:var(--good)}
+.vl-cm > span.ko{background:var(--red-soft); border-color:var(--red); color:var(--red)}
+.vl-cm > span.wa{background:var(--warn-soft); border-color:var(--warn); color:var(--warn)}
+.vl-cm b{font:600 17px var(--f-mono); color:var(--ink); font-variant-numeric:tabular-nums}
+
+/* champ de saisie des p-valeurs */
+.vl-field{display:grid; gap:4px; font-size:13px; color:var(--muted); width:100%}
+.vl-field input{font:14px var(--f-mono); padding:8px 10px; border:1px solid var(--line-strong); border-radius:6px; background:var(--paper); color:var(--ink); min-height:44px; width:100%; box-sizing:border-box}
+.vl-field input:focus{outline:2px solid var(--accent); outline-offset:1px}
+.vl-field.vl-bad input{border-color:var(--red)}
+
+/* tableaux de résultats */
+.vl-tab{overflow-x:auto; max-width:100%}
+.vl-tab table{font-size:13px}
+.vl-tab td.vl-r, .vl-tab span.vl-r{color:var(--red); font-weight:700}
+.vl-tab td.vl-g, .vl-tab span.vl-g{color:var(--good); font-weight:700}
+.vl-tab td.vl-m{color:var(--muted)}
+.vl-tab tr.vl-hi td{background:var(--accent-soft)}
+.vl-bar{display:inline-block; height:8px; border-radius:4px; background:var(--accent); vertical-align:middle; margin-right:6px; transition:width .25s ease-out}
+.vl-bar.vl-bad{background:var(--red)}
+.vl-bar.vl-good{background:var(--good)}
+
+/* arbre « quel test choisir ? » */
+.vl-steps{display:grid; gap:12px}
+.vl-step{display:grid; gap:6px}
+.vl-step > p{margin:0; font-size:13px; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:.05em; font-family:var(--f-mono)}
+.vl-step .chip{min-height:44px}
+.vl-cards{display:grid; grid-template-columns:repeat(auto-fill,minmax(min(230px,100%),1fr)); gap:8px}
+.vl-card{border:1px solid var(--line); border-left:4px solid var(--accent); border-radius:6px; padding:10px 12px; background:var(--paper-2); display:grid; gap:6px; animation:vl-in .35s ease-out both}
+.vl-card small{color:var(--muted); font-size:12px}
+.vl-card code{font:600 14px var(--f-mono); color:var(--accent); overflow-wrap:anywhere}
+.vl-card:nth-child(2){animation-delay:.06s} .vl-card:nth-child(3){animation-delay:.12s} .vl-card:nth-child(4){animation-delay:.18s}
+.vl-path{display:flex; flex-wrap:wrap; gap:6px; align-items:center; font-size:13px; color:var(--muted)}
+.vl-path b{color:var(--ink)}
+
+@media (prefers-reduced-motion: reduce){
+  .vl-pop, .vl-fade, .vl-card, .vl-badge.vl-bump{animation:none}
+  .vl-meter > i, .vl-bar{transition:none}
+}
+.vl-svg .vz-t{font-size:13.5px}
+.vl-svg .vz-t.vl-s{font-size:12px}
+.vl-tab table.t th, .vl-tab table.t td{padding:5px 7px; font-size:13px}
+.vl-tab table.t td{white-space:nowrap}
+@media (max-width:420px){ .vl-tab .vl-bar{display:none} .vl-tab table.t th, .vl-tab table.t td{padding:4px 5px} }
