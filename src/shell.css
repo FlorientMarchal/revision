@@ -270,14 +270,17 @@ table.t td{max-width:420px}
 .hl-n{color:var(--c3)}
 .hl-c{color:var(--muted); font-style:italic}
 /* ---------- Labo R ---------- */
-.r-status{display:flex; flex-wrap:wrap; align-items:center; gap:8px 12px; padding:10px 14px; font-size:14px; position:sticky; top:58px; z-index:5}
-.r-status.r-err{border-color:var(--red); background:var(--red-soft)}
-.r-dot{width:10px; height:10px; border-radius:50%; background:var(--line-strong); flex:none}
-.r-dot[data-s=loading], .r-dot[data-s=busy]{background:var(--warn); animation:rpulse 1s infinite alternate}
-.r-dot[data-s=ready]{background:var(--good)}
-.r-dot[data-s=error]{background:var(--red)}
+.r-error-box{margin:0; padding:10px 14px; border-color:var(--red); background:var(--red-soft); color:var(--red); font-size:14px}
+.r-dot{width:10px; height:10px; border-radius:50%; background:var(--warn); flex:none; animation:rpulse 1s infinite alternate}
 @keyframes rpulse{to{opacity:.3}}
-.r-actions{margin-left:auto; display:inline-flex; flex-wrap:wrap; gap:6px}
+.r-busy{display:flex; align-items:center; gap:8px; margin:0; padding:8px 12px; border:1px dashed var(--warn); border-radius:8px; background:var(--warn-soft); font-size:14px}
+.r-tools{display:flex; flex-wrap:wrap; gap:6px}
+.r-work{display:grid; grid-template-columns:minmax(0,1fr); gap:10px}
+.r-mine{display:grid; grid-template-columns:minmax(0,1fr); gap:10px; align-content:start}
+@media (min-width:1000px){
+  .r-work.with-sol{grid-template-columns:minmax(0,1fr) minmax(0,1fr); align-items:start}
+  .r-work.with-sol .r-sol{position:sticky; top:70px; max-height:calc(100vh - 90px); overflow:auto}
+}
 .r-lab{display:grid; grid-template-columns:minmax(0,1fr); gap:18px}
 .r-lab > header{display:grid; gap:6px}
 .r-chunk{display:grid; grid-template-columns:minmax(0,1fr); gap:10px; padding-top:12px; border-top:1px solid var(--line)}

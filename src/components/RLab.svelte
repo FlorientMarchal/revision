@@ -4,7 +4,7 @@
   import { tick } from 'svelte';
   import { kv, progress, setVal } from '../lib/progress.js';
   import { typeset } from '../lib/math.js';
-  import { runR, resetR, startR, rState, rMessage } from '../lib/webr.js';
+  import { runR, resetR, rState, rMessage } from '../lib/webr.js';
 
   let { course, data } = $props();
   const ui = kv(course.id);
@@ -69,32 +69,24 @@
   {/each}
 </div>
 
-<div class="card r-status" class:r-err={$rState === 'error'}>
-  <span class="r-dot" data-s={$rState}></span>
-  <span>
-    {#if $rState === 'off'}R n'est pas encore lancé : il se charge au premier « Exécuter » (environ 20 Mo la première fois).
-    {:else if $rState === 'loading'}{$rMessage}
-    {:else if $rState === 'busy'}{$rMessage || 'R calcule…'}
-    {:else if $rState === 'error'}{$rMessage}
-    {:else}R est prêt. Les objets créés dans un bloc restent disponibles dans les suivants.{/if}
-  </span>
-  <span class="r-actions">
-    {#if $rState === 'off'}<button class="btn small" onclick={() => startR()}>Lancer R</button>{/if}
-    <button class="btn small" onclick={runAll}>Tout exécuter</button>
-    <button class="btn small" onclick={reset} disabled={$rState === 'off'} title="Efface tous les objets de la session R">Vider la session</button>
-  </span>
-</div>
+{#if $rState === 'error'}<p class="card r-error-box" role="alert">{$rMessage}</p>{/if}
 
 <article class="card r-lab" bind:this={body}>
   <header>
     <h2>{lab.t}</h2>
     {#if lab.d}<div class="lead">{@html lab.d}</div>{/if}
+    <div class="r-tools">
+      <button class="btn small" onclick={runAll}>Tout exécuter</button>
+      <button class="btn small" onclick={reset} disabled={$rState === 'off'} title="Efface tous les objets de la session R">Vider la session R</button>
+    </div>
   </header>
   {#each lab.chunks as ch (ch.id)}
     {@const r = results[ch.id]}
     <section class="r-chunk">
       {#if ch.t}<h3>{ch.t}</h3>{/if}
       {#if ch.html}<div class="r-text">{@html ch.html}</div>{/if}
+      <div class="r-work" class:with-sol={ch.sol && showSol[ch.id]}>
+      <div class="r-mine">
       {#if ch.code !== undefined || ch.sol}
       <div class="r-editor">
         <div class="r-bar">
@@ -109,11 +101,8 @@
           spellcheck="false" autocapitalize="off" autocomplete="off" aria-label="Code R"></textarea>
       </div>
       {/if}
-      {#if ch.sol && showSol[ch.id]}
-        <div class="r-sol">
-          <div class="r-bar"><span class="r-src">Corrigé de l'enseignante</span><button class="btn small" onclick={() => restore(ch, ch.sol)}>Copier dans le bloc</button></div>
-          {#if ch.solHtml}<div class="r-solhtml">{@html ch.solHtml}</div>{:else}<pre><code>{ch.sol}</code></pre>{/if}
-        </div>
+      {#if running[ch.id] && ($rState === 'loading' || $rMessage)}
+        <p class="r-busy" role="status"><span class="r-dot"></span>{$rMessage || 'Chargement de R…'}</p>
       {/if}
       {#if r}
         <div class="r-out" aria-live="polite">
@@ -123,6 +112,14 @@
           {#if !r.out.length && !r.error && !r.images.length}<p class="r-none">Exécuté, sans sortie.</p>{/if}
         </div>
       {/if}
+      </div>
+      {#if ch.sol && showSol[ch.id]}
+        <div class="r-sol">
+          <div class="r-bar"><span class="r-src">Corrigé de l'enseignante</span><button class="btn small" onclick={() => restore(ch, ch.sol)}>Copier dans le bloc</button></div>
+          {#if ch.solHtml}<div class="r-solhtml">{@html ch.solHtml}</div>{:else}<pre><code>{ch.sol}</code></pre>{/if}
+        </div>
+      {/if}
+      </div>
       {#if ch.after}<div class="r-text r-after">{@html ch.after}</div>{/if}
     </section>
   {/each}
