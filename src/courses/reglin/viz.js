@@ -377,7 +377,7 @@ function icViz(el) {
      <label>x₀ = <b data-o="x0"></b><input type="range" min="-2" max="12" step="0.05" value="${x0}" data-i="x0" aria-label="point de prévision"></label>
      <span class="viz-btns"><button type="button" class="btn small primary" data-i="sim">${playLbl(false)} 40 simulations</button><button type="button" class="btn small" data-i="new">Nouvel échantillon</button></span></div>
      <div class="rl-stage">${svg(W, H, '<g data-l="g"></g>', 'Droite ajustée, bande de confiance et bande de prévision', 'rl-drag')}</div>
-     <div class="viz-leg"><span><i class="sw" style="--sw:var(--accent)"></i>IC de E(Y₀) : ŷ₀ ∓ t <span class="rl-hat">σ</span> √(v₀ᵀ(XᵀX)⁻¹v₀)</span><span><i class="sw" style="--sw:var(--warn)"></i>prévision : ŷ₀ ∓ t <span class="rl-hat">σ</span> √(1 + v₀ᵀ(XᵀX)⁻¹v₀)</span><span><i class="sw sw-d" style="--sw:var(--ink-2)"></i>vraie droite</span></div>
+     <div class="viz-leg"><span><i class="sw" style="--sw:var(--accent)"></i><span>IC de E(Y₀) : ŷ₀ ∓ t <span class="rl-hat">σ</span> √(v₀ᵀ(XᵀX)⁻¹v₀)</span></span><span><i class="sw" style="--sw:var(--warn)"></i><span>prévision : ŷ₀ ∓ t <span class="rl-hat">σ</span> √(1 + v₀ᵀ(XᵀX)⁻¹v₀)</span></span><span><i class="sw sw-d" style="--sw:var(--ink-2)"></i>vraie droite</span></div>
      <p class="viz-out" data-o="out"></p>`;
   const s = $(el, 'svg'), simB = $(el, '[data-i=sim]');
   const fitOf = (xs, ys) => { const f = simple(xs, ys), m = xs.length, s2 = f.scr / (m - 2); return { ...f, m, sh: Math.sqrt(s2), q: tq(0.975, m - 2) }; };
