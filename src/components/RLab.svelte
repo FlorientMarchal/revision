@@ -92,7 +92,7 @@
         <div class="r-bar">
           <span class="r-src">{ch.src || 'R'}</span>
           <span class="r-btns">
-            <button class="btn primary small" onclick={() => run(ch)} disabled={running[ch.id]} title="Ctrl/⌘ + Entrée">{running[ch.id] ? 'Calcul…' : '▶ Exécuter'}</button>
+            <button class="btn primary small" onclick={() => run(ch)} disabled={running[ch.id]} title="Ctrl/⌘ + Entrée">{#if running[ch.id]}<span class="r-spin" aria-hidden="true"></span> Calcul…{:else}▶ Exécuter{/if}</button>
             {#if ch.code !== undefined && codes[ch.id] !== ch.code}<button class="btn small" onclick={() => restore(ch, ch.code)}>Code de départ</button>{/if}
             {#if ch.sol}<button class="btn small" aria-pressed={!!showSol[ch.id]} onclick={() => (showSol = { ...showSol, [ch.id]: !showSol[ch.id] })}>{showSol[ch.id] ? 'Masquer le corrigé' : 'Voir le corrigé'}</button>{/if}
           </span>
@@ -101,13 +101,14 @@
           spellcheck="false" autocapitalize="off" autocomplete="off" aria-label="Code R"></textarea>
       </div>
       {/if}
-      {#if running[ch.id] && ($rState === 'loading' || $rMessage)}
-        <p class="r-busy" role="status"><span class="r-dot"></span>{$rMessage || 'Chargement de R…'}</p>
-      {/if}
-      {#if r}
+      {#if running[ch.id]}
+        <p class="r-busy" role="status"><span class="r-spin" aria-hidden="true"></span>{$rMessage || ($rState === 'loading' ? 'Chargement de R…' : 'Exécution en cours…')}</p>
+      {:else if r}
         <div class="r-out" aria-live="polite">
-          {#each r.out as o}<pre class="r-{o.type}">{o.text}</pre>{/each}
-          {#if r.error}<pre class="r-error">Erreur : {r.error}</pre>{/if}
+          <div class="r-text-out">
+            {#each r.out as o}<pre class="r-{o.type}">{o.text}</pre>{/each}
+            {#if r.error}<pre class="r-error">Erreur : {r.error}</pre>{/if}
+          </div>
           {#each r.images as img}<canvas class="r-plot" use:bitmap={img}></canvas>{/each}
           {#if !r.out.length && !r.error && !r.images.length}<p class="r-none">Exécuté, sans sortie.</p>{/if}
         </div>

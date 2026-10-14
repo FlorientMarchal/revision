@@ -273,7 +273,10 @@ table.t td{max-width:420px}
 .r-error-box{margin:0; padding:10px 14px; border-color:var(--red); background:var(--red-soft); color:var(--red); font-size:14px}
 .r-dot{width:10px; height:10px; border-radius:50%; background:var(--warn); flex:none; animation:rpulse 1s infinite alternate}
 @keyframes rpulse{to{opacity:.3}}
-.r-busy{display:flex; align-items:center; gap:8px; margin:0; padding:8px 12px; border:1px dashed var(--warn); border-radius:8px; background:var(--warn-soft); font-size:14px}
+.r-busy{display:flex; align-items:center; gap:10px; margin:0; padding:12px 14px; border:1px dashed var(--line-strong); border-radius:8px; background:var(--paper-2); font-size:14px; color:var(--muted)}
+.r-spin{display:inline-block; width:14px; height:14px; border:2px solid currentColor; border-right-color:transparent; border-radius:50%; animation:rspin .7s linear infinite; vertical-align:-2px; flex:none}
+.r-busy .r-spin{color:var(--accent)}
+@keyframes rspin{to{transform:rotate(360deg)}}
 .r-tools{display:flex; flex-wrap:wrap; gap:6px}
 .r-work{display:grid; grid-template-columns:minmax(0,1fr); gap:10px}
 .r-mine{display:grid; grid-template-columns:minmax(0,1fr); gap:10px; align-content:start}
@@ -299,10 +302,12 @@ table.t td{max-width:420px}
 .r-solhtml pre{background:var(--paper); border:1px solid var(--line); border-radius:6px}
 .r-solhtml code, .r-sol code{border:0; background:none; padding:0}
 .r-out{border:1px solid var(--line); border-radius:8px; background:var(--paper); padding:8px 0; display:grid; gap:6px; overflow:hidden}
-.r-out pre{margin:0; padding:0 12px; font:12.5px/1.45 var(--f-mono); white-space:pre; overflow-x:auto; color:var(--ink)}
-.r-out pre.r-error{color:var(--red)}
-.r-out pre.r-stderr{color:var(--muted)}
-.r-out pre.r-warning, .r-out pre.r-message{color:var(--warn)}
+.r-text-out{overflow-x:auto; display:grid}
+.r-text-out pre{margin:0; padding:0 12px; font:12.5px/1.45 var(--f-mono); white-space:pre; overflow:visible; color:var(--ink); width:max-content; min-width:100%; box-sizing:border-box}
+.r-text-out:empty{display:none}
+.r-text-out pre.r-error{color:var(--red)}
+.r-text-out pre.r-stderr{color:var(--muted)}
+.r-text-out pre.r-warning, .r-text-out pre.r-message{color:var(--warn)}
 .r-plot{display:block; max-width:min(100%,720px); height:auto; margin:4px 12px; border:1px solid var(--line); border-radius:6px; background:#fff}
 .r-none{margin:0 12px; font-size:13px; color:var(--muted)}
 .r-after{font-size:14px; color:var(--muted)}
