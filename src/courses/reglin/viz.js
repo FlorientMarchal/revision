@@ -174,7 +174,7 @@ function projViz(el) {
   const Yp = [1.9, 1.25];
   el.innerHTML = head('Ŷ est la projection orthogonale de Y sur Vect(X)', 'Déplace le point violet Xβ dans le plan : la distance à Y est minimale quand Xβ = Ŷ. Fais tourner la scène pour voir l\'angle droit.') +
     `<div class="viz-ctrl"><label>rotation <input type="range" min="0" max="359" step="1" value="${th}" data-i="th" aria-label="angle de vue"></label>
-     <label>‖<span class="rl-hat">ε</span>‖ (hauteur de Y) = <b data-o="h"></b><input type="range" min="0.3" max="2.4" step="0.05" value="${h}" data-i="h" aria-label="hauteur de Y au-dessus du plan"></label>
+     <label><span>‖<span class="rl-hat">ε</span>‖ (hauteur de Y) =</span> <b data-o="h"></b><input type="range" min="0.3" max="2.4" step="0.05" value="${h}" data-i="h" aria-label="hauteur de Y au-dessus du plan"></label>
      <span class="viz-btns"><button type="button" class="btn small" data-i="spin">${playLbl(false)}</button><button type="button" class="btn small primary" data-i="proj">Projeter : Xβ → Ŷ</button></span></div>
      <div class="rl-stage">${svg(W, H, `${arrowDefs(uid + 'a')}<g data-l="g"></g>`, 'Projection orthogonale de Y sur le plan engendré par les colonnes de X', 'rl-drag')}</div>
      <p class="viz-out" data-o="out"></p>`;
@@ -290,7 +290,7 @@ function studentViz(el) {
     const tc = clamp(Tv, -xr, xr);
     g += line(X(-tc), B, X(-tc), Y(tpdf(tc, nu)) - 6, 'class="rl-tobs-m"');
     g += line(X(tc), B + 2, X(tc), T + 2, 'class="rl-tobs"') + `<circle cx="${X(tc).toFixed(1)}" cy="${B}" r="22" class="rl-hit"/><path d="M${X(tc).toFixed(1)},${B - 2}l-8,13h16z" class="rl-tri"/>` + tx(clamp(X(tc), L + 34, R - 34), T - 2, `T = ${fmt(Tv, 2)}`, 'middle', 'rl-ttobs');
-    g += tx(R, T + 40, 'Student(' + nu + ')', 'end', 'vz-s rl-tdens') + tx(R, T + 54, '-- N(0, 1)', 'end', 'vz-s');
+    g += tx(R, T + 62, 'Student(' + nu + ')', 'end', 'vz-s rl-tdens') + tx(R, T + 76, '-- N(0, 1)', 'end', 'vz-s');
     $(el, '[data-l=g]').innerHTML = g;
     $(el, '[data-o=t]').textContent = fmt(Tv, 2); $(el, '[data-o=nu]').textContent = nu;
     el.querySelectorAll('[data-a]').forEach(b => b.setAttribute('aria-pressed', String(+b.dataset.a === alpha)));
@@ -343,7 +343,7 @@ function fisherViz(el) {
     const stp = xm > 20 ? 5 : xm > 10 ? 2 : 1; for (let x = 0; x <= xm; x += stp) g += tx(X(x), B + 15, x, 'middle');
     if (q95 < xm) g += line(X(q95), B, X(q95), T + 34, 'class="rl-crit"') + tx(X(q95) + 3, T + 32, `f = ${fmt(q95, 3)}`, 'start', 'vz-s rl-tcrit');
     const Fx = X(Math.min(F, xm)); g += line(Fx, B + 2, Fx, T + 2, 'class="rl-tobs"') + `<path d="M${Fx.toFixed(1)},${B - 2}l-8,13h16z" class="rl-tri"/>` + tx(clamp(Fx, L + 40, R - 40), T - 2, `F = ${fmt(F, 3)}${F > xm ? ' →' : ''}`, 'middle', 'rl-ttobs');
-    g += tx(R, T + 44, `loi F(${d1}, ${d2})`, 'end', 'vz-s rl-tdens');
+    g += tx(R, T + 62, `loi F(${d1}, ${d2})`, 'end', 'vz-s rl-tdens');
     $(el, '[data-l=g]').innerHTML = g;
     ['R2', 'R2q'].forEach(k => { $(el, `[data-o=${k}]`).textContent = fmt(st[k], 4); });
     ['n', 'p', 'q'].forEach(k => { $(el, `[data-o=${k}]`).textContent = st[k]; });
