@@ -101,3 +101,20 @@ export const quiz = [
 ];
 
 export * from './codesheet.js';
+
+// Illustrations interactives (src/courses/nosql/viz.js), insérées dans les sections des leçons.
+export const vizPlacements = [
+  { lesson: 'n1', section: 'requetes', name: 'nq-join', where: { after: 'WHERE p.titre = \'iPhone 14\';</code></pre></div>' } },
+  { lesson: 'n2', section: 'cluster', name: 'nq-cluster', where: { before: '<div class="box warn"><div class="box-h">Attention · les problèmes du cluster' } },
+  { lesson: 'n2', section: 'cluster', name: 'nq-cap', where: 'end' },
+  { lesson: 'n2', section: 'compromis', name: 'nq-recipe', where: { before: '<div class="box warn"><div class="box-h">Attention · inconvénients' } },
+  { lesson: 'n2', section: 'galaxie', name: 'nq-families', where: 'end' },
+  { lesson: 'n2', section: 'modeliser', name: 'nq-model', where: { before: '<div class="box method">' } },
+  { lesson: 'n3', section: 'vues', name: 'nq-couchview', where: { before: '<p>CouchDB a aussi un langage' } },
+  { lesson: 'n3', section: 'perfs', name: 'nq-couchkey', where: { before: '<p>Performances : indexation' } },
+  { lesson: 'n4', section: 'aql', name: 'nq-aql', where: { before: '<h4>Pour aller plus loin' } },
+  { lesson: 'n5', section: 'traversee', name: 'nq-traversal', where: 'end' },
+  { lesson: 'n5', section: 'pourquoi', name: 'nq-friends', where: { before: '<div class="box warn"><div class="box-h">Attention · les problèmes des jointures' } },
+  { lesson: 'n6', section: 'redondance', name: 'nq-redund', where: { before: '<div class="box warn">' } },
+  { lesson: 'n6', section: 'regles', name: 'nq-index', where: { before: '<div class="box ex">' } },
+];

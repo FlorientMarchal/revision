@@ -14,6 +14,30 @@ export function typeset(el) {
       strict: 'ignore',
     });
   } catch (e) { /* une formule invalide ne doit pas casser la page */ }
+  fitWide(el);
+}
+
+// Formules en ligne plus larges que leur bloc (ex. un vecteur de résidus sur mobile) : on les rend défilables
+// horizontalement plutôt que de faire déborder toute la page. Les autres formules ne changent pas.
+function blockOf(n) {
+  for (let p = n.parentElement; p; p = p.parentElement) if (!getComputedStyle(p).display.startsWith('inline')) return p;
+  return null;
+}
+export function fitWide(root) {
+  if (!root || typeof getComputedStyle !== 'function') return;
+  for (const k of root.querySelectorAll('.katex')) {
+    if (k.closest('.katex-display')) continue;
+    const b = blockOf(k);
+    if (!b || !b.clientWidth) continue;
+    const cs = getComputedStyle(b);
+    const avail = b.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+    k.classList.remove('katex-wide');
+    if (k.getBoundingClientRect().width > avail + 1) k.classList.add('katex-wide');
+  }
+}
+if (typeof window !== 'undefined') {
+  let t = null;
+  window.addEventListener('resize', () => { clearTimeout(t); t = setTimeout(() => fitWide(document.body), 200); });
 }
 
 // Action Svelte : <div use:math> re-rend les formules à chaque mise à jour du contenu.

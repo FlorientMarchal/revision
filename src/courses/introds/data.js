@@ -6,6 +6,12 @@ import { lessonsData, cardsData, quizData } from './lessons-data.js';
 import { exams } from './exams.js';
 import { tpVec, tpLim, rExos } from './rlabs.js';
 import pylabsAll from './pylabs.json';
+import { places as placesProba } from './places-proba.js';
+import { places as placesLim } from './places-lim.js';
+import { places as placesPy } from './places-py.js';
+
+// Où insérer les illustrations interactives (viz-*.js) dans les leçons.
+export const vizPlacements = [...placesProba, ...placesLim, ...placesPy];
 
 const r = String.raw;
 export { exams };

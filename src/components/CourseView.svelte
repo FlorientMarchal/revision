@@ -1,6 +1,8 @@
 <script>
   import { loadCourse } from '../courses/index.js';
-  import { kv, migrateLegacy } from '../lib/progress.js';
+  import { kv, migrateLegacy, progress } from '../lib/progress.js';
+  import { summarize, overall } from '../lib/summary.js';
+  import Ring from './Ring.svelte';
   import { link } from '../lib/router.js';
   import Fiches from './Fiches.svelte';
   import Flashcards from './Flashcards.svelte';
@@ -45,11 +47,28 @@
 
   const current = $derived(tabs.find(t => t.id === tab) ? tab : (tabs.find(t => t.id === ui.get('tab', 'fiches')) || tabs[0] || {}).id);
   $effect(() => { if (current) ui.set('tab', current); });
+
+  const prog = progress(course.id);
+  const total = $derived(data ? overall(summarize($prog, data)) : 0);
+
+  // l'onglet actif reste visible dans la barre (qui défile horizontalement sur mobile)
+  let nav = $state(null);
+  $effect(() => {
+    current;
+    if (!nav) return;
+    const a = nav.querySelector('[aria-current="page"]');
+    if (a && (a.offsetLeft < nav.scrollLeft || a.offsetLeft + a.offsetWidth > nav.scrollLeft + nav.clientWidth - 28)) {
+      nav.scrollTo({ left: a.offsetLeft - (nav.clientWidth - a.offsetWidth) / 2, behavior: 'smooth' });
+    }
+  });
 </script>
 
 <section class="course-head">
   <p class="eyebrow">{[course.code, course.level, course.semester].filter(Boolean).join(' · ')}</p>
-  <h1>{course.title}</h1>
+  <div class="ch-title">
+    <h1>{course.title}</h1>
+    {#if data}<Ring value={total} size={58} stroke={5} label="Progression dans ce cours" />{/if}
+  </div>
   <p class="sub">{course.topics.join(' / ')}</p>
   {#if course.evals}
     <ul class="cc-evals" aria-label="Évaluations">
@@ -65,9 +84,9 @@
 {#if error}
   <div class="card"><h2>Impossible de charger le cours</h2><p class="lead">{error}</p></div>
 {:else if !data}
-  <p class="lead">Chargement du cours…</p>
+  <div class="skel" role="status" aria-label="Chargement du cours"><i class="skel-tabs"></i><i></i><i></i><i class="short"></i></div>
 {:else}
-  <nav class="tabs" aria-label="Sections du cours">
+  <nav class="tabs" aria-label="Sections du cours" bind:this={nav}>
     {#each tabs as t, i (t.id)}
       <a href={link('c', course.id, t.id)} aria-current={t.id === current ? 'page' : undefined}><span class="tab-n">0{i + 1}</span>{t.label}</a>
     {/each}
