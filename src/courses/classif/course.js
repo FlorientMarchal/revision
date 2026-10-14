@@ -11,6 +11,10 @@ export default {
     { label: 'Partiel', date: '2026-10-12', time: '8h15' },
     { label: 'Rattrapage', date: '2027-01-06', time: '14h' },
   ],
+  links: [
+    { label: 'Cours en ligne du master : classification supervisée (partie II)', url: 'https://master-miashs.github.io/machine_learning/part2/lesson1' },
+    { label: 'Clustering (partie III)', url: 'https://master-miashs.github.io/machine_learning/part3/lesson1' },
+  ],
   topics: ['KNN', 'régression logistique', 'arbres CART', 'SVM', 'clustering'],
   load: () => import('./data.js'),
   viz: () => import('./viz.js'),
