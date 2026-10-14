@@ -17,6 +17,7 @@ npm run dev
 - `src/courses/<id>/course.js` : fiche d'identité d'un cours (titre, code, enseignant·e, crédits, consignes). Tout dossier qui contient ce fichier apparaît automatiquement sur l'accueil.
 - `src/courses/<id>/data.js` : le contenu (chapitres, fiches HTML avec formules LaTeX `\( … \)` / `\[ … \]`, flashcards, QCM, annales, TP). Chaque carte et chaque question a un identifiant stable : la progression ne se décale pas quand on ajoute du contenu.
 - `src/courses/<id>/lessons.js` (facultatif) : l'onglet « Cours complet », une leçon par chapitre (sommaire, encadrés, démonstrations, illustrations interactives).
+- `src/courses/<id>/queries.js` (facultatif) : l'onglet « Requêtes » (cours NoSQL). Chaque question a une solution (`kind` : corrigé de l'enseignant, requête du cours, ou solution proposée) ; on tape sa requête, on affiche la solution à côté, et le site signale les mots-clés, valeurs, champs et tables de la solution absents de la réponse. Rien n'est exécuté ; `expected` peut donner le résultat attendu, calculé à partir des données du cours.
 - `src/courses/<id>/viz.js`, `tools.js` (facultatifs) : illustrations interactives des fiches (`<figure class="viz" data-viz="…">`) et outils de l'onglet « Exercices interactifs ».
 - `public/courses/<id>/img/` : figures des annales.
 - `src/components/` : les écrans (accueil, cours, fiches, flashcards, QCM, annales, TP, compte).
