@@ -98,5 +98,5 @@
 .or-cvm{border-color:var(--accent-line)}
 @media (prefers-reduced-motion: reduce){ .or-sol-sp{animation:none} .or-cbar i, .or-fold, .or-cvpt{transition:none} }
 .or-hat{position:relative; display:inline-block}
-.or-hat::after{content:"ˆ"; position:absolute; left:0; right:0; top:-.42em; text-align:center; font-size:.95em; line-height:1}
+.or-hat::after{content:"ˆ"; position:absolute; left:0; right:0; top:-.2em; text-align:center; font-size:.95em; line-height:1}
 .or-metrics .metric > span:first-child{text-transform:none; letter-spacing:.02em}

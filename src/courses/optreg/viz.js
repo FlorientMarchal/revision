@@ -21,7 +21,7 @@ const line = (x1, y1, x2, y2, extra = '') => `<line x1="${x1.toFixed(1)}" y1="${
 const cl = v => clamp(v, -2000, 4000);
 const poly = pts => pts.map((p, i) => `${i ? 'L' : 'M'}${cl(p[0]).toFixed(1)},${cl(p[1]).toFixed(1)}`).join('');
 const arrowDefs = id => `<defs><marker id="${id}" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0L10,5L0,10z" fill="context-stroke"/></marker></defs>`;
-const shat = (c, sub = '') => `${c}<tspan dx="-0.5em" dy="-0.5em" font-size="0.9em">ˆ</tspan><tspan dx="0.12em" dy="0.5em">${sub}</tspan>`;
+const shat = (c, sub = '') => `${c}<tspan dx="-0.5em" dy="-0.28em" font-size="0.9em">ˆ</tspan><tspan dx="0.12em" dy="0.28em">${sub}</tspan>`;
 const playLbl = on => (on ? '❚❚ Pause' : '▶ Lancer');
 const COL = ['var(--c2)', 'var(--c1)', 'var(--c3)', 'var(--c6)', 'var(--c4)', 'var(--c5)'];
 

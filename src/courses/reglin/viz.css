@@ -56,7 +56,7 @@
 .rl-stack-leg{display:flex; flex-wrap:wrap; gap:4px 16px; font-size:13px; color:var(--muted); font-variant-numeric:tabular-nums}
 .rl-stack-leg b{color:var(--ink)}
 .rl-sw{display:inline-block; width:12px; height:12px; border-radius:3px; margin-right:6px; vertical-align:-1px}
-.rl-metrics{grid-template-columns:repeat(auto-fit,minmax(min(84px,100%),1fr))}
+.rl-metrics{grid-template-columns:repeat(auto-fit,minmax(min(120px,100%),1fr))}
 .rl-metrics .metric b{font-size:18px; font-variant-numeric:tabular-nums}
 /* tests */
 .rl-dens{fill:none; stroke:var(--ink); stroke-width:2}
@@ -105,6 +105,6 @@
 @media (prefers-reduced-motion: reduce){ .rl-bar i, .rl-bar em, .rl-stack i{transition:none} .rl-pop line[class^="rl-dev"]{animation:none} }
 .rl-drag :is(.rl-pt,.rl-P,.rl-cand,.rl-tri,.rl-infl,.rl-handle){pointer-events:none}
 .rl-hat{position:relative; display:inline-block}
-.rl-hat::after{content:"ˆ"; position:absolute; left:0; right:0; top:-.42em; text-align:center; font-size:.95em; line-height:1}
+.rl-hat::after{content:"ˆ"; position:absolute; left:0; right:0; top:-.2em; text-align:center; font-size:.95em; line-height:1}
 .rl-metrics .metric > span:first-child{text-transform:none; letter-spacing:.02em}
 .rl-g2 .vz-svg.rl-small{max-width:250px}
