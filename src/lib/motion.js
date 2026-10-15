@@ -69,10 +69,10 @@ export async function transition(kind, update, { dir = '', fallbackEl = null, in
     // le nouvel écran est photographié dès que le DOM a basculé : on n'attend jamais les données,
     // la typographie des formules ni les illustrations (plafond dur : 250 ms)
     t = document.startViewTransition(() => Promise.race([(async () => {
-      ready = null; const T0 = performance.now(); const L = window.__vtlog = [];
-      await update(); L.push('upd ' + Math.round(performance.now() - T0));
-      await tick(); L.push('tick ' + Math.round(performance.now() - T0));
-      if (ready) await Promise.race([ready, wait(150)]); L.push('ready ' + Math.round(performance.now() - T0));
+      ready = null;
+      await update();
+      await tick();
+      if (ready) await Promise.race([ready, wait(150)]);
     })(), wait(250)]));
   } catch (e) { root.classList.remove(...cls); nav = null; await update(); onDone && onDone(); return; }
   activeVT = t;
@@ -121,9 +121,9 @@ export function go(href, origin) {
   }
   const cleanCard = () => { root().classList.remove('vt-card'); document.querySelectorAll('.vt-target').forEach(e => e.classList.remove('vt-target')); };
   transition(kind, async () => {
-    const changed = hashChanged(); const T1 = performance.now();
+    const changed = hashChanged();
     location.hash = href;
-    await Promise.race([changed, wait(250)]); (window.__vtlog2 = window.__vtlog2 || []).push('hash ' + Math.round(performance.now() - T1));
+    await Promise.race([changed, wait(250)]);
     await tick();
     if (keep >= 0) scrollTo({ top: keep });
   }, { dir, info, onDone: cleanCard, fallbackEl: () => document.querySelector('main.panel') });

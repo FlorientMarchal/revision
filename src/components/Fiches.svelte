@@ -2,6 +2,7 @@
   import { tick } from 'svelte';
   import { kv, progress, setVal } from '../lib/progress.js';
   import { typeset } from '../lib/math.js';
+  import { afterNav } from '../lib/motion.js';
   import { reveal, confetti } from '../lib/motion.js';
   import { lens, inkReveal } from '../lib/motion-components.js';
 
@@ -31,7 +32,7 @@
 
   $effect(() => {
     ch; // relancé à chaque changement de chapitre
-    tick().then(async () => {
+    tick().then(afterNav).then(async () => {
       if (!body) return;
       typeset(body);
       if (course.viz && body.querySelector('[data-viz]')) {

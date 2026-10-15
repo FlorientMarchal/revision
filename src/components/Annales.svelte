@@ -2,6 +2,7 @@
   import { tick } from 'svelte';
   import { kv, progress, setVal } from '../lib/progress.js';
   import { typeset } from '../lib/math.js';
+  import { afterNav } from '../lib/motion.js';
   import { reveal } from '../lib/motion.js';
   import { lens, roll, inkReveal } from '../lib/motion-components.js';
 
@@ -24,7 +25,7 @@
 
   $effect(() => {
     id; openAll;
-    tick().then(async () => {
+    tick().then(afterNav).then(async () => {
       if (!body) return;
       typeset(body);
       if (course.viz && body.querySelector('[data-viz]')) {
