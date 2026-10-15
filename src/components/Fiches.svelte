@@ -2,7 +2,9 @@
   import { tick } from 'svelte';
   import { kv, progress, setVal } from '../lib/progress.js';
   import { typeset } from '../lib/math.js';
+  import { afterNav } from '../lib/motion.js';
   import { reveal, confetti } from '../lib/motion.js';
+  import { lens, inkReveal } from '../lib/motion-components.js';
 
   let { course, data } = $props();
   const ui = kv(course.id);
@@ -11,6 +13,7 @@
   let ch = $state(chapters.find(c => c.id === ui.get('ficheCh')) ? ui.get('ficheCh') : chapters[0].id);
   let body = $state(null);
   let pendingAnchor = null;
+  let dir = $state(0);          // sens du changement de chapitre (1 suivant, -1 précédent) pour la transition
 
   const i = $derived(chapters.findIndex(c => c.id === ch));
   const read = $derived(($prog['fiche:' + ch] || {}).v === 1);
@@ -21,13 +24,15 @@
     if (all) confetti();
   }
   async function show(id, anchor) {
+    const to = chapters.findIndex(c => c.id === id);
+    dir = to > i ? 1 : to < i ? -1 : 0;
     ch = id; ui.set('ficheCh', id); pendingAnchor = anchor || null;
     if (!anchor && body && body.getBoundingClientRect().top < 0) body.scrollIntoView({ block: 'start' });
   }
 
   $effect(() => {
     ch; // relancé à chaque changement de chapitre
-    tick().then(async () => {
+    tick().then(afterNav).then(async () => {
       if (!body) return;
       typeset(body);
       if (course.viz && body.querySelector('[data-viz]')) {
@@ -35,11 +40,12 @@
       }
       if (pendingAnchor) { const t = document.getElementById(pendingAnchor); if (t) t.scrollIntoView({ block: 'start' }); pendingAnchor = null; }
       reveal(body);
+      inkReveal(body);
     });
   });
 </script>
 
-<div class="chips" role="tablist" aria-label="Chapitres">
+<div class="chips" role="tablist" aria-label="Chapitres" use:lens>
   {#each chapters as c (c.id)}
     <button class="chip" aria-pressed={c.id === ch} onclick={() => show(c.id)}>
       {#if ($prog['fiche:' + c.id] || {}).v === 1}<span class="chip-ok" aria-label="lue">✓</span>{/if}{c.name}
@@ -58,8 +64,9 @@
   </aside>
 {/if}
 
-<article class="card fiche" bind:this={body}>
+<article class="card fiche" class:mc-next={dir > 0} class:mc-prev={dir < 0} bind:this={body}>
   {#key ch}
+    <span class="fiche-pen" aria-hidden="true"></span>
     <header><span class="tag">Chapitre {i + 1}/{chapters.length}</span><h2>{chapters[i].name}</h2></header>
     {@html data.fiches[ch] || ''}
   {/key}

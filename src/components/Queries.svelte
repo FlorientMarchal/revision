@@ -3,6 +3,7 @@
   // Rien n'est exécuté : le « résultat attendu » éventuel est calculé à l'avance à partir des données du cours.
   import { kv, progress, setVal } from '../lib/progress.js';
   import { highlight, missing } from '../lib/code.js';
+  import { lens, markMissing, html } from '../lib/motion-components.js';
 
   let { course, data } = $props();
   const ui = kv(course.id);
@@ -35,7 +36,7 @@
   const label = { cours: 'Requête du cours', corrige: 'Corrigé de l\'enseignant', propose: 'Solution proposée (pas un corrigé officiel)' };
 </script>
 
-<div class="chips" role="tablist" aria-label="Séries de requêtes">
+<div class="chips" role="tablist" aria-label="Séries de requêtes" use:lens>
   {#each S as s (s.id)}
     {@const c = count(s)}
     <button class="chip" aria-pressed={s.id === id} onclick={() => choose(s.id)}>{s.title}{#if c}<span class="chip-count">{c}/{s.exos.length}</span>{/if}</button>
@@ -64,24 +65,27 @@
     {@const v = draft(x)}
     <article class="card rq" class:rq-ok={s === 'ok'} class:rq-todo={s === 'revoir'}>
       <div class="rq-q"><span class="rq-n">{k + 1}</span><div>{@html x.q}</div></div>
+      <div class="rq-field">
       <textarea class="rq-input" rows={Math.max(3, Math.min(14, (v.match(/\n/g) || []).length + 2))} spellcheck="false" autocapitalize="off" autocomplete="off"
         placeholder={'Écris ta requête ' + (x.lang || set.lang) + '…'} aria-label={'Ta requête pour la question ' + (k + 1)}
         value={v} oninput={e => edit(x, e.currentTarget.value)} onkeydown={e => tab(e, x)}></textarea>
+      <i class="rq-line" aria-hidden="true"></i>
+      </div>
       <div class="row">
-        <button class="btn small" class:primary={!shown[x.id]} onclick={() => (shown[x.id] = !shown[x.id])}>{shown[x.id] ? 'Masquer la solution' : 'Voir la solution'}</button>
+        <button class="btn small" class:primary={!shown[x.id]} aria-expanded={!!shown[x.id]} onclick={() => (shown[x.id] = !shown[x.id])}>{shown[x.id] ? 'Masquer la solution' : 'Voir la solution'}</button>
         {#if v}<button class="btn small" onclick={() => edit(x, '')}>Effacer</button>{/if}
       </div>
       {#if shown[x.id]}
         {@const miss = v.trim() ? missing(v, x.sol) : []}
         <div class="grid2 rq-compare">
           <div><h4>Ta réponse</h4>{#if v.trim()}<pre class="rq-code">{@html highlight(v)}</pre>{:else}<p class="math-note">Pas de réponse tapée.</p>{/if}</div>
-          <div><h4>{label[x.kind || set.kind] || 'Solution'}</h4><pre class="rq-code">{@html highlight(x.sol)}</pre></div>
+          <div><h4>{label[x.kind || set.kind] || 'Solution'}</h4><pre class="rq-code" use:html={markMissing(x.sol, miss)}></pre></div>
         </div>
         {#if v.trim()}
           {#if miss.length}
-            <p class="rq-miss"><b>Présents dans la solution, absents de ta réponse :</b> {#each miss as m}<code>{m}</code>{/each}</p>
+            <p class="rq-miss"><b>Présents dans la solution, absents de ta réponse :</b> {#each miss as m, n}<code style:--i={Math.min(n, 14)}>{m}</code>{/each}</p>
           {:else}
-            <p class="rq-miss ok">Tous les mots-clés, valeurs et champs de la solution sont dans ta réponse.</p>
+            <p class="rq-miss ok"><svg class="rq-ok-ic" viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 8.5l3 3 6-7" pathLength="1" /></svg>Tous les mots-clés, valeurs et champs de la solution sont dans ta réponse.</p>
           {/if}
         {/if}
         {#if x.note}<div class="math-note">{@html x.note}</div>{/if}
@@ -97,8 +101,8 @@
           </details>
         {/if}
         <div class="q-status" role="group" aria-label="Mon résultat">
-          <button class="btn small" class:on-ok={s === 'ok'} aria-pressed={s === 'ok'} onclick={() => mark(x, 'ok')}>✓ J'avais juste</button>
-          <button class="btn small" class:on-todo={s === 'revoir'} aria-pressed={s === 'revoir'} onclick={() => mark(x, 'revoir')}>À revoir</button>
+          <button class="btn small" class:on-ok={s === 'ok'} aria-pressed={s === 'ok'} onclick={() => mark(x, 'ok')}><svg class="st-ic" viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 8.5l3 3 6-7" pathLength="1" /></svg>J'avais juste</button>
+          <button class="btn small" class:on-todo={s === 'revoir'} aria-pressed={s === 'revoir'} onclick={() => mark(x, 'revoir')}><svg class="st-ic" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 3.5v5.5M8 12v.5" pathLength="1" /></svg>À revoir</button>
         </div>
       {/if}
     </article>

@@ -17,18 +17,29 @@
   import RLab from './RLab.svelte';
   import CodeSheet from './CodeSheet.svelte';
   import { evalList } from '../lib/evals.js';
+  import Emblem from './Emblem.svelte';
+  import { tick } from 'svelte';
+  import { navInfo } from '../lib/motion.js';
 
   let { course, tab } = $props();
   const ui = kv(course.id);
   let data = $state(null);
   let error = $state('');
 
-  loadCourse(course)
+  // arrivée depuis la carte de l'accueil : titre, emblème et anneau arrivent par morphing (pas d'entrée cinétique)
+  const arrival = navInfo();
+  const viaCard = !!(arrival && arrival.kind === 'fwd' && arrival.id === course.id);
+
+  const loading = loadCourse(course)
     .then(d => {
       if (course.legacy && d.LEGACY_CARD_ORDER) migrateLegacy(course.id, course.legacy.prefix, d.LEGACY_CARD_ORDER);
       data = d;
     })
     .catch(e => { error = e.message || String(e); });
+
+  const words = course.title.split(/\s+/);
+  const DAY = 864e5;
+  const daysTo = d => { const t = new Date(); t.setHours(0, 0, 0, 0); return Math.round((d - t) / DAY); };
 
   const tabs = $derived(data ? [
     { id: 'cours', label: 'Cours complet', on: (data.lessons || []).length },
@@ -51,10 +62,35 @@
   const prog = progress(course.id);
   const total = $derived(data ? overall(summarize($prog, data)) : 0);
 
+  // soulignement partagé de l'onglet actif : il glisse d'un onglet à l'autre
+  let ink = $state(null);
+  let inkOn = $state(false);
+  function placeInk() {
+    if (!nav_ || !ink) return;
+    const a = nav_.querySelector('[aria-current="page"]');
+    if (!a) return;
+    ink.style.transform = `translateX(${a.offsetLeft + 8}px) scaleX(${Math.max(0, a.offsetWidth - 16) / 100})`;
+    if (!inkOn) requestAnimationFrame(() => { inkOn = true; });
+  }
+  $effect(() => {
+    current; tabs.length;
+    if (!nav_) return;
+    tick().then(placeInk);
+  });
+  $effect(() => {
+    const nav = nav_;
+    if (!nav || typeof ResizeObserver !== 'function') return;
+    const ro = new ResizeObserver(() => placeInk());
+    ro.observe(nav);
+    nav.querySelectorAll('a').forEach(a => ro.observe(a));
+    return () => ro.disconnect();
+  });
+
   // l'onglet actif reste visible dans la barre (qui défile horizontalement sur mobile)
-  let nav = $state(null);
+  let nav_ = $state(null);
   $effect(() => {
     current;
+    const nav = nav_;
     if (!nav) return;
     const a = nav.querySelector('[aria-current="page"]');
     if (a && (a.offsetLeft < nav.scrollLeft || a.offsetLeft + a.offsetWidth > nav.scrollLeft + nav.clientWidth - 28)) {
@@ -63,22 +99,25 @@
   });
 </script>
 
-<section class="course-head">
-  <p class="eyebrow">{[course.code, course.level, course.semester].filter(Boolean).join(' · ')}</p>
-  <div class="ch-title">
-    <h1>{course.title}</h1>
-    {#if data}<Ring value={total} size={58} stroke={5} label="Progression dans ce cours" />{/if}
+<section class="course-head" class:via-card={viaCard} style="--vt-t:ct-{course.id}; --vt-e:em-{course.id}; --vt-r:rg-{course.id}">
+  <div class="ch-main">
+    <p class="eyebrow ch-eyebrow">{[course.code, course.level, course.semester].filter(Boolean).join(' · ')}</p>
+    <h1 class="ch-h">{#each words as w, k}{#if k}{' '}{/if}<span class="w"><span style="--k:{k}">{w}</span></span>{/each}</h1>
+    <p class="sub">{#each course.topics as t, k}{#if k}<span class="sub-sep">{' / '}</span>{/if}<span class="sub-t" style="--k:{k}">{t}</span>{/each}</p>
+    {#if course.evals}
+      <ul class="cc-evals ch-evals" aria-label="Évaluations">
+        {#each evalList(course) as e, k}<li class:next={e.next} class:past={e.past} style="--k:{k}">{#if e.next}<span class="ev-pulse" aria-hidden="true"></span>{/if}<b>{e.label}</b>{#if e.when}<span>{e.when}{#if e.time} · {e.time}{/if}</span>{:else}<span class="tbd">date à venir</span>{/if}{#if e.next}{@const n = daysTo(e.d)}<em class="ev-badge">{n === 0 ? "aujourd'hui" : 'J-' + n}</em>{/if}</li>{/each}
+      </ul>
+    {/if}
+    {#if course.links}
+      <p class="course-links">{#each course.links as l, k}<a href={l.url} target="_blank" rel="noopener" style="--k:{k}">{l.label} ↗</a>{/each}</p>
+    {/if}
   </div>
-  <p class="sub">{course.topics.join(' / ')}</p>
-  {#if course.evals}
-    <ul class="cc-evals" aria-label="Évaluations">
-      {#each evalList(course) as e}<li class:next={e.next} class:past={e.past}><b>{e.label}</b>{#if e.when}<span>{e.when}{#if e.time} · {e.time}{/if}</span>{:else}<span class="tbd">date à venir</span>{/if}</li>{/each}
-    </ul>
-  {/if}
-  {#if course.links}
-    <p class="course-links">{#each course.links as l}<a href={l.url} target="_blank" rel="noopener">{l.label} ↗</a>{/each}</p>
-  {/if}
-  {#if course.examInfo}<p class="exam-info">{@html course.examInfo}</p>{/if}
+  <div class="ch-side">
+    <span class="ch-emblem"><Emblem id={course.id} size="hero" /></span>
+    {#if data}<Ring value={total} size={58} stroke={5} label="Progression dans ce cours" delay={viaCard ? 0 : 450} animate={!viaCard} />{/if}
+  </div>
+  {#if course.examInfo}<p class="exam-info"><span class="ei-in">{@html course.examInfo}</span></p>{/if}
 </section>
 
 {#if error}
@@ -86,12 +125,13 @@
 {:else if !data}
   <div class="skel" role="status" aria-label="Chargement du cours"><i class="skel-tabs"></i><i></i><i></i><i class="short"></i></div>
 {:else}
-  <nav class="tabs" aria-label="Sections du cours" bind:this={nav}>
+  <nav class="tabs" class:ink-on={inkOn} aria-label="Sections du cours" bind:this={nav_}>
+    <span class="tab-ink" aria-hidden="true" bind:this={ink}></span>
     {#each tabs as t, i (t.id)}
-      <a href={link('c', course.id, t.id)} aria-current={t.id === current ? 'page' : undefined}><span class="tab-n">0{i + 1}</span>{t.label}</a>
+      <a href={link('c', course.id, t.id)} aria-current={t.id === current ? 'page' : undefined} style="--k:{i}" data-ripple><span class="tab-n">{String(i + 1).padStart(2, '0')}</span>{t.label}</a>
     {/each}
   </nav>
-  <main class="panel">
+  <main class="panel course-panel">
     {#if current === 'cours'}<Lessons {course} {data} />
     {:else if current === 'fiches'}<Fiches {course} {data} />
     {:else if current === 'formules'}<Formulas {course} {data} />
