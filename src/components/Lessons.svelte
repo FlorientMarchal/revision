@@ -71,7 +71,7 @@
   {#key id}
     <header class="lesson-head">
       <span class="tag">Leçon {i + 1}/{L.length}{#if lesson.src} · {lesson.src}{/if}</span>
-      <h2 class="lesson-t">{#if /\\[(\[]|[<&]/.test(lesson.t)}{lesson.t}{:else}{#each lesson.t.split(/\s+/) as w, k}{#if k} {/if}<span class="w"><span style="--k:{k}">{w}</span></span>{/each}{/if}</h2>
+      <h2 class="lesson-t">{#if /\\[(\[]|[<&]/.test(lesson.t)}{lesson.t}{:else}{#each lesson.t.split(/\s+/) as w, k}{#if k}{' '}{/if}<span class="w"><span style="--k:{k}">{w}</span></span>{/each}{/if}</h2>
       {#if lesson.sub}<p class="lead">{lesson.sub}</p>{/if}
     </header>
     <nav class="lesson-toc" aria-label="Sommaire">

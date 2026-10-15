@@ -103,8 +103,8 @@
 <section class="course-head" class:via-card={viaCard} style="--vt-t:ct-{course.id}; --vt-e:em-{course.id}; --vt-r:rg-{course.id}">
   <div class="ch-main">
     <p class="eyebrow ch-eyebrow">{[course.code, course.level, course.semester].filter(Boolean).join(' · ')}</p>
-    <h1 class="ch-h">{#each words as w, k}{#if k} {/if}<span class="w"><span style="--k:{k}">{w}</span></span>{/each}</h1>
-    <p class="sub">{#each course.topics as t, k}{#if k}<span class="sub-sep"> / </span>{/if}<span class="sub-t" style="--k:{k}">{t}</span>{/each}</p>
+    <h1 class="ch-h">{#each words as w, k}{#if k}{' '}{/if}<span class="w"><span style="--k:{k}">{w}</span></span>{/each}</h1>
+    <p class="sub">{#each course.topics as t, k}{#if k}<span class="sub-sep">{' / '}</span>{/if}<span class="sub-t" style="--k:{k}">{t}</span>{/each}</p>
     {#if course.evals}
       <ul class="cc-evals ch-evals" aria-label="Évaluations">
         {#each evalList(course) as e, k}<li class:next={e.next} class:past={e.past} style="--k:{k}">{#if e.next}<span class="ev-pulse" aria-hidden="true"></span>{/if}<b>{e.label}</b>{#if e.when}<span>{e.when}{#if e.time} · {e.time}{/if}</span>{:else}<span class="tbd">date à venir</span>{/if}{#if e.next}{@const n = daysTo(e.d)}<em class="ev-badge">{n === 0 ? "aujourd'hui" : 'J-' + n}</em>{/if}</li>{/each}
