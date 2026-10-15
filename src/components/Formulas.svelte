@@ -3,6 +3,7 @@
   import { tick } from 'svelte';
   import { kv } from '../lib/progress.js';
   import { typeset } from '../lib/math.js';
+  import { afterNav } from '../lib/motion.js';
   import { reveal as revealOnScroll } from '../lib/motion.js';
   import { lens, inkReveal } from '../lib/motion-components.js';
 
@@ -22,7 +23,7 @@
   function toggleHide() { hide = !hide; ui.set('formHide', hide); shown = {}; }
   function reveal(k) { shown = { ...shown, [k]: !shown[k] }; }
 
-  $effect(() => { list; hide; shown; tick().then(() => { if (body) { typeset(body); revealOnScroll(body); inkReveal(body); } }); });
+  $effect(() => { list; hide; shown; tick().then(afterNav).then(() => { if (body) { typeset(body); revealOnScroll(body); inkReveal(body); } }); });
 </script>
 
 <div class="form-bar">
