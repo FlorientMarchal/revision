@@ -16,7 +16,7 @@
   const from = lastFrom();
   const backId = from && from.name === 'course' ? from.course : null;
   const mode = nav && nav.kind === 'back' ? 'back' : (typeof window !== 'undefined' && introDue() ? 'intro' : 'plain');
-  if (mode === 'intro') playIntro(1500);
+  const stopIntro = mode === 'intro' ? playIntro(1500) : () => {};
   const cardDelay = ci => mode === 'intro' ? 420 + ci * 65 : 70 + ci * 45;
 
   // Prochaine évaluation, tous cours confondus (compte à rebours)
@@ -47,7 +47,7 @@
     }
     const onScroll = () => saveHomeScroll(scrollY);
     addEventListener('scroll', onScroll, { passive: true });
-    return () => { unsubs.forEach(u => u()); removeEventListener('scroll', onScroll); };
+    return () => { unsubs.forEach(u => u()); removeEventListener('scroll', onScroll); stopIntro(); };
   });
 </script>
 

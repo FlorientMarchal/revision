@@ -11,6 +11,7 @@ export const EASE = { out: 'cubic-bezier(.2,.9,.25,1)', spring: 'cubic-bezier(.3
 
 /* ---------------------------------------------------------------- transitions */
 
+let vtSeq = 0, activeVT = null;
 let nav = null;          // navigation en cours (lue par les composants qui se montent pendant la transition)
 let ready = null;        // promesse « le nouvel écran est prêt » (données chargées, défilement restauré)
 let homeScroll = 0;      // position de défilement de l'accueil, restaurée au retour
@@ -43,6 +44,12 @@ export async function transition(kind, update, { dir = '', fallbackEl = null, in
     return;
   }
   const root = document.documentElement;
+  const me = ++vtSeq;
+  // une transition encore en cours est abrégée avant de lancer la suivante
+  if (activeVT) { const prev = activeVT; activeVT = null; try { prev.skipTransition(); } catch (e) {} await Promise.race([prev.finished.catch(() => {}), wait(120)]); }
+  if (me !== vtSeq) { await update(); return; }
+  // une transition précédente encore active est terminée proprement (ses classes ne doivent pas rester)
+  root.classList.forEach(c => { if (c === 'vt' || (c.startsWith('vt-') && c !== 'vt-card')) root.classList.remove(c); });
   const cls = ['vt', 'vt-' + kind];
   if (dir) cls.push('vt-dir-' + dir);
   root.classList.add(...cls);
@@ -57,7 +64,8 @@ export async function transition(kind, update, { dir = '', fallbackEl = null, in
       await tick();
     });
   } catch (e) { root.classList.remove(...cls); nav = null; await update(); onDone && onDone(); return; }
-  const done = () => { root.classList.remove(...cls); nav = null; ready = null; onDone && onDone(); };
+  activeVT = t;
+  const done = () => { if (activeVT === t) activeVT = null; if (me !== vtSeq) return; root.classList.remove(...cls); nav = null; ready = null; onDone && onDone(); };
   t.finished.then(done, done);
   return t.updateCallbackDone.catch(() => {});
 }
@@ -131,14 +139,15 @@ export function playIntro(ms = 1500) {
     clearTimeout(timer);
     evs.forEach(e => removeEventListener(e, onSkip, true));
     removeEventListener('scroll', onSkip);
-    if (skip) { r.classList.add('intro-skip'); setTimeout(() => r.classList.remove('intro-skip', 'intro'), 60); }
-    else r.classList.remove('intro');
+    // « intro-skip » reste posé tant que l'accueil est affiché : les animations restent terminées
+    if (skip) r.classList.add('intro-skip');
+    r.classList.remove('intro');
   };
   const onSkip = () => end(true);
   evs.forEach(e => addEventListener(e, onSkip, { capture: true, passive: true }));
   addEventListener('scroll', onSkip, { passive: true });
   timer = setTimeout(() => end(false), ms);
-  return () => end(false);
+  return () => { end(false); r.classList.remove('intro-skip'); };
 }
 
 /* ---------------------------------------------------------------- petits effets */
