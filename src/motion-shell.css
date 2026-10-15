@@ -316,3 +316,7 @@ html.vt-dir-l::view-transition-new(lesson){animation:ms-slideInL .6s var(--e-out
 /* les sujets du cours sont découpés en <span> : on neutralise le style « .sub span » (séparateurs) d'app.css */
 .course-head .sub .sub-t{color:var(--muted); padding:0}
 .course-head .sub .sub-sep{padding:0}
+/* leçon en cours de mise en forme (formules KaTeX après la transition) : le corps arrive en fondu ensuite */
+.lesson .lesson-sec, .lesson > .box{transition:opacity .45s ease, transform .75s var(--e-spring)}
+.lesson.is-typesetting .lesson-sec, .lesson.is-typesetting > .box{opacity:0}
+@media print{ .lesson.is-typesetting .lesson-sec, .lesson.is-typesetting > .box{opacity:1} }

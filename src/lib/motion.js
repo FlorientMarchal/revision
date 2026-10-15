@@ -19,6 +19,16 @@ let curRoute = null, lastRoute = null;
 
 /** La navigation qui est en train de monter ce composant ({ kind, id, … }) ou null. */
 export const navInfo = () => nav;
+/**
+ * Promesse résolue quand la transition en cours est terminée (ou tout de suite s'il n'y en a pas) :
+ * les travaux lourds (formules KaTeX, illustrations) attendent ce moment pour ne pas figer l'écran.
+ */
+export function afterNav() {
+  const t = activeVT;
+  const frame = () => new Promise(r => setTimeout(r, 16));
+  if (!t) return frame();
+  return Promise.race([t.finished.catch(() => {}), wait(900)]).then(frame);
+}
 /** Un écran qui se monte peut signaler quand il est prêt à être photographié (max 300 ms d'attente). */
 export const setReady = p => { ready = p; };
 export const saveHomeScroll = y => { homeScroll = y; };
@@ -56,13 +66,14 @@ export async function transition(kind, update, { dir = '', fallbackEl = null, in
   nav = { kind, dir, ...info };
   let t;
   try {
-    t = document.startViewTransition(async () => {
-      ready = null;
-      await update();
-      await tick(); await wait(0); await tick();
-      if (ready) await Promise.race([ready, wait(300)]);
-      await tick();
-    });
+    // le nouvel écran est photographié dès que le DOM a basculé : on n'attend jamais les données,
+    // la typographie des formules ni les illustrations (plafond dur : 250 ms)
+    t = document.startViewTransition(() => Promise.race([(async () => {
+      ready = null; const T0 = performance.now(); const L = window.__vtlog = [];
+      await update(); L.push('upd ' + Math.round(performance.now() - T0));
+      await tick(); L.push('tick ' + Math.round(performance.now() - T0));
+      if (ready) await Promise.race([ready, wait(150)]); L.push('ready ' + Math.round(performance.now() - T0));
+    })(), wait(250)]));
   } catch (e) { root.classList.remove(...cls); nav = null; await update(); onDone && onDone(); return; }
   activeVT = t;
   const done = () => { if (activeVT === t) activeVT = null; if (me !== vtSeq) return; root.classList.remove(...cls); nav = null; ready = null; onDone && onDone(); };
@@ -110,9 +121,9 @@ export function go(href, origin) {
   }
   const cleanCard = () => { root().classList.remove('vt-card'); document.querySelectorAll('.vt-target').forEach(e => e.classList.remove('vt-target')); };
   transition(kind, async () => {
-    const changed = hashChanged();
+    const changed = hashChanged(); const T1 = performance.now();
     location.hash = href;
-    await Promise.race([changed, wait(250)]);
+    await Promise.race([changed, wait(250)]); (window.__vtlog2 = window.__vtlog2 || []).push('hash ' + Math.round(performance.now() - T1));
     await tick();
     if (keep >= 0) scrollTo({ top: keep });
   }, { dir, info, onDone: cleanCard, fallbackEl: () => document.querySelector('main.panel') });
