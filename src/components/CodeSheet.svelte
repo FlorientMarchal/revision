@@ -2,6 +2,7 @@
   // Mémo de code : les commandes à connaître, regroupées par thème, avec recherche, copie et mode entraînement.
   import { kv } from '../lib/progress.js';
   import { highlight } from '../lib/code.js';
+  import { lens } from '../lib/motion-components.js';
 
   let { course, data } = $props();
   const ui = kv(course.id);
@@ -32,7 +33,7 @@
 
 <div class="form-bar">
   {#if parts.length > 1}
-    <div class="chips" role="tablist" aria-label="Langages">
+    <div class="chips" role="tablist" aria-label="Langages" use:lens>
       <button class="chip" aria-pressed={part === 'all'} onclick={() => setPart('all')}>Tout</button>
       {#each parts as p}<button class="chip" aria-pressed={part === p} onclick={() => setPart(p)}>{p}</button>{/each}
     </div>
@@ -47,17 +48,17 @@
 </div>
 
 {#if !total}<p class="lead">Rien ne correspond à « {q} ».</p>{/if}
-<div class="form-list">
+<div class="form-list" class:mc-hide={hide}>
   {#each list as g, gi (g.part + g.t)}
-    <section class="card form-group">
+    <section class="card form-group" style:--gi={Math.min(gi, 6)}>
       <header><span class="tag">{g.lang}{#if g.src} · {g.src}{/if}</span><h2>{g.t}</h2>{#if g.d}<p class="math-note">{@html g.d}</p>{/if}</header>
       <div class="memo-items">
         {#each g.items as it, ii}
           {@const k = gi + ':' + ii}
-          <div class="memo-item">
+          <div class="memo-item" style:--fi={Math.min(ii, 8)}>
             <div class="memo-head">
               <span class="form-name">{@html it.n}</span>
-              {#if !hide || shown[k]}<button class="btn small" onclick={() => copy(it.code, k)}>{copied === k ? 'Copié ✓' : 'Copier'}</button>{/if}
+              {#if !hide || shown[k]}<button class="btn small mc-copy" class:is-copied={copied === k} onclick={() => copy(it.code, k)}>{copied === k ? 'Copié ✓' : 'Copier'}</button>{/if}
             </div>
             {#if hide && !shown[k]}
               <button class="form-mask" onclick={() => (shown = { ...shown, [k]: true })}>Afficher le code</button>

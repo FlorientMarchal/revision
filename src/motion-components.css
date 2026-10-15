@@ -1,0 +1,372 @@
+/* Motion design des écrans d'étude : flashcards, QCM, fiches, formulaire, annales, labos (agent composants).
+   Règles : transform / opacity / clip-path / tracés SVG uniquement (exception assumée : background-size du
+   surligneur, sur du texte en ligne, une seule fois) ; état final toujours visible sans animation
+   (prefers-reduced-motion coupe tout via app.css, et les états « cachés » sont posés par JS seulement si l'animation est permise). */
+:root{
+  --mc-out:cubic-bezier(.2,.75,.2,1);
+  --mc-spring:cubic-bezier(.3,1.45,.5,1);
+  --mc-ink:cubic-bezier(.55,.1,.35,1);
+  --mc-sheen:rgba(255,255,255,.7);
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){ --mc-sheen:rgba(255,255,255,.13); } }
+:root[data-theme="dark"]{ --mc-sheen:rgba(255,255,255,.13); }
+
+@keyframes mcRise{from{opacity:0; transform:translateY(8px)}}
+@keyframes mcFade{from{opacity:0}}
+@keyframes mcDraw{from{stroke-dashoffset:1}}
+@keyframes mcSpin{to{transform:rotate(360deg)}}
+@keyframes mcPop{0%{transform:scale(.9)}55%{transform:scale(1.06)}100%{transform:none}}
+@keyframes mcHl{from{background-size:0% 100%}}
+@keyframes mcUnfold{from{opacity:0; clip-path:inset(0 0 100% 0); transform:perspective(900px) rotateX(-16deg)}}
+
+/* =============== sélecteurs : l'encre glisse d'une puce à l'autre =============== */
+.mc-lensed{position:relative}
+.mc-lens{position:absolute; inset:0; margin:0; pointer-events:none; z-index:1; opacity:0}
+.mc-lens.mc-lens-on{transition:clip-path .44s var(--mc-out), opacity .2s}
+.mc-lens > *{background:var(--ink) !important; color:var(--paper) !important; border-color:var(--ink) !important;
+  animation:none !important; transform:none !important; opacity:1 !important; box-shadow:none !important; transition:none !important}
+.mc-lens > * *{color:inherit !important}
+.mc-lens .chip-count{background:color-mix(in srgb, var(--paper) 22%, transparent) !important}
+.mc-lensed > .chip[aria-pressed="true"]{background:var(--paper); color:var(--muted); border-color:var(--line); animation:none}
+.mc-lensed > .chip[aria-pressed="true"] .chip-ok{color:var(--good)}
+.mc-lensed.fc-seg > button[aria-pressed="true"]{background:none; color:var(--muted)}
+.mc-lensed > .chip:active, .mc-lensed > button:active{transform:none}
+
+/* =============== chiffres à rouleaux =============== */
+.mc-roll{display:inline-flex; font-variant-numeric:tabular-nums}
+.mc-roll-box{display:inline-flex}
+.mc-roll-d{display:inline-block; height:1.2em; line-height:1.2em; overflow:hidden}
+.mc-roll-c{display:flex; flex-direction:column; transition:transform .65s var(--mc-out); transition-delay:calc(var(--k,0) * 70ms)}
+.mc-roll-c > span{display:block; height:1.2em; line-height:1.2em; text-align:center}
+
+/* =============== texte cinétique (mot à mot) =============== */
+.mc-kin .mc-w{display:inline-block; animation:mcWord .6s var(--mc-out) backwards; animation-delay:calc(60ms + var(--i,0) * 24ms)}
+@keyframes mcWord{from{opacity:0; transform:translateY(.5em) rotate(2.5deg)}}
+
+/* =============== écriture à l'encre (formules) et surligneur =============== */
+.mc-ink:not(.key){position:relative}
+.mc-ink:not(.key):not(.mc-ink-in){opacity:0}
+.mc-ink-in:not(.key){animation:mcInk .95s var(--mc-ink) var(--d,0s) backwards}
+.mc-ink-in:not(.key)::after{content:""; position:absolute; inset:0; pointer-events:none; opacity:0;
+  background:linear-gradient(90deg, transparent calc(100% - 3px), var(--accent) calc(100% - 3px));
+  animation:mcNib .95s var(--mc-ink) var(--d,0s) backwards}
+@keyframes mcInk{from{clip-path:inset(0 100% 0 0)}to{clip-path:inset(0 0 0 0)}}
+@keyframes mcNib{from{transform:translateX(-100%); opacity:.85}88%{opacity:.85}to{transform:translateX(0); opacity:0}}
+.key.mc-ink{background-repeat:no-repeat}
+.key.mc-ink:not(.mc-ink-in){background-size:0% 100%}
+.key.mc-ink-in{background-size:100% 100%; animation:mcHl .8s cubic-bezier(.6,.1,.3,1) calc(var(--d,0s) + .15s) backwards}
+
+/* =============== FLASHCARDS : un paquet en 3D =============== */
+.fc-deck{position:relative; display:grid; padding-bottom:calc(var(--gh,0) * 9px)}
+.fc-deck > .fc-card, .fc-deck > .fc-ghost{grid-area:1/1}
+.fc-ghost{border-radius:16px; background:var(--paper); border:1px solid var(--line); transform-origin:50% 100%;
+  box-shadow:0 10px 22px -18px rgba(0,0,0,.45);
+  background-image:repeating-linear-gradient(to bottom, transparent 0 27px, var(--rule) 27px 28px);
+  opacity:calc(1 - var(--g) * .22);
+  transform:translateY(calc(var(--g) * 9px - var(--pa,0) * 9px)) scale(calc(1 - var(--g) * .045 + var(--pa,0) * .045));
+  transition:transform .4s var(--mc-out), opacity .3s}
+.fc-deck:has(.is-drag) .fc-ghost{transition-duration:.06s}
+.fc-card{perspective:none; position:relative; z-index:1}
+.fc-mover{position:relative; perspective:1600px; transform-origin:50% 130%}
+.fc-mover.is-drag{cursor:grabbing}
+.fc-mover.mc-a-spring{transition:translate .5s var(--mc-spring), rotate .5s var(--mc-spring)}
+.fc-mover.is-drag .fc-inner{transition:none}
+/* lueur colorée pendant le glissé : verte vers la droite, rouge vers la gauche */
+.fc-mover::before, .fc-mover::after{content:""; position:absolute; inset:0; border-radius:16px; pointer-events:none; z-index:2; opacity:0}
+.fc-mover::before{box-shadow:0 0 0 2px var(--good), 0 18px 44px -18px var(--good); opacity:clamp(0, calc(var(--p,0) * 1.4), 1)}
+.fc-mover::after{box-shadow:0 0 0 2px var(--red), 0 18px 44px -18px var(--red); opacity:clamp(0, calc(var(--p,0) * -1.4), 1)}
+.fc-stamp{position:absolute; top:20px; z-index:3; padding:3px 11px; border:2.5px solid currentColor; border-radius:8px; pointer-events:none;
+  font:800 14px/1.25 var(--f-mono); letter-spacing:.09em; text-transform:uppercase; background:color-mix(in srgb, var(--paper) 85%, transparent); opacity:0}
+.fc-stamp-good{left:16px; color:var(--good); rotate:-11deg; opacity:clamp(0, calc(var(--p,0) * 1.6), 1); scale:calc(.85 + clamp(0, var(--p,0), 1) * .2)}
+.fc-stamp-bad{right:16px; color:var(--red); rotate:11deg; opacity:clamp(0, calc(var(--p,0) * -1.6), 1); scale:calc(.85 + clamp(0, calc(var(--p,0) * -1), 1) * .2)}
+/* reflet qui balaie la carte quand elle se retourne, et léger soulèvement */
+.fc-face::after{content:""; position:absolute; inset:0; pointer-events:none; opacity:0;
+  background:linear-gradient(105deg, transparent 30%, var(--mc-sheen) 48%, transparent 64%); transform:translateX(-120%)}
+.fc-mover.mc-a-sheen{animation:fcLift .55s var(--mc-out)}
+.fc-mover.mc-a-sheen .fc-face::after{animation:fcSheen .75s ease-out .08s}
+@keyframes fcLift{45%{scale:1.035}}
+@keyframes fcSheen{0%{transform:translateX(-120%); opacity:0}25%{opacity:1}100%{transform:translateX(120%); opacity:0}}
+/* la carte suivante monte du paquet ; la précédente retombe de la gauche */
+.fc-mover.mc-a-rise{animation:fcRise .55s var(--mc-out)}
+.fc-mover.mc-a-drop{animation:fcDrop .5s var(--mc-out)}
+.fc-mover.mc-a-rise .fc-inner, .fc-mover.mc-a-drop .fc-inner{transition:none}
+@keyframes fcRise{from{transform:translateY(12px) scale(.95); opacity:.35}}
+@keyframes fcDrop{from{transform:translateX(-46%) rotate(-9deg); opacity:0}}
+/* mélange : le paquet se bat comme un jeu de cartes */
+.fc-deck.mc-a-shuffle .fc-mover{animation:fcShufTop .6s var(--mc-out)}
+.fc-deck.mc-a-shuffle .fc-ghost{animation:fcShuf .6s var(--mc-out)}
+.fc-deck.mc-a-shuffle .fc-ghost + .fc-ghost{animation-direction:reverse}
+@keyframes fcShufTop{25%{transform:translateX(-16px) rotate(-3deg)}60%{transform:translateX(10px) rotate(2deg)}}
+@keyframes fcShuf{35%{transform:translateY(calc(var(--g) * 9px)) translateX(22px) rotate(4deg)}70%{transform:translateY(calc(var(--g) * 9px)) translateX(-14px) rotate(-3deg)}}
+/* copie qui s'envole (calque fixe, hors du flux : pas de débordement horizontal) */
+.mc-fly-layer{position:fixed; inset:0; overflow:hidden; pointer-events:none; z-index:55}
+.mc-fly{will-change:transform, opacity}
+.mc-fly.fly-good .fc-stamp-good, .mc-fly.fly-bad .fc-stamp-bad{opacity:1; scale:1.05}
+.mc-fly.fly-good .fc-mover::before, .mc-fly.fly-bad .fc-mover::after{opacity:1}
+.mc-trail{position:absolute; border-radius:16px; transform-origin:50% 50%; opacity:0}
+.mc-trail.trail-good{background:linear-gradient(calc(var(--dir) * 90deg), transparent 5%, color-mix(in srgb, var(--good) 55%, transparent))}
+.mc-trail.trail-bad{background:linear-gradient(calc(var(--dir) * 90deg), transparent 5%, color-mix(in srgb, var(--red) 55%, transparent))}
+html.mc-xclip, html.mc-xclip body{overflow-x:clip}
+/* compteur de paquet */
+.fc-track i{width:100%; transform-origin:left center; transition:transform .55s var(--mc-out)}
+.fc-meta b{font-weight:600; color:var(--ink)}
+.fc-grade button{animation:mcRise .35s var(--mc-out) backwards}
+.fc-grade button + button{animation-delay:.06s}
+.fc-reveal{animation:mcFade .25s ease-out backwards}
+.fc-hint-touch{display:none}
+@media (pointer:coarse){ .fc-hint-fine{display:none} .fc-hint-touch{display:inline} }
+.fc-front footer{display:block}
+/* « tout est su » : une coche tracée */
+.fc-done-ic{width:52px; height:52px; margin:8px auto -6px; display:block; fill:none; stroke:var(--good); stroke-width:3; stroke-linecap:round; stroke-linejoin:round}
+.fc-done-ic circle, .fc-done-ic path{stroke-dasharray:1}
+.fc-done-ic circle{animation:mcDraw .7s var(--mc-out) .1s backwards}
+.fc-done-ic path{animation:mcDraw .4s ease-out .65s backwards}
+/* fin de paquet : coche, rayons, puis tout s'efface */
+.fc-party{position:absolute; inset:0 0 calc(var(--gh,0) * 9px) 0; z-index:4; display:grid; place-items:center; border-radius:16px; pointer-events:none;
+  background:color-mix(in srgb, var(--paper) 90%, transparent); animation:fcParty 2.8s ease forwards}
+@keyframes fcParty{0%{opacity:0}8%{opacity:1}82%{opacity:1}100%{opacity:0}}
+.fc-party-in{position:relative; display:grid; justify-items:center; gap:4px; text-align:center; padding:12px}
+.fc-party svg{width:76px; height:76px; fill:none; stroke:var(--good); stroke-width:3.5; stroke-linecap:round; stroke-linejoin:round; overflow:visible}
+.fc-party circle, .fc-party path{stroke-dasharray:1}
+.fc-party circle{animation:mcDraw .7s var(--mc-out) .1s backwards}
+.fc-party path{animation:mcDraw .45s ease-out .6s backwards}
+.fc-party b{font:700 22px/1.2 var(--f-display); color:var(--ink); animation:mcRise .45s var(--mc-out) .7s backwards}
+.fc-party-in > span:last-child{font:500 13px var(--f-mono); color:var(--muted); animation:mcRise .45s var(--mc-out) .8s backwards}
+.fc-rays{position:absolute; left:50%; top:50px; width:0; height:0}
+.fc-rays i{position:absolute; left:-1.5px; top:-7px; width:3px; height:14px; border-radius:2px; background:var(--c4); opacity:0;
+  transform:rotate(calc(var(--k) * 30deg)) translateY(-50px) scaleY(0); animation:fcRay .8s ease-out .6s forwards}
+.fc-rays i:nth-child(odd){background:var(--good)}
+@keyframes fcRay{0%{opacity:1}55%{opacity:1; transform:rotate(calc(var(--k) * 30deg)) translateY(-58px) scaleY(1)}100%{opacity:0; transform:rotate(calc(var(--k) * 30deg)) translateY(-72px) scaleY(.2)}}
+
+/* =============== QCM =============== */
+.qz-dots{display:grid; grid-template-columns:repeat(var(--n,1), minmax(0,1fr)); gap:4px; height:6px; margin-top:12px}
+.qz-dots.dense{gap:2px; height:5px}
+.qz-dots i{position:relative; overflow:hidden; border-radius:3px; background:var(--line)}
+.qz-dots i::after{content:""; position:absolute; inset:0; border-radius:inherit; background:var(--accent); transform:scaleX(0); transform-origin:left center; transition:transform .55s var(--mc-out), background-color .2s}
+.qz-dots i.cur::after{transform:scaleX(.4)}
+.qz-dots i.ok::after{transform:scaleX(1); background:var(--good)}
+.qz-dots i.ko::after{transform:scaleX(1); background:var(--red)}
+.qz-sc{color:var(--ink); font-weight:600}
+.qz-card .stat b{font-weight:600}
+.mc-opts{position:relative}
+.mc-opts .opt{position:relative; isolation:isolate; animation:mcOptIn .5s var(--mc-out) backwards; animation-delay:calc(.22s + var(--i,0) * 65ms)}
+@keyframes mcOptIn{from{opacity:0; transform:translateX(-14px)}}
+.opt-t{min-width:0}
+/* choix : la couleur se répand depuis la gauche, coche ou croix tracée dans la pastille */
+.mc-opts .opt::after{content:""; position:absolute; inset:0; z-index:-1; border-radius:7px; transform:scaleX(0); transform-origin:left center; transition:transform .5s var(--mc-out)}
+.mc-opts .opt.ok, .mc-opts .opt.ko{background:var(--paper)}
+.mc-opts .opt.ok::after{background:var(--good-soft); transform:scaleX(1)}
+.mc-opts .opt.ko::after{background:var(--red-soft); transform:scaleX(1)}
+.mc-opts .opt.ok{animation:mcPop .5s var(--mc-spring)}
+.mc-opts .opt.ko{animation:shake .42s ease}
+.mc-opts.answered .opt.ok:not(.picked){animation:mcPop .5s var(--mc-spring) .35s}
+.mc-opts.answered .opt.ok:not(.picked)::after{transition-delay:.35s}
+.mc-opts .opt.ok::before, .mc-opts .opt.ko::before{content:counter(opt, upper-alpha); color:transparent; animation:mcPop .4s var(--mc-spring)}
+.mc-opts.answered .opt.ok:not(.picked)::before{animation-delay:.35s}
+.opt-mark{position:absolute; left:14px; top:10px; width:24px; height:24px; pointer-events:none; fill:none; stroke:var(--paper); stroke-width:2.6; stroke-linecap:round; stroke-linejoin:round}
+.opt-mark path{stroke-dasharray:1; animation:mcDraw .35s ease-out .12s backwards}
+.opt-mark path.p2{animation-delay:.24s}
+.mc-opts.answered .opt.ok:not(.picked) .opt-mark path{animation-delay:.5s}
+.opt-glow{position:absolute; inset:-1px; border-radius:9px; pointer-events:none; opacity:0;
+  box-shadow:0 0 0 4px color-mix(in srgb, var(--good) 30%, transparent), 0 0 26px -2px color-mix(in srgb, var(--good) 45%, transparent)}
+.opt.ok .opt-glow{animation:mcGlow 1.3s ease-out .2s}
+.mc-opts.answered .opt.ok:not(.picked) .opt-glow{animation-delay:.5s}
+.opt.ko .opt-glow{display:none}
+@keyframes mcGlow{30%{opacity:1}100%{opacity:0}}
+/* trait de correction au stylo rouge, dans la marge, vers la bonne réponse */
+.qz-link{position:absolute; left:0; top:0; width:100%; height:100%; overflow:visible; pointer-events:none; fill:none; stroke:var(--red); stroke-width:2; stroke-linecap:round; stroke-linejoin:round}
+.qz-link path{stroke-dasharray:1; animation:mcDraw .6s var(--mc-ink) .45s backwards}
+.qz-link path.hd{animation:mcDraw .2s ease-out 1.02s backwards}
+.qz-body .exp{animation:mcExp .55s var(--mc-out) .15s backwards}
+@keyframes mcExp{from{opacity:0; clip-path:inset(0 0 100% 0); transform:translateY(-6px)}}
+.qz-next{animation:mcRise .4s var(--mc-out) .35s backwards}
+/* écran de score */
+.qz-end .qz-score-txt > *{animation:mcRise .45s var(--mc-out) backwards}
+.qz-end .qz-score-txt > :nth-child(1){animation-delay:.1s}
+.qz-end .qz-score-txt > :nth-child(3){animation-delay:.45s}
+.qz-end .qz-score-txt > :nth-child(4){animation-delay:.55s}
+.qz-end .qz-score-txt > h2{animation:none}
+.qz-stats{grid-column:1/-1; justify-self:stretch; list-style:none; margin:8px 0 0; padding:0; display:grid; grid-template-columns:repeat(3, minmax(0,1fr)); gap:8px}
+.qz-stats li{display:grid; gap:1px; padding:10px 12px; border:1px solid var(--line); border-radius:10px; background:var(--paper-2); min-width:0; animation:mcRise .5s var(--mc-out) backwards}
+.qz-stats li:nth-child(1){animation-delay:.4s} .qz-stats li:nth-child(2){animation-delay:.5s} .qz-stats li:nth-child(3){animation-delay:.6s}
+.qz-stats b{font:700 clamp(20px,5vw,26px)/1.15 var(--f-mono); color:var(--ink)}
+.qz-stats .st-good b{color:var(--good)} .qz-stats .st-bad b{color:var(--red)}
+.qz-stats li > span{font-size:12px; color:var(--muted); line-height:1.3}
+.qz-recap{grid-column:1/-1; justify-self:stretch; display:grid; grid-template-columns:repeat(var(--n,1), minmax(0,1fr)); gap:3px; height:8px; margin-top:4px}
+.qz-recap i{border-radius:3px; background:var(--line); transform-origin:50% 100%; animation:mcRecap .4s var(--mc-out) backwards; animation-delay:calc(.65s + var(--k,0) * 22ms)}
+.qz-recap i.ok{background:var(--good)} .qz-recap i.ko{background:var(--red)}
+@keyframes mcRecap{from{opacity:0; transform:scaleY(0)}}
+
+/* =============== FICHES =============== */
+.fiche.mc-next > :not(.read-toggle):not(.fiche-nav):not(.fiche-pen){animation-name:mcFromR}
+.fiche.mc-prev > :not(.read-toggle):not(.fiche-nav):not(.fiche-pen){animation-name:mcFromL}
+@keyframes mcFromR{from{opacity:0; transform:translateX(26px)}}
+@keyframes mcFromL{from{opacity:0; transform:translateX(-26px)}}
+.fiche > .fiche-pen{position:absolute; left:33px; top:0; width:3px; height:min(100%, 100vh); border-radius:2px; background:var(--red); pointer-events:none;
+  transform-origin:50% 0; transform:scaleY(0); opacity:0; animation:mcPen 1.2s cubic-bezier(.6,.1,.3,1)}
+@keyframes mcPen{0%{transform:scaleY(0); opacity:.9}70%{transform:scaleY(1); opacity:.8}100%{transform:scaleY(1); opacity:0}}
+@media (max-width:560px){ .fiche > .fiche-pen{left:17px} }
+.fiche-nav .btn{transition:transform .25s var(--mc-out), border-color .15s, color .15s}
+@media (hover:hover){ .fiche-nav .btn:hover{transform:translateX(-3px)} .fiche-nav .btn.next:hover{transform:translateX(3px)} }
+
+/* =============== FORMULAIRE et MÉMO =============== */
+.form-list > .form-group{animation:mcRise .5s var(--mc-out) backwards; animation-delay:calc(var(--gi,0) * 70ms)}
+.form-item, .memo-item{animation:mcRise .45s var(--mc-out) backwards; animation-delay:calc(80ms + var(--gi,0) * 70ms + var(--fi,0) * 40ms)}
+@media (hover:hover){
+  .form-item, .memo-item{transition:transform .28s var(--mc-out), border-color .2s, box-shadow .28s}
+  .form-item:hover, .memo-item:hover{transform:translateY(-2px); box-shadow:var(--shadow-lift)}
+}
+.form-item.must{position:relative; box-shadow:none}
+.form-item.must::before{content:""; position:absolute; left:-1px; top:-1px; bottom:-1px; width:4px; border-radius:8px 0 0 8px; background:var(--red);
+  transform-origin:50% 0; animation:mcBar .6s var(--mc-out) backwards; animation-delay:calc(.3s + var(--gi,0) * 70ms + var(--fi,0) * 40ms)}
+@keyframes mcBar{from{transform:scaleY(0)}}
+.must-tag{background:linear-gradient(var(--red-soft), var(--red-soft)) no-repeat; background-size:100% 100%;
+  animation:mcHl .6s cubic-bezier(.6,.1,.3,1) backwards; animation-delay:calc(.45s + var(--gi,0) * 70ms + var(--fi,0) * 40ms)}
+.form-mask{transform-origin:50% 0; animation:mcCover .4s var(--mc-out) backwards; animation-delay:calc(var(--fi,0) * 35ms)}
+@keyframes mcCover{from{opacity:0; transform:scaleY(.4)}}
+.form-tex.mc-ink-in{animation:mcInk .95s var(--mc-ink) var(--d,0s) backwards}
+.memo-code.mc-ink-in::after{display:none}
+.mc-copy.is-copied, .mc-copy.is-copied:hover{color:var(--good); border-color:var(--good-line); animation:mcPop .4s var(--mc-spring)}
+
+/* =============== ANNALES =============== */
+.exo-meter{display:flex; align-items:center; gap:10px; margin-top:-4px}
+.exo-segs{flex:0 1 240px; display:grid; grid-auto-flow:column; grid-auto-columns:minmax(0,1fr); gap:3px; height:5px; min-width:0}
+.exo-segs i{position:relative; overflow:hidden; border-radius:3px; background:var(--line)}
+.exo-segs i::after{content:""; position:absolute; inset:0; background:var(--good); transform:scaleX(0); transform-origin:left center; transition:transform .55s var(--mc-out)}
+.exo-segs i.ok::after{transform:scaleX(1)}
+.exo-segs i.todo::after{transform:scaleX(1); background:var(--red); opacity:.6}
+.exo-n{font:600 12px var(--f-mono); color:var(--muted); white-space:nowrap; transition:color .3s}
+.exo-n b{color:var(--ink)}
+.exo-meter.full .exo-n, .exo-meter.full .exo-n b{color:var(--good)}
+.exo > .exo-meter + .q-item{border-top:0; padding-top:2px}
+.exo > .exo-meter + .q-item::before{top:2px}
+/* la correction se déplie comme une feuille */
+.q-item details[open] > .answer{animation:mcUnfold .6s var(--mc-out) backwards; transform-origin:50% 0}
+.q-item details[open] > .answer::before{animation:mcRise .4s var(--mc-out) .2s backwards}
+.q-item details > summary .sm-hide{display:none}
+.q-item details[open] > summary .sm-show{display:none}
+.q-item details[open] > summary .sm-hide{display:inline; animation:mcRise .3s var(--mc-out)}
+/* trait de marge à la place de la bordure : pas de saut de mise en page */
+.q-item.q-ok, .q-item.q-todo{border-left:0; padding-left:50px}
+.q-item::after{content:""; position:absolute; left:-13px; top:14px; bottom:2px; width:3px; border-radius:2px; background:var(--good);
+  transform:scaleY(0); transform-origin:50% 0; transition:transform .5s var(--mc-out), background-color .2s; pointer-events:none}
+.exo > .exo-meter + .q-item::after{top:2px}
+.q-item.q-ok::after{transform:scaleY(1)}
+.q-item.q-todo::after{transform:scaleY(1); background:var(--red)}
+@media (max-width:560px){
+  .q-item.q-ok, .q-item.q-todo{padding-left:0}
+  .q-item::after{left:-10px}
+  .exo > .exo-meter + .q-item::before{top:auto}
+}
+/* boutons « réussie / à revoir » (annales, requêtes) : l'encre remplit le bouton, l'icône se trace */
+.q-status .btn{position:relative; isolation:isolate; overflow:hidden; display:inline-flex; align-items:center; gap:6px}
+.q-status .btn::after{content:""; position:absolute; inset:0; z-index:-1; transform:scaleX(0); transform-origin:left center; transition:transform .42s var(--mc-out)}
+.q-status .btn.on-ok, .q-status .btn.on-todo{background:var(--paper)}
+.q-status .btn.on-ok::after{background:var(--good); transform:scaleX(1)}
+.q-status .btn.on-todo::after{background:var(--red-soft); transform:scaleX(1)}
+.q-status .btn.on-ok, .q-status .btn.on-todo{animation:mcPop .45s var(--mc-spring)}
+.st-ic{width:14px; height:14px; flex:none; fill:none; stroke:currentColor; stroke-width:2.2; stroke-linecap:round; stroke-linejoin:round}
+.st-ic path{stroke-dasharray:1}
+.on-ok .st-ic path, .on-todo .st-ic path{animation:mcDraw .45s ease-out .15s backwards}
+
+/* =============== LABOS (TP web, R, Python) =============== */
+.mc-run{display:inline-flex; align-items:center; gap:7px; position:relative}
+.mc-run-ic{width:15px; height:15px; flex:none; display:inline-block; position:relative}
+.mc-run-ic svg{position:absolute; inset:0; width:100%; height:100%; overflow:visible}
+.mc-run .i-play{fill:currentColor; transform-box:fill-box; transform-origin:50% 50%; transition:transform .32s var(--mc-spring), opacity .2s}
+.mc-run .i-line{fill:none; stroke:currentColor; stroke-width:1.9; stroke-linecap:round; stroke-linejoin:round}
+.mc-run .i-spin{fill:none; stroke:currentColor; stroke-width:2.2; stroke-linecap:round; stroke-dasharray:.3 1; opacity:0; transform-box:fill-box; transform-origin:50% 50%; transition:opacity .2s}
+.mc-run .i-ok, .mc-run .i-err{fill:none; stroke:currentColor; stroke-width:2.3; stroke-linecap:round; stroke-linejoin:round; stroke-dasharray:1; stroke-dashoffset:1; opacity:0}
+.mc-run.is-run .i-play, .mc-run.is-done .i-play, .mc-run.is-err .i-play{transform:scale(0); opacity:0}
+.mc-run.is-run .i-spin{opacity:1; animation:mcSpin .75s linear infinite}
+.mc-run.is-done .i-ok, .mc-run.is-err .i-err{opacity:1; stroke-dashoffset:0; transition:stroke-dashoffset .4s ease-out .05s}
+.mc-run.is-done, .mc-run.is-done:hover{background:var(--good); border-color:var(--good); color:var(--paper)}
+.mc-run.is-err, .mc-run.is-err:hover{background:var(--red); border-color:var(--red); color:var(--paper)}
+.mc-run.is-done, .mc-run.is-err{animation:mcPop .45s var(--mc-spring)}
+.mc-run:disabled{cursor:progress; opacity:.92}
+/* sorties : le panneau se déplie, le texte se tape, les graphiques apparaissent */
+.r-out{animation:mcUnfold .5s var(--mc-out) backwards; transform-origin:50% 0}
+.r-text-out pre{animation:mcType .55s steps(22, end) backwards; animation-delay:calc(.15s + var(--n,0) * 90ms)}
+@keyframes mcType{from{clip-path:inset(0 100% 0 0)}to{clip-path:inset(0 0 0 0)}}
+.r-plot{animation:mcPlot .6s var(--mc-out) backwards; animation-delay:calc(.25s + var(--n,0) * 120ms)}
+@keyframes mcPlot{from{opacity:0; transform:scale(.94) translateY(6px)}}
+.r-busy{animation:mcRise .3s var(--mc-out)}
+.r-sol{animation:mcSolUp .5s var(--mc-out) backwards}
+@keyframes mcSolUp{from{opacity:0; transform:translateY(14px); clip-path:inset(0 0 100% 0 round 8px)}}
+@media (min-width:1000px){
+  .r-work.with-sol .r-sol{animation-name:mcSolSide}
+  @keyframes mcSolSide{from{opacity:0; transform:translateX(24px); clip-path:inset(0 0 0 100% round 8px)}}
+}
+.r-chunk{animation:none}
+.lab-steps{animation:mcRise .45s var(--mc-out) backwards}
+.lab-list > li{animation:mcRise .45s var(--mc-out) backwards}
+.lab-list > li:nth-child(2){animation-delay:.05s} .lab-list > li:nth-child(3){animation-delay:.1s} .lab-list > li:nth-child(n+4){animation-delay:.15s}
+.lab-out iframe{animation:mcPlot .5s var(--mc-out)}
+.lab-console .log{animation:mcLog .3s var(--mc-out) backwards}
+@keyframes mcLog{from{opacity:0; transform:translateX(-8px)}}
+
+/* =============== REQUÊTES =============== */
+.rq-field{position:relative}
+.rq-field .rq-input{display:block; caret-color:var(--accent)}
+.rq-field .rq-input:focus{outline:none; border-color:var(--accent-line)}
+.rq-field::before{content:""; position:absolute; inset:0; border-radius:8px; pointer-events:none; opacity:0; transition:opacity .3s;
+  box-shadow:0 0 0 3px color-mix(in srgb, var(--accent) 22%, transparent), 0 8px 26px -14px var(--accent)}
+.rq-field:focus-within::before{opacity:1}
+.rq-line{position:absolute; left:6px; right:6px; bottom:0; height:2px; border-radius:2px; background:var(--accent); pointer-events:none;
+  transform:scaleX(0); transition:transform .4s var(--mc-out)}
+.rq-field:focus-within .rq-line{transform:scaleX(1)}
+.rq-compare > div{animation:mcFromL2 .45s var(--mc-out) backwards}
+.rq-compare > div:last-child{animation-name:mcFromR2; animation-delay:.08s}
+@keyframes mcFromL2{from{opacity:0; transform:translateX(-12px)}}
+@keyframes mcFromR2{from{opacity:0; transform:translateX(12px)}}
+.rq-miss{animation:mcRise .4s var(--mc-out) .2s backwards}
+.rq-miss code{display:inline-block; animation:mcChip .45s var(--mc-spring) backwards; animation-delay:calc(.35s + var(--i,0) * 55ms)}
+@keyframes mcChip{from{opacity:0; transform:scale(.4) translateY(6px)}}
+.rq-mk{color:inherit; border-radius:3px; padding:0 1px; box-shadow:inset 0 -2px 0 var(--warn);
+  background:linear-gradient(var(--warn-soft), var(--warn-soft)) no-repeat; background-size:100% 100%;
+  animation:mcHl .55s cubic-bezier(.6,.1,.3,1) backwards; animation-delay:calc(.4s + var(--i,0) * 70ms)}
+.rq-ok-ic{width:16px; height:16px; flex:none; align-self:center; fill:none; stroke:var(--good); stroke-width:2.2; stroke-linecap:round; stroke-linejoin:round}
+.rq-ok-ic path{stroke-dasharray:1; animation:mcDraw .5s ease-out .3s backwards}
+.rq.rq-ok, .rq.rq-todo{transition:border-color .3s}
+
+/* =============== COMPTE =============== */
+.fl-field{position:relative; flex:1 1 220px; min-width:0}
+.login .fl-field input{min-height:54px; padding:20px 12px 6px}
+.fl-field label{position:absolute; left:13px; top:27px; transform:translateY(-50%); transform-origin:0 0; pointer-events:none; white-space:nowrap;
+  font:500 15px/1.2 var(--f-body); color:var(--muted); transition:transform .28s var(--mc-out), color .2s}
+.fl-field input:focus + label, .fl-field input:not(:placeholder-shown) + label{transform:translateY(-140%) scale(.76)}
+.fl-field input:focus + label{color:var(--accent)}
+.fl-field input:not(:focus)::placeholder{color:transparent}
+.fl-field input:focus-visible{outline:none; border-color:var(--accent-line)}
+.fl-line{position:absolute; left:6px; right:6px; bottom:0; height:2px; border-radius:2px; background:var(--accent); pointer-events:none; transform:scaleX(0); transition:transform .4s var(--mc-out)}
+.fl-field input:focus ~ .fl-line{transform:scaleX(1)}
+.sync-st{display:inline-flex; align-items:center; gap:7px}
+.sync-ic{width:18px; height:18px; flex:none; display:inline-block}
+.sync-ic svg{width:100%; height:100%; display:block; fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; overflow:visible}
+.sync-ic .s-ring{opacity:.4; transform-box:fill-box; transform-origin:50% 50%; stroke-dasharray:1}
+.sync-ic .s-ok, .sync-ic .s-err{opacity:0}
+.st-syncing .s-ring{opacity:1; stroke-dasharray:.28 1; animation:mcSpin .9s linear infinite}
+.st-ok .s-ring{opacity:1; animation:mcDraw .6s var(--mc-out) backwards}
+.st-ok .s-ok{opacity:1; stroke-dasharray:1; animation:mcDraw .4s ease-out .45s backwards}
+.st-error .s-ring{opacity:1}
+.st-error .s-err{opacity:1}
+.st-error .sync-ic{animation:shake .45s ease}
+
+/* =============== TP (fiches), outils =============== */
+.tp-card{animation-delay:calc(.05s + var(--i,0) * 80ms) !important}
+.tp-card li{animation:mcRise .4s var(--mc-out) backwards; animation-delay:calc(.2s + var(--i,0) * 80ms)}
+#tool > *{animation:mcRise .4s var(--mc-out) backwards}
+
+/* =============== garde-fous =============== */
+@media (prefers-reduced-motion: reduce){
+  .mc-ink, .mc-ink-in{clip-path:none !important}
+  .mc-ink-in::after{display:none}
+  .key.mc-ink{background-size:100% 100% !important}
+  .fc-mover{translate:none !important; rotate:none !important}
+  .mc-fly-layer{display:none}
+}
+@media print{
+  .mc-lens, .mc-fly-layer, .fc-party, .fiche-pen{display:none !important}
+  .mc-ink{clip-path:none !important}
+  .key.mc-ink{background-size:100% 100% !important}
+}

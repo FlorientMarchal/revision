@@ -3,7 +3,9 @@
   import { tick } from 'svelte';
   import { kv } from '../lib/progress.js';
   import { typeset } from '../lib/math.js';
+  import { afterNav } from '../lib/motion.js';
   import { reveal as revealOnScroll } from '../lib/motion.js';
+  import { lens, inkReveal } from '../lib/motion-components.js';
 
   let { course, data } = $props();
   const ui = kv(course.id);
@@ -21,11 +23,11 @@
   function toggleHide() { hide = !hide; ui.set('formHide', hide); shown = {}; }
   function reveal(k) { shown = { ...shown, [k]: !shown[k] }; }
 
-  $effect(() => { list; hide; shown; tick().then(() => { if (body) { typeset(body); revealOnScroll(body); } }); });
+  $effect(() => { list; hide; shown; tick().then(afterNav).then(() => { if (body) { typeset(body); revealOnScroll(body); inkReveal(body); } }); });
 </script>
 
 <div class="form-bar">
-  <div class="chips" role="tablist" aria-label="Chapitres">
+  <div class="chips" role="tablist" aria-label="Chapitres" use:lens>
     <button class="chip" aria-pressed={ch === 'all'} onclick={() => setCh('all')}>Tout</button>
     {#each chapters as c (c.id)}<button class="chip" aria-pressed={ch === c.id} onclick={() => setCh(c.id)}>{c.name}</button>{/each}
   </div>
@@ -36,14 +38,14 @@
 </div>
 {#if hide}<p class="lead form-hint">Retrouve chaque formule de tête, puis clique dessus pour vérifier.</p>{/if}
 
-<div class="form-list" bind:this={body}>
+<div class="form-list" class:mc-hide={hide} bind:this={body}>
   {#each list as g, gi (g.ch + g.t)}
-    <section class="card form-group">
+    <section class="card form-group" style:--gi={Math.min(gi, 6)}>
       <header><span class="tag">{name(g.ch)}</span><h2>{g.t}</h2></header>
       <div class="form-items">
         {#each g.items as f, fi}
           {@const k = gi + ':' + fi}
-          <div class="form-item" class:must={f.must}>
+          <div class="form-item" class:must={f.must} style:--fi={Math.min(fi, 8)}>
             <div class="form-name">{f.n}{#if f.must}<span class="must-tag">à savoir démontrer</span>{/if}</div>
             {#if hide && !shown[k]}
               <button class="form-mask" onclick={() => reveal(k)}>Afficher la formule</button>
