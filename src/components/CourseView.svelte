@@ -19,7 +19,7 @@
   import { evalList } from '../lib/evals.js';
   import Emblem from './Emblem.svelte';
   import { tick } from 'svelte';
-  import { navInfo, setReady } from '../lib/motion.js';
+  import { navInfo } from '../lib/motion.js';
 
   let { course, tab } = $props();
   const ui = kv(course.id);
@@ -36,7 +36,6 @@
       data = d;
     })
     .catch(e => { error = e.message || String(e); });
-  if (arrival) setReady(loading.then(tick));
 
   const words = course.title.split(/\s+/);
   const DAY = 864e5;

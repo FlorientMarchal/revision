@@ -3,7 +3,7 @@
   import { tick, onMount } from 'svelte';
   import { kv, progress, setVal } from '../lib/progress.js';
   import { typeset } from '../lib/math.js';
-  import { reveal, confetti, burst, transition, onEnter, readingBar } from '../lib/motion.js';
+  import { reveal, confetti, burst, transition, onEnter, readingBar, afterNav } from '../lib/motion.js';
 
   let { course, data } = $props();
   const ui = kv(course.id);
@@ -44,11 +44,18 @@
     if (t) t.scrollIntoView({ block: 'start', behavior: 'smooth' });
   }
 
+  // formules et illustrations : après la transition (l'écran n'est jamais figé) ; le corps de la leçon
+  // apparaît en fondu une fois mis en forme, l'en-tête et le sommaire sont là tout de suite
+  let typesetting = $state(true);
+  let run = 0;
   $effect(() => {
     id;
-    tick().then(async () => {
-      if (!body) return;
+    const me = ++run;
+    typesetting = true;
+    tick().then(afterNav).then(async () => {
+      if (!body || me !== run) return;
       typeset(body);
+      typesetting = false;
       if (course.viz && body.querySelector('[data-viz]')) {
         try { const m = await course.viz(); m.mountViz(body); typeset(body); } catch (e) { console.error(e); }
       }
@@ -67,7 +74,7 @@
   {/each}
 </div>
 
-<article class="card lesson" bind:this={body}>
+<article class="card lesson" class:is-typesetting={typesetting} bind:this={body}>
   {#key id}
     <header class="lesson-head">
       <span class="tag">Leçon {i + 1}/{L.length}{#if lesson.src} · {lesson.src}{/if}</span>
