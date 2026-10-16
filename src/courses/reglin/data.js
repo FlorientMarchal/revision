@@ -65,47 +65,6 @@ export const formulas = [
 ];
 
 const C = (id, ch, q, a) => ({ id: 'rc_' + id, ch, q, a });
-export const cards = [
-  C('def', 'rlm', 'À quoi sert la régression linéaire multiple ?', 'Expliquer les variations d\'une variable aléatoire quantitative Y par plusieurs variables explicatives (mesurer leur effet), et prédire Y à partir de leurs valeurs.'),
-  C('regr', 'rlm', 'Les régresseurs sont-ils aléatoires ?', 'Non : ils sont déterministes (connus, non aléatoires). Seuls Y et ε sont aléatoires.'),
-  C('X', 'rlm', 'Dimension et première colonne de X ?', 'n × (p + 1) ; la première colonne est le vecteur de 1 (la constante β₀).'),
-  C('h1', 'rlm', 'Hypothèse (H1) ?', 'X est de plein rang : rang(X) = p + 1, donc XᵀX est inversible.'),
-  C('h2', 'rlm', 'Hypothèse (H2) ?', 'Erreurs centrées, de même variance et non corrélées : E(ε) = 0, Σε = σ²Iₙ.'),
-  C('mco', 'rlm', 'Estimateur des moindres carrés et sa preuve ?', 'β̂ = (XᵀX)⁻¹XᵀY. On dérive ‖Y − Xβ‖² = YᵀY − 2βᵀXᵀY + βᵀXᵀXβ : −2XᵀY + 2XᵀXβ = 0.'),
-  C('prop', 'rlm', 'Propriétés de β̂ sous (H1)-(H2) ?', 'Sans biais ; variance σ²(XᵀX)⁻¹ ; de variance minimale parmi les estimateurs sans biais linéaires en Y (Gauss-Markov).'),
-  C('proj', 'rlm', 'Interprétation géométrique de Ŷ ?', 'Ŷ = P_X Y, projection orthogonale de Y sur Vect(X), avec P_X = X(XᵀX)⁻¹Xᵀ. Les résidus sont orthogonaux à Vect(X).'),
-  C('sig', 'rlm', 'Estimateur sans biais de σ² ?', 'σ̂² = ‖ε̂‖² / (n − p − 1).'),
-  C('ect', 'rlm', 'Écart-type estimé de β̂ⱼ₋₁ ?', '√(σ̂² [(XᵀX)⁻¹]ⱼⱼ), avec le j-ième élément diagonal (la ligne 1 est la constante).'),
-  C('sct', 'rlm', 'SCT, SCE, SCR ?', 'SCT = ‖Y − ȳ1‖², SCE = ‖Ŷ − ȳ1‖², SCR = ‖ε̂‖², et SCT = SCE + SCR.'),
-  C('r2', 'rlm', 'R² et R² ajusté ?', 'R² = SCE/SCT, part de variation expliquée. R̃² = 1 − (n−1)/(n−p−1) · SCR/SCT tient compte du nombre de régresseurs.'),
-  C('swiss', 'rlm', 'Exemple swiss : que montre-t-il ?', 'Quatre régressions simples ont des R² de 0,12 à 0,44 ; la régression multiple sur les 4 variables atteint un R² ajusté de 0,67.'),
-  C('ex44', 'rlm', 'Exemple 4.4 : β̂ et σ̂² ?', 'β̂ = (3,2195 ; −12,0562 ; 0,5803 ; 0,6411), σ̂² = 16,8852 ; pour (1 enfant, BEU 30, NSE 50) : ŷ ≈ 40,6.'),
-  C('h3', 'inf', 'Hypothèse (H3) et conséquence ?', 'εᵢ ~ N(0, σ²). Avec (H2) : erreurs indépendantes, ε ~ Nₙ(0, σ²Iₙ).'),
-  C('mv', 'inf', 'Maximum de vraisemblance dans le modèle gaussien ?', 'β̂_MV = β̂ des MCO ; σ̂²_MV = ‖ε̂‖²/n est biaisé, on préfère ‖ε̂‖²/(n − p − 1).'),
-  C('lois', 'inf', 'Lois de β̂ et σ̂² sous (H1)-(H3) ?', 'β̂ ~ N(β, σ²(XᵀX)⁻¹) ; (n−p−1)σ̂²/σ² ~ χ²(n−p−1) ; β̂ et σ̂² indépendants.'),
-  C('t', 'inf', 'Loi de Tⱼ₋₁ et degrés de liberté ?', 'Student à n − p − 1 ddl.'),
-  C('ic', 'inf', 'IC à 1 − α de βⱼ₋₁ ?', 'β̂ⱼ₋₁ ∓ t_{n−p−1}(1 − α/2) √(σ̂²[(XᵀX)⁻¹]ⱼⱼ).'),
-  C('stud', 'inf', 'Test de Student de β = 0 : rejet si… ?', '|T| > t_{n−p−1}(1 − α/2), avec T = β̂/écart-type estimé.'),
-  C('fc', 'inf', 'Test du modèle complet ?', 'H₀ : β₁ = … = βₚ = 0 ; F = (SCE/p)/(SCR/(n−p−1)) ~ F(p, n−p−1). Intérêt limité : rejette dès qu\'une variable est liée à Y.'),
-  C('fr', 'inf', 'Test d\'un modèle réduit ?', 'F_q = [(R² − R²_q)/q] / [(1 − R²)/(n − p − 1)] ~ F(q, n − p − 1). Pour q = 1, F = T².'),
-  C('prev', 'inf', 'Intervalle de prévision ?', 'ŷ₀ ∓ t_{n−p−1}(1 − α/2) σ̂ √(1 + v₀ᵀ(XᵀX)⁻¹v₀), v₀ = (1, x₀ᵀ)ᵀ, dans le domaine où la linéarité est valide.'),
-  C('longley', 'inf', 'Exemple longley : conclusion des tests à 5 % ?', 'T = 4,471 ; 3,369 ; −2,391 avec t₅(97,5 %) = 2,571 : on rejette β₀ = 0 et β₁ = 0 (PNB), pas β₂ = 0 (population).'),
-  C('h2p', 'mcg', 'Hypothèse (H′2) ?', 'Erreurs centrées, Σε = σ²Ω avec Ω connue, symétrique définie positive, de rang n (erreurs corrélées).'),
-  C('mcosous', 'mcg', 'Que devient β̂ des MCO sous (H′2) ?', 'Toujours sans biais, mais variance σ²(XᵀX)⁻¹XᵀΩX(XᵀX)⁻¹ et plus de variance minimale.'),
-  C('mcg', 'mcg', 'Estimateur des MCG ?', 'β̂_MCG = (XᵀΩ⁻¹X)⁻¹XᵀΩ⁻¹Y, sans biais, de variance σ²(XᵀΩ⁻¹X)⁻¹, de variance minimale.'),
-  C('mcgp', 'mcg', 'Comment obtient-on les MCG ?', 'Ω = PPᵀ ; on multiplie le modèle par P⁻¹ : Y* = X*β + ε* vérifie les hypothèses des MCO.'),
-  C('vif', 'val', 'VIF ?', 'VIFⱼ = 1/(1 − Rⱼ²), Rⱼ² = R² de xⱼ sur les autres covariables : facteur d\'inflation de la variance de β̂ⱼ. Inquiétant au-delà de 5 ou 10.'),
-  C('kappa', 'val', 'Indice de conditionnement ?', 'κ(X) = σmax/σmin (valeurs singulières), κ(XᵀX) = λmax/λmin = κ(X)². κ(X) > 30 : colinéarité sévère.'),
-  C('rangTP', 'val', 'Quel rang vérifier ?', 'Celui de la matrice de design [1, x] (avec la colonne de 1) : il doit valoir k + 1.'),
-  C('corr', 'val', 'Corrélations deux à deux faibles : plus de colinéarité ?', 'Non : la colinéarité peut venir d\'une combinaison de plusieurs variables, d\'où le VIF et le conditionnement.'),
-  C('sd', 'val', 'Piège de rnorm ?', 'rnorm prend l\'écart-type : σ² = 4 donc sd = 2.'),
-  C('ic6', 'val', '6 IC à 95 % : probabilité qu\'ils contiennent tous la vraie valeur ?', 'Environ 0,95⁶ ≈ 73 % (si indépendants) : une vraie valeur hors de son IC n\'est pas anormale.'),
-  C('r2th', 'val', 'R² théorique et comment l\'augmenter sans changer β ?', 'Var(Xβ)/(Var(Xβ) + σ²) ; réduire σ ou disperser davantage les x.'),
-  C('resid', 'val', 'Que lire sur résidus vs valeurs prédites ?', 'Courbure : non-linéarité. Entonnoir : hétéroscédasticité. Sinon nuage sans structure autour de 0.'),
-  C('ordre', 'val', 'Résidus selon l\'ordre des observations ?', 'Vérifie l\'indépendance : pas de tendance ni de regroupement.'),
-  C('norm', 'val', 'Vérifier la normalité des erreurs ?', 'Histogramme et QQ-plot des résidus, test de Shapiro-Wilk (H₀ : normalité).'),
-  C('somme', 'val', 'Moyenne des résidus d\'un modèle avec constante ?', 'Exactement 0.'),
-];
 
 const Q = (id, ch, q, opts, ans, exp) => ({ id: 'rq_' + id, ch, q, opts, ans, exp });
 export const quiz = [
@@ -232,3 +191,5 @@ export const vizPlacements = [
 ];
 
 export * from './codesheet.js';
+
+export { cards } from './cards.js';

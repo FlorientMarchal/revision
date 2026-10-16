@@ -14,54 +14,6 @@ export const chapters = [
 ];
 
 const C = (id, ch, q, a) => ({ id: 'nc_' + id, ch, q, a });
-export const cards = [
-  C('bdd', 'intro', 'Qu\'est-ce qu\'une base de données ?', 'Un jeu de données structurées (classées, organisées, étiquetées) dont l\'objectif est de retrouver efficacement les données selon des critères multiples. Une bibliothèque en est une, pas une penderie.'),
-  C('sgbd', 'intro', 'Qu\'est-ce qu\'un SGBD(R) ?', 'Un logiciel de gestion de bases de données : centralisé, multi-utilisateurs, client-serveur (le SGBD est le serveur). Relationnel : les relations sont modélisées (clés étrangères) → performances et sémantique, mais schéma contraignant.'),
-  C('exsgbd', 'intro', 'Exemples de SGBD relationnels et non relationnels ?', 'Relationnels : MySQL / MariaDB, PostgreSQL, Oracle, Microsoft SQL Server. Non relationnels : CouchDB, MongoDB, ArangoDB.'),
-  C('sql', 'intro', 'Que signifie SQL et à quoi sert-il ?', 'Structured english as Query Language : un langage standardisé pour exprimer des requêtes au SGBD (lecture multicritère, écriture, suppression).'),
-  C('orga', 'intro', 'Organisation d\'une base SQL ?', 'Des tables (lignes = tuples, colonnes typées, clé primaire), des relations entre tables (clés étrangères, mécanismes « cascade »), des index ; et aussi triggers, procédures stockées, vues.'),
-  C('acid', 'intro', 'Les propriétés ACID ?', 'Atomicité (tout ou rien), Cohérence (jamais de contrainte violée), Isolation (la simultanéité des transactions n\'impacte pas le résultat), Durabilité (toute transaction réussie est enregistrée définitivement).'),
-  C('pk', 'intro', 'Comment choisir une clé primaire (corrigé du TP 1) ?', 'Le plus simple : numérique auto-incrémentée. Sinon une clé naturelle si la colonne est unique pour toute donnée (ex. nom d\'artiste), ou une clé sur plusieurs colonnes (ex. id_edition + id_artiste).'),
-  C('having', 'intro', 'WHERE ou HAVING ?', 'WHERE filtre les lignes avant le regroupement ; HAVING filtre les groupes après GROUP BY (ex. HAVING COUNT(DISTINCT f.id) >= 2).'),
-  C('leftjoin', 'intro', 'Pourquoi un LEFT JOIN dans la requête 7 du TP 1 ?', 'Pour garder aussi les artistes qui n\'ont participé à aucune édition (ils ont 0 festival et 0 édition).'),
-  C('nosql', 'nosql', 'Que veut dire NoSQL ?', 'D\'abord « not SQL », puis « Not Only SQL » (vers 2010) : des SGBD non relationnels ou partiellement relationnels.'),
-  C('besoins', 'nosql', 'À quels besoins répond le NoSQL ?', 'Très grands volumes de données (> 1 To), performances sur ces volumes, clusters (répartition et redondance des données).'),
-  C('cluster', 'nosql', 'Passage à l\'échelle horizontal ?', 'Répartir la charge sur plusieurs machines ordinaires en réseau : extensibilité presque infinie ; les données sont répliquées et/ou partitionnées.'),
-  C('clusterpb', 'nosql', 'Problèmes du cluster ?', 'ACID difficile voire impossible (théorème CAP) ; latence réseau, incohérence ou indisponibilité possibles ; les SGBD relationnels se distribuent mal horizontalement.'),
-  C('couts', 'nosql', 'Ce qui coûte dans le relationnel ?', 'À l\'écriture : ACID (rollback, contraintes, verrous, stockage dur), vérification des clés, typage. À la lecture : granularité fine → jointures et multiples i/o ; structure indépendante des cas d\'utilisation.'),
-  C('recette', 'nosql', 'Que jette le NoSQL pour gagner en performances ?', 'ACID (sauf l\'isolation en général), relations, typage, schéma ; données à granularité forte et variable, organisées selon les cas d\'utilisation, dé-normalisées (redondance).'),
-  C('inconv', 'nosql', 'Inconvénients du NoSQL ?', 'Cohérence à garantir à la main ; plusieurs modèles valides (anticiper) ; pas de schéma (plus de logique applicative) ; pas de langage de requête normalisé.'),
-  C('familles', 'nosql', 'Les 4 familles NoSQL et un exemple de chaque ?', 'Clé-valeur (Redis), documents (CouchDB, ArangoDB, MongoDB), graphes (ArangoDB, Neo4J), colonnes (Cassandra, HBase).'),
-  C('doc', 'nosql', 'Base orientée documents ?', 'Du clé-valeur dont la valeur est un document dans un format (JSON, XML…) compris par le SGBD.'),
-  C('modele', 'nosql', 'Bibliothèque : un document par ouvrage ou par auteur ?', 'Par ouvrage : facile de lister les ouvrages, moins les auteurs. Par auteur : l\'inverse. Simulation du relationnel (champ type) : difficulté égale, une partie seulement de l\'information par document, mises à jour du nom d\'auteur à répercuter.'),
-  C('couch', 'couchdb', 'CouchDB en quelques mots ?', 'SGBD orienté documents : un id (hash) → un document JSON, documents ordonnés par date d\'insertion, interrogation par des vues (par défaut _all_docs), réplication pair à pair.'),
-  C('params', 'couchdb', 'Paramètres d\'interrogation d\'une vue CouchDB ?', 'skip, limit, descending, key, startkey, endkey (et include_docs=true pour avoir le contenu des documents).'),
-  C('vue', 'couchdb', 'Qu\'est-ce qu\'une vue CouchDB ?', 'Une requête pré-construite écrite en JavaScript qui parcourt les documents et émet des paires clé-valeur (emit). Très performante une fois construite ; coûte du temps d\'indexation et du volume.'),
-  C('mapreduce', 'couchdb', 'map, reduce et group ?', 'map produit les paires clé-valeur ; reduce (optionnelle, ex. _count) calcule une donnée pour chaque clé et pour l\'ensemble ; group=true groupe le résultat par clé (astuce pour lister les clés).'),
-  C('tp2model', 'couchdb', 'TP 2 : quel modèle documents pour les festivals ?', 'Un document par édition de festival (nom, lieu, année, jauge) avec la liste des artistes (nom, pays) imbriquée. Alternative : un document par artiste et par édition, plus redondant mais sans boucle dans les vues.'),
-  C('recette', 'couchdb', 'La « recette » des vues CouchDB (corrigé du TP 2) ?', 'Émettre des clés correspondant aux critères sur lesquels on veut filtrer. Ex. artistes français des Eurockéennes 2018 : emit([doc.nom, doc.annee, a.pays], a.nom) puis key=["Les Eurockéennes",2018,"France"].'),
-  C('collation', 'couchdb', 'Ordre de collation des clés CouchDB ?', 'null < booléens < nombres < chaînes < tableaux < objets. D\'où endkey=["France", {}] : l\'objet vide passe après toutes les chaînes, la plage couvre toutes les clés qui commencent par "France".'),
-  C('ordrecle', 'couchdb', 'Pourquoi l\'ordre des éléments d\'une clé composée compte ?', 'Une plage startkey/endkey ne fixe que le début de la clé : pour « artistes français des Eurockéennes, toutes éditions », il faut émettre [festival, pays, année] et non [festival, année, pays].'),
-  C('maj', 'couchdb', 'Que deviennent les vues quand on modifie la base ?', 'Mises à jour automatiquement et de façon incrémentale (seuls les documents ajoutés ou modifiés repassent dans map), par défaut au moment de la requête : la première requête après beaucoup d\'écritures est plus lente.'),
-  C('mango', 'couchdb', 'CouchDB a-t-il un langage de requêtes ?', 'Oui, « Mango » (≠ MongoDB) depuis la version 2.0, mais le cours n\'en parle volontairement pas.'),
-  C('arango', 'arango', 'ArangoDB en quelques mots ?', 'SGBD NoSQL multi-modèle (documents et graphes), depuis 2011 : plusieurs collections par base, langage AQL, index, requêtes géospatiales, cluster.'),
-  C('relat', 'arango', 'Ce qu\'ArangoDB reprend du relationnel… et ce qu\'il n\'a pas ?', 'Reprend : plusieurs collections (séparation des concepts) et des jointures (AQL). N\'a pas : schéma, typage, clés étrangères (pas de contraintes), ACID ; redondance possible.'),
-  C('aql', 'arango', 'Mots-clés de base d\'AQL ?', 'FOR x IN collection (boucle), FILTER (condition), SORT … DESC (tri), RETURN { … } (résultat). Paradigme plus itératif qu\'ensembliste.'),
-  C('collect', 'arango', 'Comment regrouper en AQL ?', 'COLLECT cle = expr WITH COUNT INTO n, ou COLLECT cle = expr INTO groupe ; un FILTER après le COLLECT joue le rôle de HAVING.'),
-  C('graphe', 'graphes', 'Qu\'est-ce qu\'un graphe ArangoDB ?', 'Au moins une collection de sommets (vertices, type document) et au moins une collection d\'arêtes (edges, type edge, avec _from et _to).'),
-  C('trav', 'graphes', 'Syntaxe d\'une traversée AQL ?', 'FOR vertex, edge, path IN 1..3 INBOUND|OUTBOUND|ANY "coll/cle" GRAPH nomDuGraphe [FILTER, PRUNE, OPTIONS] RETURN …'),
-  C('dir', 'graphes', 'INBOUND, OUTBOUND, ANY ?', 'INBOUND : arêtes entrantes vers le nœud de référence (_to = référence) ; OUTBOUND : sortantes ; ANY : dans les deux sens (relation non orientée).'),
-  C('path', 'graphes', 'Que contiennent vertex, edge et path ?', 'vertex : le nœud atteint ; edge : l\'arête parcourue pour l\'atteindre ; path : le chemin complet (path.edges → LENGTH(path.edges) = distance).'),
-  C('pourquoi', 'graphes', 'Pourquoi une traversée plutôt que des jointures ?', 'Profondeur variable : avec des jointures il faut une boucle par niveau, la distance et les doublons sont difficiles à gérer, et une profondeur de 3000 est impossible.'),
-  C('complex', 'index', 'Complexité des boucles AQL ?', 'Une boucle FOR : O(n) ; deux boucles imbriquées : O(n²)… Leviers : limiter les jointures, indexer, limiter les i/o.'),
-  C('redond', 'index', 'Quand introduire de la redondance (nom de l\'auteur dans le post) ?', 'Quand les lectures sont plus nombreuses que les écritures : pas de jointure à la lecture, mais une jointure + concaténation à l\'écriture, et la mise à jour du nom à répercuter.'),
-  C('persist', 'index', 'Index persistent ?', 'Un hash sur un ou plusieurs champs qui produit un arbre : accès aux _key en O(log n) ; trié ; peut être unique et/ou sparse ; créé par défaut sur _key.'),
-  C('select', 'index', 'Sélectivité d\'un index ?', 'Forte : beaucoup de valeurs différentes, index très discriminant (ex. timestamp). Faible : beaucoup de valeurs identiques (ex. booléen).'),
-  C('regles', 'index', 'Règles d\'utilisation d\'un index sur [auteur, parution] ?', 'On peut n\'interroger que les n premiers champs, dans l\'ordre ; seul le dernier champ interrogé peut faire l\'objet d\'une inégalité.'),
-  C('geo', 'index', 'Index geo ?', 'Indexe des paires de coordonnées (2 champs lat, lon ou un objet GeoJSON) ; accélère GEO_CONTAINS, GEO_DISTANCE, GEO_INTERSECTS…'),
-  C('unseul', 'index', 'Combien d\'index par parcours de collection ?', 'Un seul : l\'optimiseur AQL choisit selon la sélectivité.'),
-  C('io', 'index', 'Pourquoi éviter d\'ouvrir les documents ?', 'Lire un document = entrées-sorties = latence. Les index ne stockent que les _key : un FILTER sur un champ non indexé oblige à ouvrir le document. Autres leviers : SSD NVMe, plus de mémoire (cache).'),
-];
 
 const Q = (id, ch, q, opts, ans, exp) => ({ id: 'nq_' + id, ch, q, opts, ans, exp });
 export const quiz = [
@@ -126,3 +78,5 @@ export const vizPlacements = [
   { lesson: 'n6', section: 'redondance', name: 'nq-redund', where: { before: '<div class="box warn">' } },
   { lesson: 'n6', section: 'regles', name: 'nq-index', where: { before: '<div class="box ex">' } },
 ];
+
+export { cards } from './cards.js';

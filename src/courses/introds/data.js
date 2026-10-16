@@ -1,8 +1,8 @@
 // Contenu du cours « Introduction à la science des données ». Identifiants fixes : la progression ne se décale pas
 // si l'on ajoute du contenu.
 import { lessonsStat } from './lessons-stat.js';
-import { lessonsPy, cardsPy, quizPy } from './lessons-python.js';
-import { lessonsData, cardsData, quizData } from './lessons-data.js';
+import { lessonsPy, quizPy } from './lessons-python.js';
+import { lessonsData, quizData } from './lessons-data.js';
 import { exams } from './exams.js';
 import { tpVec, tpLim, rExos } from './rlabs.js';
 import pylabsAll from './pylabs.json';
@@ -99,54 +99,6 @@ export const formulas = [
 
 /* ------------------------------------------------------------------ flashcards */
 const C = (id, ch, q, a) => ({ id: 'dsc_' + id, ch, q, a });
-const cardsStat = [
-  C('loi', 'proba', 'Qu\'est-ce que la loi d\'une variable aléatoire ?', 'La donnée des probabilités de ses valeurs : P(X = k) pour une v.a. discrète (somme 1), une densité f ≥ 0 d\'intégrale 1 pour une v.a. continue.'),
-  C('var', 'proba', 'Deux formules de la variance ?', 'V(X) = E[(X − E(X))²] = E(X²) − E(X)².'),
-  C('aff', 'proba', 'E(aX + b) et V(aX + b) ?', 'E = aE(X) + b ; V = a²V(X).'),
-  C('somme', 'proba', 'V(X + Y) ? V(X − Y) si X et Y sont indépendantes ?', 'V(X + Y) = V(X) + V(Y) + 2 cov(X, Y). Si indépendantes : V(X + Y) = V(X − Y) = V(X) + V(Y).'),
-  C('binom', 'proba', 'Loi binomiale B(n, p) : situation, loi, E, V ?', 'Nombre de succès en n épreuves indépendantes de probabilité p. P(X = k) = C(n, k) pᵏ (1 − p)ⁿ⁻ᵏ ; E = np ; V = np(1 − p).'),
-  C('geom', 'proba', 'Loi géométrique G(p) : situation, loi, E ?', 'Rang du premier succès. P(X = k) = (1 − p)ᵏ⁻¹ p pour k ≥ 1 ; E = 1/p ; V = (1 − p)/p².'),
-  C('pois', 'proba', 'Loi de Poisson P(λ) : situation, loi, E, V ?', 'Nombre d\'événements sur une durée, de moyenne λ. P(X = k) = e^(−λ) λᵏ/k! ; E = V = λ.'),
-  C('unif', 'proba', 'Loi uniforme U(a, b) : densité, E, V ?', 'f = 1/(b − a) sur [a, b] ; E = (a + b)/2 ; V = (b − a)²/12.'),
-  C('expo', 'proba', 'Loi exponentielle E(λ) : densité, F, E, V ?', 'f(x) = λ e^(−λx) sur ℝ₊ ; F(x) = 1 − e^(−λx) ; E = 1/λ ; V = 1/λ². Sans mémoire.'),
-  C('memo', 'proba', 'Absence de mémoire de la loi exponentielle ?', 'P(X > s + t | X > s) = P(X > t) : avoir déjà attendu s ne change pas la loi de l\'attente restante.'),
-  C('gamma', 'proba', 'Loi Gamma Γ(a, λ) : E, V ? Lien avec l\'exponentielle ?', 'E = a/λ, V = a/λ². La somme de n exponentielles indépendantes E(λ) suit Γ(n, λ).'),
-  C('normale', 'proba', 'Si X ~ N(μ, σ²), loi de (X − μ)/σ et de aX + b ?', '(X − μ)/σ ~ N(0, 1) ; aX + b ~ N(aμ + b, a²σ²).'),
-  C('sommes', 'proba', 'Somme de Poisson indépendantes ? de normales indépendantes ?', 'P(λ) + P(μ) = P(λ + μ) ; N(μ₁, σ₁²) + N(μ₂, σ₂²) = N(μ₁ + μ₂, σ₁² + σ₂²).'),
-  C('bayes', 'proba', 'Théorème de Bayes et probabilités totales ?', 'P(A) = Σ P(A | Bₖ) P(Bₖ) pour une partition (Bₖ) ; P(B | A) = P(A | B) P(B) / P(A).'),
-  C('indep', 'proba', 'Définition de l\'indépendance de deux événements ?', 'P(A ∩ B) = P(A) P(B), soit P(A | B) = P(A).'),
-  C('cov', 'proba', 'Covariance et corrélation ?', 'cov(X, Y) = E(XY) − E(X)E(Y) ; corr = cov / (σX σY), entre −1 et 1.'),
-  C('reci', 'proba', 'Indépendantes ⇒ non corrélées. Et la réciproque ?', 'Fausse en général (ex. X + Y et X − Y pour X, Y de Bernoulli(1/2)). Vraie pour un vecteur gaussien.'),
-  C('vgauss', 'proba', 'Densité d\'un vecteur gaussien N_d(μ, Σ) ?', 'f(x) = (2π)^(−d/2) |Σ|^(−1/2) exp(−½ (x − μ)\' Σ⁻¹ (x − μ)).'),
-  C('lin', 'proba', 'Loi de AX + B si X ~ N_d(μ, Σ) ?', 'N(Aμ + B, AΣA\').'),
-  C('compo', 'proba', 'Des composantes gaussiennes forment-elles toujours un vecteur gaussien ?', 'Non : les composantes d\'un vecteur gaussien sont gaussiennes, mais la réciproque est fausse.'),
-  C('ech', 'estim', 'Qu\'est-ce qu\'un échantillon (X₁, …, Xₙ) ?', 'n variables aléatoires indépendantes et de même loi que X (i.i.d.), associées à n répétitions de l\'expérience.'),
-  C('estim', 'estim', 'Estimateur vs estimation ?', 'L\'estimateur Tₙ est une variable aléatoire, fonction de (X₁, …, Xₙ). L\'estimation est sa valeur sur l\'échantillon observé.'),
-  C('biais', 'estim', 'Biais d\'un estimateur ? Asymptotiquement sans biais ?', 'B(Tₙ) = E(Tₙ) − θ. Asymptotiquement sans biais si E(Tₙ) → θ.'),
-  C('conv', 'estim', 'Estimateur convergent : définition et critère pratique ?', 'Tₙ → θ en probabilité : P(|Tₙ − θ| > ε) → 0. Critère : (asymptotiquement) sans biais et V(Tₙ) → 0.'),
-  C('rq', 'estim', 'Risque quadratique ?', 'R = E[(Tₙ − θ)²] = V(Tₙ) + B(Tₙ)² : variance + carré du biais.'),
-  C('xbar', 'estim', 'Propriétés de la moyenne empirique ?', 'E(X̄ₙ) = μ (sans biais), V(X̄ₙ) = σ²/n → 0 : convergent.'),
-  C('s2', 'estim', 'La variance empirique (1/n) Σ (Xᵢ − X̄)² est-elle sans biais ?', 'Non : son espérance vaut (n − 1)σ²/n. La version en 1/(n − 1) est sans biais (c\'est var() de R).'),
-  C('vrais', 'estim', 'Vraisemblance d\'un échantillon ?', 'ℓ(x ; θ) = Π f(xᵢ ; θ) (ou Π P(Xᵢ = xᵢ)) : la probabilité d\'observer l\'échantillon pour θ fixé, vue comme fonction de θ.'),
-  C('emv', 'estim', 'Méthode pour calculer un EMV ?', 'Log-vraisemblance L = Σ ln f(xᵢ ; θ), dériver, résoudre L\'(θ) = 0, vérifier L\'\' < 0.'),
-  C('emvp', 'estim', 'Propriétés de l\'EMV ?', 'Asymptotiquement sans biais, asymptotiquement normal, convergent ; peut être biaisé pour n fini.'),
-  C('emvex', 'estim', 'EMV pour Poisson, N(a, 1), exponentielle ?', 'Poisson : λ̂ = x̄ ; N(a, 1) : â = x̄ ; exponentielle : λ̂ = 1/x̄.'),
-  C('lgn', 'limites', 'Loi des grands nombres : énoncé et hypothèses ?', 'Si (Xₙ) i.i.d. intégrables, X̄ₙ → E(X) presque sûrement.'),
-  C('tcl', 'limites', 'Théorème central limite ?', 'Si i.i.d. de variance σ² finie : (X̄ₙ − μ)/√(σ²/n) → N(0, 1) en loi, quelle que soit la loi de X.'),
-  C('quant', 'limites', 'Quantiles de N(0, 1) à 95 % et 99 % ?', '1,96 et 2,576.'),
-  C('disp', 'limites', 'Intervalle de dispersion vs intervalle de confiance ?', 'Dispersion : paramètre connu, intervalle fixe où tombera la variable aléatoire. Confiance : paramètre inconnu, intervalle aléatoire qui le contient avec probabilité 1 − α.'),
-  C('icmu', 'limites', 'IC à 95 % de μ (σ² inconnu, n grand) ?', '[x̄ − 1,96 √(σ̂²/n) ; x̄ + 1,96 √(σ̂²/n)].'),
-  C('icp', 'limites', 'IC à 95 % d\'une proportion ?', '[x̄ − 1,96 √(x̄(1 − x̄)/n) ; x̄ + 1,96 √(x̄(1 − x̄)/n)].'),
-  C('h0', 'tests', 'Principe d\'un test statistique ?', 'Raisonnement par l\'absurde sous H0 (« pas d\'effet ») : si l\'observation est très improbable sous H0 (zone de rejet), on rejette H0.'),
-  C('pval', 'tests', 'Qu\'est-ce que la p-valeur ? Règle de décision ?', 'La probabilité sous H0 d\'une statistique au moins aussi extrême que celle observée. On rejette H0 si p-valeur ≤ α.'),
-  C('err', 'tests', 'Erreurs de type I et II ?', 'Type I : rejeter H0 alors qu\'elle est vraie (fausse découverte, probabilité α). Type II : ne pas rejeter H0 alors qu\'elle est fausse (découverte manquée).'),
-  C('valid', 'tests', 'Peut-on valider H0 ?', 'Non : on la rejette ou on ne la rejette pas.'),
-  C('multi', 'tests', 'Probabilité d\'au moins un faux positif sur m tests indépendants sans effet ?', '1 − (1 − α)ᵐ, environ 0,60 pour m = 18 et α = 5 %.'),
-  C('fwer', 'tests', 'FWER et procédure de Bonferroni ?', 'FWER = P(au moins une fausse découverte). Bonferroni : rejeter si pᵢ ≤ α/m ; contrôle le FWER, très conservateur.'),
-  C('fdr', 'tests', 'FDR et procédure de Benjamini-Hochberg ?', 'FDR = E[FP/(FP + TP)]. BH : trier les p-valeurs, plus grand k avec p(k) ≤ kα/m, rejeter les k premières. Contrôle le FDR si p-valeurs indépendantes.'),
-  C('ttest', 'tests', 'Quel test pour comparer deux moyennes ? la normalité ? l\'indépendance de deux variables qualitatives ?', 't.test(x, y) ; shapiro.test(x) ; chisq.test(tableau) (ou fisher.test).'),
-];
-export const cards = [...cardsStat, ...cardsPy, ...cardsData];
 
 /* ------------------------------------------------------------------ QCM */
 const Q = (id, ch, q, opts, ans, exp) => ({ id: 'dsq_' + id, ch, q, opts, ans, exp });
@@ -191,3 +143,5 @@ const quizStat = [
 export const quiz = [...quizStat, ...quizPy, ...quizData];
 
 export * from './codesheet.js';
+
+export { cards } from './cards.js';
