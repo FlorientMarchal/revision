@@ -6,92 +6,6 @@ import { lessons } from './lessons.js';
 export { chapters, fiches, labs, lessons };
 
 const C = (id, ch, q, a) => ({ id: 'vc_' + id, ch, q, a });
-export const cards = [
-  // Introduction
-  C('def', 'intro', 'Définition d\'une visualisation ?', 'À partir d\'un jeu de données, une ou plusieurs représentations visuelles (des vues composées d\'idiomes), conçues pour aider à accomplir des tâches de façon efficace (temps, exactitude).'),
-  C('obj', 'intro', 'Les deux objectifs d\'une visualisation ?', 'Présenter des résultats connus (ex. Minard) ; analyser et explorer des données (ex. John Snow, quartet d\'Anscombe).'),
-  C('minard', 'intro', 'Carte de Minard (1869) : quelles dimensions ?', '6 dimensions : taille, position en 2D et direction de l\'armée, températures, dates.'),
-  C('snow', 'intro', 'Que montre l\'exemple de John Snow ?', 'La carte de l\'épidémie de choléra de Londres (1854) : une visualisation pour analyser / explorer des données (les cas se concentrent autour d\'une pompe).'),
-  C('anscombe', 'intro', 'Quartet d\'Anscombe : la leçon ?', '4 jeux de données avec mêmes moyennes (x : 9, y : 7,5), variances (10 et 3,75), corrélation (0,816 ; la diapositive écrit 0,876) et droite de régression (y = 3 + 0,5x), mais des nuages de points complètement différents. Les statistiques résumées ne suffisent pas : il faut visualiser.'),
-  C('info', 'intro', 'Visualisation en informatique : 3 caractéristiques ?', 'Une application informatique ; une visualisation avec des vues coordonnées / interactives ; utilisée pour automatiser la génération des représentations.'),
-  C('idiome', 'intro', 'Concevoir une visualisation : que choisit-on pour chaque vue ?', 'Ses idiomes : encodages visuels (types de représentation : barres, camemberts…) et techniques d\'interaction (filtres, sélections…).'),
-  C('compromis', 'intro', 'Pourquoi parle-t-on de compromis en conception ?', 'L\'espace des possibilités est vaste et la plupart sont inefficaces pour une tâche donnée. Ex. des notes : triées, on voit max et médiane ; en boîte à moustaches on voit min, Q1, médiane, Q3, max mais plus les valeurs individuelles.'),
-  C('qpc', 'intro', 'Quoi ? Pourquoi ? Comment ?', 'Quoi : les données (que visualiser ?). Pourquoi : les tâches (pourquoi les utilisateurs ont besoin de visualiser ?). Comment : les idiomes (comment visualiser ?).'),
-  C('semtype', 'intro', 'Les deux aspects des données à connaître ?', 'Sémantique : ce qu\'elles représentent dans le monde réel. Type : interprétation structurelle (individus, variables, nœuds, liens), combinaison (tables, graphes) et opérations possibles.'),
-  C('cp', 'intro', 'Pourquoi la moyenne de codes postaux n\'a-t-elle pas de sens ?', 'Ce sont des nombres, mais la variable est nominale (non quantitative) : seule l\'égalité / différence a un sens.'),
-  C('dstypes', 'intro', 'Types de jeux de données (Munzner) ?', 'Tables, réseaux et arbres, champs, géométrie (et groupes, ensembles, listes). Disponibilité statique ou dynamique.'),
-  C('dir', 'intro', 'Sens d\'ordre possibles d\'une variable ordonnée ?', 'Séquentiel, divergent, cyclique.'),
-  C('abstr', 'intro', 'Qu\'est-ce qu\'une tâche abstraite ? Exemple.', 'Le besoin de l\'utilisateur traduit dans le vocabulaire de la visualisation, indépendamment du domaine. « Aller le plus vite de A à B sur la carte routière » → « rechercher le plus court chemin dans un graphe multivarié ».'),
-  C('abstr2', 'intro', 'Intérêt d\'une tâche abstraite ?', 'Plus générique : accès aux solutions des autres domaines (plus court chemin : algorithmique de graphes, réseaux sociaux…) et diffusion du résultat.'),
-  C('tache', 'intro', 'Une tâche se décrit par… ?', 'Une action (ex. « rechercher ») et une cible (ex. « chemin dans un graphe »).'),
-  C('search', 'intro', 'Les 4 types de recherche ?', 'Lookup (cible et position connues), browse (position connue, cible inconnue), locate (cible connue, position inconnue), explore (ni l\'une ni l\'autre).'),
-  C('query', 'intro', 'Les 3 requêtes ?', 'Identifier (un élément), comparer (quelques éléments), résumer (tous).'),
-  C('how', 'intro', 'Les 4 familles du « Comment ? » ?', 'Encoder (arranger, associer : couleur, taille, forme, mouvement), manipuler (changer, sélectionner, naviguer), facettes (juxtaposer, partitionner, superposer), réduire (filtrer, agréger, intégrer).'),
-  C('concl', 'intro', 'Conclusion du CM 1 ?', 'Science jeune, pas de recette miracle : connaître les visualisations existantes, savoir les utiliser et les combiner. Réf. : Munzner, Visualization Analysis & Design, 2014.'),
-  // Tables
-  C('indiv', 'tables', 'Individu et variable : définitions et synonymes ?', 'Individu (item, élément) : entité particulière de type discret (personne, ville…). Variable (attribut, dimension) : propriété observée, calculée ou enregistrée (salaire, prix…).'),
-  C('table', 'tables', 'Qu\'est-ce qu\'une table ?', 'Lignes = individus, colonnes = variables ; la cellule (i, j) contient la valeur de la variable j pour l\'individu i. On peut ajouter d\'autres dimensions.'),
-  C('nom', 'tables', 'Variable nominale ?', 'Pas d\'ordre implicite (patronyme, fruit, ville) ; seule opération : égal ou différent. On peut calculer un ordre arbitraire (alphabétique) ou à partir d\'une autre variable (fruits par prix).'),
-  C('ord', 'tables', 'Variable ordinale ?', 'Ordre implicite, mais pas d\'arithmétique : taille de vêtement, mention de diplôme.'),
-  C('quant', 'tables', 'Variable quantitative ?', 'Ordre explicite et comparaison arithmétique : longueur, poids, température, prix, nombre de ventes.'),
-  C('conv', 'tables', 'Qu\'est-ce qu\'un ordre conventionnel ? Exemple.', 'Un ordre arbitraire, admis par convention, qu\'on impose à une variable nominale qui n\'a pas d\'ordre naturel : l\'ordre alphabétique des noms de villes, des patronymes…'),
-  C('statvis', 'tables', 'Différence de vocabulaire statistique / visualisation ?', 'Statistique : qualitative (nominale, ordinale) / quantitative (discrète, continue). Visualisation : nominale / ordonnée (ordinale, quantitative). L\'ordinale change de camp.'),
-  C('ts', 'tables', 'Table surlignée : variables ?', 'Abscisses : 1 nominale/ordinale ; ordonnées : 1 nominale/ordinale ; couleur : 1 quantitative.'),
-  C('bar', 'tables', 'Diagramme en barres : variables ?', 'Abscisses : 1 nominale/ordinale ; ordonnées : 1 quantitative.'),
-  C('barst', 'tables', 'Barres empilées : variables ?', 'Abscisses : 1 nominale/ordinale ; ordonnées : 1 quantitative ; couleur : 1 nominale.'),
-  C('barcc', 'tables', 'Barres côte à côte : variables ?', 'Abscisses / couleur : 2 nominales/ordinales ; ordonnées : 1 quantitative.'),
-  C('stvscc', 'tables', 'Empilées vs côte à côte : avantages / inconvénients ?', 'Empilées : total lisible, compacte ; mais segments sans base commune, difficiles à comparer (sauf celui du bas). Côte à côte : comparaison précise de chaque valeur (base commune) ; mais total non visible et graphique large.'),
-  C('pie', 'tables', 'Camembert : variables et variables visuelles ?', 'Secteurs / couleurs : 1 nominale (palette qualitative) ; taille des secteurs : 1 quantitative (angle / longueur d\'arc et aire de la portion).'),
-  C('line', 'tables', 'Diagramme en lignes : variables ?', 'Abscisses : 1 quantitative (souvent une date) ; ordonnées : 1 quantitative ; lignes / couleurs : 1 nominale.'),
-  C('area', 'tables', 'Aires empilées et diagramme en flots : variables ?', 'Abscisses : 1 quantitative (souvent une date) ; ordonnées : 1 quantitative ; aires / couleurs : 1 nominale.'),
-  C('scatter', 'tables', 'Nuage de points et matrice de nuages ?', 'Nuage : 2 quantitatives (x et y). Matrice de nuages : n quantitatives, un nuage par paire.'),
-  C('pc', 'tables', 'Coordonnées parallèles ?', 'Individus = lignes ; axes verticaux : n quantitatives. Avantage : beaucoup de variables grâce à la position. Inconvénient : on compare mal deux variables dont les axes ne sont pas consécutifs.'),
-  C('kiviat', 'tables', 'Diagramme de Kiviat ?', 'Individus = lignes ; axes circulaires (en étoile) : n quantitatives.'),
-  // Variables visuelles 1
-  C('vvdef', 'vv1', 'Qu\'est-ce qu\'une variable visuelle ?', 'Une composante de l\'apparence des objets graphiques (taille, couleur, forme, position…) qui représente une variable du jeu de données.'),
-  C('vvlist', 'vv1', 'Variables visuelles de base ?', 'Taille 1D (longueur), taille 2D (aire), couleur, forme, position x, position y. Puis position 3D, taille 3D (volume), orientation, grain, texture, mouvement.'),
-  C('vvforme', 'vv1', 'Dans un nuage où tous les points sont des ronds, la forme est-elle une variable visuelle ?', 'Non : elle ne représente aucune variable.'),
-  C('vvtaille', 'vv1', 'Taille (1D, 2D, 3D) : pour quels types ?', 'Quantitative : oui. Ordinale : éventuellement. Nominale : non (une taille suggère un ordre).'),
-  C('vvforme2', 'vv1', 'Forme : pour quels types ?', 'Nominale uniquement : il n\'y a pas d\'ordre implicite sur les formes.'),
-  C('vvpos', 'vv1', 'Position : pour quels types ?', 'Quantitative et ordinale : oui. Nominale : éventuellement, avec un ordre conventionnel (alphabétique) ou calculé à partir d\'une autre variable.'),
-  C('formes', 'vv1', 'Types de formes ?', 'Géométriques (abstraites) et symboliques : conventionnelles (®), évocatrices (couvert pour restaurant), figuratives (personne attablée).'),
-  C('aire', 'vv1', 'Aire ou longueur pour une quantitative ?', 'La longueur : on compare mieux des longueurs que des aires (taille 1D plus efficace que taille 2D, elle-même plus efficace que taille 3D).'),
-  C('carre', 'vv1', 'Valeur b = 2 × valeur a, représentée par l\'aire d\'un carré. Côté de b ?', 'Côté de a × √2 (≈ 1,41), pour que l\'aire soit doublée. Doubler le côté quadruplerait l\'aire.'),
-  // Couleur et efficacité
-  C('pal3', 'vv2', 'Les 3 types de palettes et leurs variables ?', 'Qualitative → nominale. Séquentielle → ordinale ou quantitative. Divergente → quantitative avec valeur pivot.'),
-  C('palvar', 'vv2', 'Que fait-on varier dans chaque palette ?', 'Séquentielle : la luminosité (ou la saturation), teinte éventuellement un peu. Divergente : teinte (2 teintes) et luminosité. Qualitative : la teinte (luminosité et saturation identiques).'),
-  C('pivot', 'vv2', 'Exemples de valeur pivot pour une palette divergente ?', 'Relief (niveau de la mer), température (0°), profit (0).'),
-  C('rgb', 'vv2', 'Modèle RVB ?', '3 valeurs de 0 à 255 (rouge, vert, bleu) dont la combinaison donne les autres couleurs. Correspond aux écrans, mais n\'aide pas à caractériser les palettes.'),
-  C('rgbq', 'vv2', 'RVB : 0,255,0 ; 0,128,0 ; 255,0,255 ; 0,0,0 ; 255,255,255 ; 128,128,128 ?', 'Vert ; vert foncé ; magenta ; noir ; blanc ; gris.'),
-  C('tsl', 'vv2', 'Teinte, saturation, luminosité : quels types de variables ?', 'Teinte : nominale seulement. Saturation et luminosité : ordinale et quantitative, pas nominale.'),
-  C('combi', 'vv2', 'Combiner deux palettes : les 6 cas ?', 'Quali + quali : non. Séq + séq : éventuellement. Div + div : éventuellement. Quali + séq : oui. Séq + div : éventuellement. Div + quali : non.'),
-  C('brewer', 'vv2', 'Où trouver des palettes ?', 'ColorBrewer 2.0 (colorbrewer2.org).'),
-  C('satur', 'vv2', 'Palette qualitative : couleurs pour grandes / petites zones ?', 'Grandes zones : couleurs peu saturées. Petites zones : couleurs saturées.'),
-  C('dalto', 'vv2', 'Daltonisme et impression N&B ?', 'Vérifier la palette (outil Viz Palette) : une palette peut être lisible pour les daltoniens mais pas imprimée en noir et blanc, et inversement (rouge / vert en deutéranopie).'),
-  C('effnom', 'vv2', 'Efficacité pour une variable nominale (du meilleur au moins bon) ?', 'Couleur palette qualitative, forme, position (avec ordre conventionnel ou calculé).'),
-  C('efford', 'vv2', 'Efficacité pour une variable ordinale ?', 'Position 1D/2D, taille 1D, taille 2D, position 3D, couleur palette séquentielle, taille 3D. (Les tailles : si les données s\'y prêtent, ok pour des tailles d\'habits, pas pour une mention.)'),
-  C('effquant', 'vv2', 'Efficacité pour une variable quantitative ?', 'Position 1D/2D, taille 1D, taille 2D, position 3D, couleur palette séquentielle ou divergente (si valeur pivot), taille 3D.'),
-  C('ordonnee', 'vv2', 'Pourquoi regrouper ordinales et quantitatives (« ordonnées ») ?', 'Leurs variables visuelles sont quasiment les mêmes.'),
-  C('sep', 'vv2', 'Séparabilité ?', 'Toutes les variables visuelles ne sont pas indépendantes. Faible : largeur + hauteur. Moyenne : taille + teinte. Forte : position + teinte.'),
-  C('comb', 'vv2', 'Exemples de combinaison de variables visuelles ?', '2 nominales : teinte + forme. 1 nominale + 1 ordonnée : teinte + taille. 2 ordonnées : luminosité + taille.'),
-  // TP
-  C('vect', 'tp', 'Image vectorielle vs matricielle ?', 'Vectorielle : objets géométriques + propriétés + transformations, rendu recalculé (nette à tout zoom), ex. SVG. Matricielle : grille de pixels, pixellisée au zoom (PNG, JPEG, GIF).'),
-  C('repere', 'tp', 'Repère SVG ?', 'Origine en haut à gauche, axe y vers le bas : augmenter y fait descendre l\'objet.'),
-  C('path', 'tp', 'Commandes de l\'attribut d d\'un path ?', 'M (MoveTo : se déplacer), L (LineTo : tracer une ligne), C (CurveTo : courbe), Z (fermer le chemin).'),
-  C('rect', 'tp', 'rect : que désignent x et y ?', 'Le coin en haut à gauche du rectangle. Pour une barre de hauteur h sur une base y₀ : y = y₀ − h.'),
-  C('g', 'tp', 'À quoi sert la balise g ?', 'Regrouper des objets, par exemple pour leur appliquer une même transformation (transform="translate(150,150)").'),
-  C('locale', 'tp', 'TP 2 : pourquoi « data is not defined » dans drawInfobulle ?', 'data est une variable locale à la fonction de chargement. On déclare une variable globale (var dataGlobale) remplie après le chargement.'),
-  C('scale', 'tp', 'Échelle D3 : domain et range ?', 'Elle transforme une valeur de l\'intervalle de départ (domain) en valeur de l\'intervalle d\'arrivée (range). domain [0,10], range [0,1000] : scale(2) = 200, scale(7.5) = 750.'),
-  C('scale5', 'tp', 'domain [0,10], range [100,1100] : scale(5) ?', '600.'),
-  C('band', 'tp', 'scaleBand ?', 'Échelle pour un domaine discret : les éléments sont répartis uniformément sur le range. ["A"…"E"] sur [0,1000] : 0, 200, 400, 600, 800. bandwidth() = largeur d\'une bande.'),
-  C('inv', 'tp', 'Pourquoi un range [450,0] pour l\'axe Y ?', 'Parce que l\'axe y du SVG va de haut en bas : sinon les étiquettes de l\'axe Y sont inversées.'),
-  C('log', 'tp', 'Pourquoi une échelle log au TP 4, et quelle précaution ?', 'La plupart des pays ont des valeurs très faibles devant quelques autres : en linéaire le nuage est illisible. log(0) n\'existe pas : domain à partir de 1 et on ne dessine que les pays à valeurs > 0.'),
-  C('zoom', 'tp', 'Principe du zoom D3 ?', 'Tous les g dans un g global ; d3.zoom() appelle une fonction qui applique la transformation au g global ; svg.call(z).'),
-  C('brush', 'tp', 'Principe du brush D3 ?', 'd3.brush() dessine un rectangle de sélection à la souris ; selection[0] = coin haut gauche, selection[1] = coin bas droit ; on teste si chaque objet est dedans.'),
-  C('tp4sem', 'tp', 'TP 4 : variables visuelles du nuage COVID ?', 'Position x : total_cases ; position y : total_deaths ; orientation du triangle : new_cases (nul ou non) ; teinte : continent. La forme triangle ne représente rien.'),
-  C('tp5sem', 'tp', 'TP 5 : variables visuelles des coordonnées parallèles ?', 'Implantation linéaire (une ligne = un iris) ; positions x : les variables quantitatives ; positions y : leurs valeurs ; teinte : espèce.'),
-  C('d3vis', 'tp', 'D3 ou une librairie de plus haut niveau ?', 'D3 est très flexible mais bas niveau (beaucoup de lignes). Pour une visualisation basique, une librairie de plus haut niveau (vis.js) ; pour une visualisation spécifique ou innovante, D3.'),
-];
 
 const Q = (id, ch, q, opts, ans, exp) => ({ id: 'vq_' + id, ch, q, opts, ans, exp });
 export const quiz = [
@@ -185,3 +99,5 @@ export const exams = [
 ];
 
 export * from './codesheet.js';
+
+export { cards } from './cards.js';

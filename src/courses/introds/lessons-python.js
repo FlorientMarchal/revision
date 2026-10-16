@@ -1332,47 +1332,6 @@ True
 
 /* ======================================================================= */
 const C = (id, ch, q, a) => ({ id: 'pyc_' + id, ch, q, a });
-export const cardsPy = [
-  C('exam', 'pybase', `Quel est l'objectif de l'examen « bases de Python » ?`, `Écrire rapidement, sur papier et sans aide, des traitements basiques en style pythonesque ET en style passe-partout (générique). 3/4 h, 25 % de la note.`),
-  C('passe', 'pybase', `Qu'est-ce que l'approche « passe-partout » (générique) ?`, `Un code transposable dans presque tout langage : boucles sur indices, while + drapeau, pas de for elt in, pas de compréhension, pas de in hors range, pas d'indice négatif, pas d'affectation multiple.`),
-  C('choix', 'pybase', `Règle du cours pour choisir entre for et while ?`, `Choisir la structure qui explique le mieux l'algorithme : for pour un parcours complet (nombre d'itérations connu), while si l'on peut s'arrêter avant la fin.`),
-  C('returnboucle', 'pybase', `Pourquoi le cours déconseille-t-il return (ou break) dans une boucle ?`, `Plusieurs points de sortie rendent le code peu lisible et difficile à déboguer ; un for avec return laisse croire à un parcours complet. Un seul return, à la fin.`),
-  C('drapeau', 'pybase', `Qu'est-ce que la technique du drapeau ?`, `Une variable booléenne (ou sentinelle) testée dans la condition du while ; on la modifie dans le corps quand le résultat est trouvé, ce qui arrête la boucle.`),
-  C('drapinit', 'pybase', `Comment initialiser le drapeau pour « il existe » et pour « pour tout » ?`, `À False pour une recherche d'existence (rien dans la liste vide), à True pour une propriété universelle (vraie pour la liste vide).`),
-  C('range', 'pybase', `Que produit range(début, seuil, pas) ?`, `Les entiers de début (0 par défaut) jusqu'à seuil EXCLU, avec le pas (1 par défaut, éventuellement négatif). range(2, 10, 3) donne 2, 5, 8.`),
-  C('input', 'pybase', `Quel est le type renvoyé par input ?`, `Toujours une chaîne (str). Il faut convertir avec int(...) ou float(...) avant de calculer.`),
-  C('printstar', 'pybase', `Que fait print(*lis, sep=" ; ") ?`, `Affiche les éléments de lis sans crochets ni virgules, séparés par " ; ". end fixe la fin de ligne ("\\n" par défaut).`),
-  C('format', 'pybase', `Que signifient {:.3f}, {:^7} et {:-<7} dans format ?`, `3 chiffres après la virgule ; centré sur 7 caractères ; aligné à gauche sur 7 caractères en complétant avec des tirets.`),
-  C('neg', 'pybase', `Que désignent lis[-1] et lis[-len(lis)] ?`, `Le dernier et le premier élément. Les indices négatifs peuvent masquer des erreurs d'indice.`),
-  C('enum', 'pybase', `Comment parcourir une liste avec indices et éléments, en Python ?`, `for i, elt in enumerate(lis): ...`),
-  C('reversed', 'pybase', `Comment parcourir une liste à l'envers en gardant les indices d'origine ?`, `for i, elt in reversed(list(enumerate(lis))): ... (en générique : for i in range(len(lis)-1, -1, -1)).`),
-  C('append', 'pybase', `Coût de append, de insert(0, x) et de x in lis ?`, `append : O(1) ; insertion en tête : O(n) ; recherche in dans une liste : O(n).`),
-  C('extend', 'pybase', `Différence entre lis1 + lis2 et lis1.extend(lis2) ?`, `+ crée une nouvelle liste (O(n1+n2)) ; extend (ou +=) modifie lis1 sur place en O(n2).`),
-  C('appendext', 'pybase', `Que donne lis.append([4, 5]) sur [1, 2, 3] ?`, `[1, 2, 3, [4, 5]] : un seul élément ajouté (une liste). extend ajouterait 4 et 5.`),
-  C('compr', 'pybase', `Écrire la liste des carrés des pairs de 0 à 10 par compréhension.`, `[i**2 for i in range(11) if i % 2 == 0] donne [0, 4, 16, 36, 64, 100].`),
-  C('slice', 'pybase', `Que désigne lis[i:j] et quel est son coût ?`, `La copie des éléments d'indices i à j-1 (i vaut 0 et j len(lis) par défaut). Coût O(j-i).`),
-  C('alias', 'pybase', `lis2 = lis copie-t-il la liste ?`, `Non : lis2 est un alias, les deux noms désignent la même liste. Copier avec lis.copy() (préféré) ou lis[:].`),
-  C('delremove', 'pybase', `Différence entre del lis[i] et lis.remove(x) ?`, `del supprime l'élément d'indice i ; remove supprime la première occurrence de la valeur x (ValueError si absente).`),
-  C('setvide', 'pybase', `Comment créer un ensemble vide ? Et les modalités d'une liste ?`, `set() (car {} est un dictionnaire vide). Modalités : set(lis).`),
-  C('hash', 'pybase', `Pourquoi {[1, 2]} provoque-t-il une erreur ?`, `Une liste est modifiable donc non hachable : elle ne peut pas être élément d'ensemble ni clé de dictionnaire (TypeError: unhashable type: 'list').`),
-  C('float', 'pybase', `Que vaut 0.1 + 0.2 == 0.3 ?`, `False : 0.1 + 0.2 vaut 0.30000000000000004. Comparer les flottants avec une tolérance : abs(a - b) < 1e-9.`),
-  C('str', 'pybase', `Peut-on écrire ch[0] = "P" sur une chaîne ?`, `Non : les chaînes sont non modifiables (TypeError). On construit une nouvelle chaîne.`),
-  C('none', 'pybase', `Que renvoie une fonction sans return ?`, `None. Un None inattendu signale souvent un cas oublié ; le cours veut des fonctions au comportement homogène.`),
-  C('allvide', 'pybase', `Que valent all([]) et any([]) ?`, `all([]) vaut True (propriété universelle vraie sur le vide), any([]) vaut False.`),
-  C('index', 'pybase', `Que fait lis.index(x) si x est absent ?`, `Il lève une exception ValueError, qu'on peut capturer avec try / except pour renvoyer -1.`),
-  C('defaut', 'pybase', `Quel piège avec def f(x, lis=[]) ?`, `La liste par défaut est créée une seule fois et partagée entre les appels. Utiliser lis=None puis if lis is None: lis = [].`),
-  C('importfrom', 'pybase', `Pourquoi préférer import module à from module import * ?`, `Le préfixe module.fonction évite que le contenu du module écrase des fonctions ou variables de même nom déjà définies.`),
-  C('main', 'pybase', `À quoi sert if __name__ == "__main__": ?`, `À n'exécuter le programme principal (tests, saisies) que si le fichier est lancé directement (%run), pas lorsqu'il est importé.`),
-  C('reimport', 'pybase', `On modifie un module déjà importé puis on refait import : que se passe-t-il ?`, `Rien : le module n'est pas relu. Il faut redémarrer le noyau (Kernel > Restart).`),
-  C('aidetest', 'pybase', `Quel est le format d'un test pour aide_test.test ?`, `Un triplet (paramètres, résultat attendu, description) ; plusieurs paramètres dans un tuple, sinon la valeur seule.`),
-  C('timeit', 'pybase', `Que renvoie timeit.timeit(stmt, setup, number) ?`, `Le temps total en secondes des number exécutions de stmt ; setup n'est exécuté qu'une fois. Pour une fonction du notebook : setup="from __main__ import f" ou stmt=lambda: f(x).`),
-  C('defaultdict', 'pybase', `À quoi sert defaultdict(int) ? Et defaultdict(list) ?`, `Une clé absente reçoit automatiquement 0 (comptage sans test d'appartenance) ; avec list, une liste vide (regroupement, dictionnaire inversé).`),
-  C('stable', 'pybase', `Qu'est-ce qu'un tri stable et à quoi cela sert-il ?`, `Il conserve l'ordre relatif des éléments égaux. On trie d'abord par critère secondaire puis par critère principal (ex. mots croissants puis fréquences décroissantes).`),
-  C('itemgetter', 'pybase', `Que fait sorted(d.items(), key=itemgetter(1), reverse=True) ?`, `Trie les couples (clé, valeur) du dictionnaire par valeur décroissante.`),
-  C('chrord', 'pybase', `Que valent ord("A"), chr(ord("A") + 3) et (25 + 3) % 26 ?`, `65, "D" et 2 (le modulo rend l'alphabet circulaire : Z décalé de 3 donne C).`),
-  C('classe', 'pybase', `Rôle de __init__ et de __str__ dans une classe ?`, `__init__(self, ...) est le constructeur qui initialise les attributs (self.titre = titre) ; __str__ renvoie la chaîne utilisée par print.`),
-  C('timsort', 'pybase', `Pourquoi préférer sorted à son propre tri par insertion ?`, `sorted/sort (Timsort) sont optimisés et en O(n log n), contre O(n²) pour le tri par insertion.`),
-];
 
 /* ======================================================================= */
 const Q = (id, ch, q, opts, ans, exp) => ({ id: 'pyq_' + id, ch, q, opts, ans, exp });

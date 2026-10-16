@@ -72,49 +72,6 @@ export const formulas = [
 
 /* ------------------------------------------------------------------ flashcards */
 const C = (id, ch, q, a) => ({ id: 'ac_' + id, ch, q, a });
-export const cards = [
-  C('X', 'notations', 'Que représentent x_{i,j}, x_j et ᵢx ?', 'x_{i,j} : la réponse de l\'individu i à la variable j. x_j (n × 1) : la colonne j, une variable. ᵢx (1 × p) : la ligne i, un individu.'),
-  C('N', 'notations', 'Matrice des poids N ?', 'N = diag(w₁, …, wₙ) avec Σ wᵢ = 1 (souvent wᵢ = 1/n).'),
-  C('g', 'notations', 'Centre de gravité g ?', 'g = 1ᵗ N X = Σ wᵢ ᵢx : le vecteur (1 × p) des moyennes pondérées des variables.'),
-  C('Y', 'notations', 'Tableau centré Y ?', 'Y = X − 1 g = (Id − 1 1ᵗ N) X : son centre de gravité est l\'origine.'),
-  C('V', 'notations', 'Matrice de variance-covariance V ?', 'V = Xᵗ N X − gᵗ g = Yᵗ N Y (p × p) : variances sur la diagonale, covariances ailleurs.'),
-  C('Z', 'notations', 'Tableau réduit Z et matrice R ?', 'Z = Y W⁻¹ avec W = diag(σ₁, …, σ_p) ; la variance-covariance de Z est la matrice des corrélations R.'),
-  C('In', 'notations', 'Inertie d\'un nuage ?', 'In = Σ wᵢ ‖ᵢy‖² = Σ σ²ⱼ = trace(V) : l\'étalement du nuage. En ACP normée, In = p.'),
-  C('fk', 'acp', 'Qu\'est-ce que f_k ?', 'La k-ième composante principale : f_k = Y a_k = Σ_j a_{j,k} y_j, une combinaison linéaire des variables.'),
-  C('a1', 'acp', 'Comment est défini a₁ ?', 'a₁ = argmax var(Ya) sous aᵗa = 1 : c\'est le vecteur propre de V associé à sa plus grande valeur propre λ₁.'),
-  C('lag', 'acp', 'Pourquoi a₁ est-il un vecteur propre de V ?', 'var(Ya) = aᵗVa. Lagrangien aᵗVa − λ(aᵗa − 1) → Va = λa ; la variance vaut alors λ, on prend la plus grande.'),
-  C('a2', 'acp', 'Comment obtient-on a₂ ?', 'Même problème avec en plus a₁ᵗa₂ = 0 : vecteur propre associé à la deuxième plus grande valeur propre λ₂.'),
-  C('prop', 'acp', 'Propriétés des composantes principales ?', 'Centrées (1ᵗ N f_k = 0), non corrélées, de variances λ_k (Cov(F) = Λ), et l\'inertie totale est conservée : Σ λ_j = In(Y).'),
-  C('formul', 'acp', 'Les 4 formulations de l\'ACP ?', 'Maximiser la variance projetée ; minimiser la distorsion des distances deux à deux ; maximiser Σ cov²(Ya, y_j) ; minimiser l\'erreur de reconstruction (rang ≤ K).'),
-  C('cov', 'acp', 'Lien entre λ_k et les covariances ?', 'λ_k = √(Σ_j cov²(f_k, y_j)) : l\'inertie conservée par une composante = la force de sa liaison avec les variables.'),
-  C('auto', 'acp', 'Pourquoi dit-on que l\'ACP est le meilleur auto-encodeur linéaire ?', 'Ŷ = Y A Aᵗ minimise ‖Y − Ŷ‖²_F parmi les matrices de rang ≤ K : on encode F = YA puis on décode FAᵗ.'),
-  C('part', 'resultats', 'Part d\'inertie conservée par K composantes ?', 'Σ_{k≤K} λ_k / In.'),
-  C('kaiser', 'resultats', 'Critère de Kaiser ?', 'Garder les composantes dont la variance λ_k dépasse la variance moyenne In/p (λ > 1 en ACP normée).'),
-  C('eboul', 'resultats', 'Trois méthodes de lecture de l\'éboulis ?', 'Corde : argmax i(λ_p − λ₁) − λ_i(p − 1) ; dérivée seconde : argmax λ_{i+1} − 2λ_i + λ_{i−1} ; coordonnées optimales : dernier k avec λ_k ≥ λ_{k+1} − (λ_p − λ_{k+1})/(p − k − 1).'),
-  C('contrib', 'resultats', 'Contribution d\'une variable à une composante ?', 'a²_{j,k} = cov²(f_k, y_j)/λ_k² : la part d\'inertie de la composante k due à la variable j (somme 1). Le signe de a_{j,k} donne le sens.'),
-  C('covfy', 'resultats', 'cov(f_k, Y) = ?', 'Yᵗ N f_k = Yᵗ N Y a_k = V a_k = λ_k a_k, donc cov(f_k, y_j) = λ_k a_{j,k}.'),
-  C('qualv', 'resultats', 'Qualité de représentation d\'une variable ?', 'Σ_k cor²(f_k, y_j) = Σ_k λ_k a²_{j,k} / σ²_j : la part de sa variance captée par les K composantes (un R²).'),
-  C('contrib2', 'resultats', 'Pourquoi une forte contribution ne suffit-elle pas ?', 'La composante doit aussi contenir suffisamment de l\'information de la variable : il faut une bonne qualité de représentation.'),
-  C('cercle', 'resultats', 'Lire un cercle des corrélations ?', 'Coordonnées = corrélations avec les composantes ; longueur de la flèche = qualité (proche du cercle = bien représentée) ; cos de l\'angle entre deux flèches bien représentées ≈ leur corrélation.'),
-  C('quali', 'resultats', 'Qualité de représentation d\'un individu ?', '‖ᵢŷ‖²/‖ᵢy‖² = Σ_k f²_{i,k} / Σ_j y²_{i,j} : rapport des distances carrées à l\'origine (cos² de l\'angle avec le plan).'),
-  C('indiv', 'resultats', 'Quand peut-on interpréter la distance entre deux individus sur le plan ?', 'Quand ils sont bien représentés : leur distance sur le plan est alors proche de leur distance dans l\'espace d\'origine.'),
-  C('vmobj', 'varimax', 'Objectif de Varimax ?', 'Une fois K choisi, répartir l\'inertie conservée entre les composantes pour les rendre plus interprétables (chaque variable liée à peu de composantes).'),
-  C('vmL', 'varimax', 'Que représente L²_{j,k} ?', 'Avec L = H⁻¹ A Λ^{1/2} et h_j = √(Σ λ_k a²_{j,k}) : la proportion de la variance de j conservée par la composante k parmi l\'inertie conservée par les K composantes.'),
-  C('vmcrit', 'varimax', 'Que maximise Varimax ?', 'Σ_k Var(L*²_{·k}) = (1/p²) Σ_k (p Σ_j L*⁴ − (Σ_j L*²)²), sur les rotations T (L* = L T).'),
-  C('vmres', 'varimax', 'Propriétés après Varimax ?', 'Composantes centrées, non corrélées (Cov = Λ*), inertie du plan conservée ; λ*_k = Σ_j h²_j L*²_{j,k} ; P = A Λ^{−1/2} T Λ*^{1/2}.'),
-  C('vmP', 'varimax', 'Conséquence de P non orthonormée ?', 'L\'espace des composantes n\'est plus directement comparable à l\'espace d\'origine : Ŷ = F*(PᵗP)⁻¹Pᵗ et la qualité des individus utilise (PᵗP)⁻¹.'),
-  C('lim', 'features', 'Quand l\'ACP est-elle pertinente ?', 'Variables quantitatives (plutôt continues), relations linéaires, inertie synonyme d\'information.'),
-  C('rangs', 'features', 'Pourquoi une ACP sur les rangs ?', 'Linéariser les liaisons monotones, réduire l\'impact des valeurs extrêmes, intégrer des variables ordinales. On interprète alors en rangs.'),
-  C('rf', 'features', 'Rang fractionnaire ?', '1 + nombre de valeurs qui précèdent + ½ × nombre d\'ex aequo : les ex aequo reçoivent la moyenne de leurs rangs (10, 20, 20, 30 → 1 ; 2,5 ; 2,5 ; 4).'),
-  C('normee', 'features', 'Pourquoi une ACP normée ?', 'Pour qu\'une variable ne contribue pas fortement ou faiblement à l\'inertie à cause de son échelle de mesure.'),
-  C('absolue', 'features', 'Prévenir la taille absolue d\'un groupe ?', 'Diviser ses variables par √n_g (nombre de variables du groupe).'),
-  C('afm', 'features', 'Qu\'est-ce que l\'AFM ?', 'Analyse Factorielle Multiple : ACP sur y_{i,j}/√λ₁^(g(j)), λ₁^(g) étant la 1re valeur propre de l\'ACP du groupe ; elle prévient la taille effective (variables redondantes).'),
-  C('grp', 'features', 'Contribution d\'un groupe à une composante ?', 'Σ_{j∈g} a²_{j,k}. Pour la qualité de représentation d\'un groupe, pas de définition universelle.'),
-  C('clvpb', 'clv', 'Pourquoi la CLV ?', 'ACP et Varimax ne donnent pas des composantes sparse (toutes les variables contribuent un peu) ; la CLV relâche la contrainte de non-corrélation des composantes.'),
-  C('clv1', 'clv', 'Perte d\'inertie quand on agrège y_a et y_b en f ?', 'var(y_a) + var(y_b) − var(f) ≥ 0, minimale si f est la 1re composante principale des deux variables : on agrège les variables les plus corrélées.'),
-  C('clvT', 'clv', 'Pourquoi la CLV donne-t-elle une hiérarchie ?', 'ΔT_{k+1} = var(f_{A∪B}) − (var(f_A) + var(f_B)) ≤ 0 : l\'inertie conservée décroît, le critère T augmente à chaque étape.'),
-  C('clvuse', 'clv', 'Autres utilisations de la CLV ?', 'Le clustering de variables comme fin en soi, ou comme feature engineering pour une ACP sur des groupes de variables.'),
-];
 
 /* ------------------------------------------------------------------ QCM */
 const Q = (id, ch, q, opts, ans, exp) => ({ id: 'aq_' + id, ch, q, opts, ans, exp });
@@ -196,3 +153,5 @@ export const exams = [
     ],
   },
 ];
+
+export { cards } from './cards.js';
