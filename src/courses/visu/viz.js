@@ -18,6 +18,7 @@ function axes(x0, y0, x1, y1) { return `<path d="M${x0},${y1}V${y0}H${x1}" class
 
 const VIZ = {};
 
+
 /* ---------- Anscombe ---------- */
 VIZ.anscombe = el => {
   const X = [10, 8, 13, 9, 11, 14, 6, 4, 12, 7, 5], X4 = [8, 8, 8, 8, 8, 8, 8, 19, 8, 8, 8];
@@ -117,19 +118,23 @@ VIZ.charts = el => {
 };
 
 /* ---------- Aire ou longueur (CM 3, TD exo 4) ---------- */
+// Les curseurs sont créés une seule fois : un mouvement ne redessine que le dessin (au plus une fois par image).
 VIZ.area = el => {
   let r = 2;
+  el.innerHTML = head('Aire ou longueur ?', 'b = r × a') +
+    `<div class="viz-ctrl"><label>Rapport r = b / a <input type="range" min="1" max="4" step="0.05" value="${r}"><b data-o></b></label></div><div data-live></div>` +
+    `<p class="viz-out">Même quand l'aire est correcte, la différence entre a et b paraît plus faible qu'avec les barres : on compare mal des aires.</p>`;
+  const inp = el.querySelector('input'), lab = el.querySelector('[data-o]'), live = el.querySelector('[data-live]');
   const draw = () => {
     const s = 34, ok = s * Math.sqrt(r), bad = s * r;
-    el.innerHTML = head('Aire ou longueur ?', 'b = r × a') +
-      `<div class="viz-ctrl"><label>Rapport r = b / a <input type="range" min="1" max="4" step="0.5" value="${r}"><b>${fmt(r, 1)}</b></label></div>` +
-      svg(800, 190,
-        `<g transform="translate(10,10)"><text x="0" y="12" class="vz-t">Longueur (barres)</text><rect x="0" y="30" width="${60 * 1}" height="22" fill="var(--c1)"/><rect x="0" y="62" width="${60 * r}" height="22" fill="var(--c1)"/><text x="${60 * r + 6}" y="78" class="vz-t">b</text><text x="66" y="46" class="vz-t">a</text></g>` +
-        `<g transform="translate(290,10)"><text x="0" y="12" class="vz-t">Aire correcte (côté × √r)</text><rect x="0" y="30" width="${s}" height="${s}" fill="var(--c3)"/><rect x="${s + 16}" y="30" width="${ok}" height="${ok}" fill="var(--c3)"/><text x="0" y="${42 + Math.max(ok, s) + 8}" class="vz-t">côté de b = ${fmt(Math.sqrt(r))} × côté de a</text></g>` +
-        `<g transform="translate(560,10)"><text x="0" y="12" class="vz-t">Faux : côté × r</text><rect x="0" y="30" width="${s}" height="${s}" fill="var(--c2)"/><rect x="${s + 16}" y="30" width="${Math.min(bad, 150)}" height="${Math.min(bad, 150)}" fill="var(--c2)" opacity=".85"/><text x="0" y="${42 + Math.min(Math.max(bad, s), 150) + 8 > 186 ? 186 : 42 + Math.min(Math.max(bad, s), 150) + 8}" class="vz-t">aire × ${fmt(r * r, 2)} au lieu de × ${fmt(r, 1)}</text></g>`, 'Comparaison longueur et aire') +
-      `<p class="viz-out">Même quand l'aire est correcte, la différence entre a et b paraît plus faible qu'avec les barres : on compare mal des aires.</p>`;
-    const inp = el.querySelector('input'); inp.oninput = () => { r = +inp.value; draw(); el.querySelector('input').focus(); };
+    lab.textContent = fmt(r, 2);
+    live.innerHTML = svg(800, 190,
+      `<g transform="translate(10,10)"><text x="0" y="12" class="vz-t">Longueur (barres)</text><rect x="0" y="30" width="${60 * 1}" height="22" fill="var(--c1)"/><rect x="0" y="62" width="${60 * r}" height="22" fill="var(--c1)"/><text x="${60 * r + 6}" y="78" class="vz-t">b</text><text x="66" y="46" class="vz-t">a</text></g>` +
+      `<g transform="translate(290,10)"><text x="0" y="12" class="vz-t">Aire correcte (côté × √r)</text><rect x="0" y="30" width="${s}" height="${s}" fill="var(--c3)"/><rect x="${s + 16}" y="30" width="${ok}" height="${ok}" fill="var(--c3)"/><text x="0" y="${42 + Math.max(ok, s) + 8}" class="vz-t">côté de b = ${fmt(Math.sqrt(r))} × côté de a</text></g>` +
+      `<g transform="translate(560,10)"><text x="0" y="12" class="vz-t">Faux : côté × r</text><rect x="0" y="30" width="${s}" height="${s}" fill="var(--c2)"/><rect x="${s + 16}" y="30" width="${Math.min(bad, 150)}" height="${Math.min(bad, 150)}" fill="var(--c2)" opacity=".85"/><text x="0" y="${Math.min(42 + Math.min(Math.max(bad, s), 150) + 8, 186)}" class="vz-t">aire × ${fmt(r * r, 2)} au lieu de × ${fmt(r, 2)}</text></g>`, 'Comparaison longueur et aire');
   };
+  const req = draw; // le site regroupe déjà les évènements du curseur (un redessin par image)
+  inp.oninput = () => { r = +inp.value; req(); };
   draw();
 };
 
@@ -156,20 +161,29 @@ VIZ.palettes = el => {
 
 /* ---------- RVB et TSL ---------- */
 VIZ.color = el => {
-  let m = 'rgb', c = [255, 0, 255], h = [300, 100, 50];
-  const draw = () => {
-    const col = m === 'rgb' ? `rgb(${c.join(',')})` : `hsl(${h[0]},${h[1]}%,${h[2]}%)`;
+  let m = 'rgb';
+  const val = { rgb: [255, 0, 255], hsl: [300, 100, 50] };
+  const build = () => {
     const ctl = m === 'rgb'
-      ? ['Rouge', 'Vert', 'Bleu'].map((l, i) => `<label>${l} <input type="range" min="0" max="255" value="${c[i]}" data-i="${i}"><b>${c[i]}</b></label>`).join('')
-      : [['Teinte', 360], ['Saturation', 100], ['Luminosité', 100]].map(([l, mx], i) => `<label>${l} <input type="range" min="0" max="${mx}" value="${h[i]}" data-i="${i}"><b>${h[i]}${i ? ' %' : '°'}</b></label>`).join('');
-    const strip = m === 'rgb' ? '' : `<div class="vz-strips">${[0, 1, 2].map(k => `<div><span>${['Teinte → nominale', 'Saturation → ordonnée', 'Luminosité → ordonnée'][k]}</span><div class="vz-strip">${[0, 1, 2, 3, 4, 5].map(t => { const v = [...h]; v[k] = k === 0 ? t * 60 : 10 + t * 16; return `<i style="background:hsl(${v[0]},${v[1]}%,${v[2]}%)"></i>`; }).join('')}</div></div>`).join('')}</div>`;
+      ? ['Rouge', 'Vert', 'Bleu'].map((l, i) => `<label>${l} <input type="range" min="0" max="255" value="${val.rgb[i]}" data-i="${i}"><b data-o="${i}"></b></label>`).join('')
+      : [['Teinte', 360], ['Saturation', 100], ['Luminosité', 100]].map(([l, mx], i) => `<label>${l} <input type="range" min="0" max="${mx}" value="${val.hsl[i]}" data-i="${i}"><b data-o="${i}"></b></label>`).join('');
     el.innerHTML = head('Modèles colorimétriques', m === 'rgb' ? 'essaie 0,255,0 · 0,128,0 · 255,0,255 · 0,0,0 · 255,255,255 · 128,128,128' : 'chaque composante a son usage') +
       seg('mm', [['rgb', 'Rouge Vert Bleu'], ['hsl', 'Teinte Saturation Luminosité']], m) +
-      `<div class="vz-color"><div class="vz-swatch" style="background:${col}"></div><div class="viz-ctrl">${ctl}</div></div>${strip}`;
-    el.querySelectorAll('[data-mm]').forEach(b => (b.onclick = () => { m = b.dataset.mm; draw(); }));
-    el.querySelectorAll('input[data-i]').forEach(inp => (inp.oninput = () => { (m === 'rgb' ? c : h)[+inp.dataset.i] = +inp.value; draw(); el.querySelector(`input[data-i="${inp.dataset.i}"]`).focus(); }));
+      `<div class="vz-color"><div class="vz-swatch"></div><div class="viz-ctrl">${ctl}</div></div>` +
+      (m === 'hsl' ? `<div class="vz-strips">${[0, 1, 2].map(k => `<div><span>${['Teinte → nominale', 'Saturation → ordonnée', 'Luminosité → ordonnée'][k]}</span><div class="vz-strip">${'<i></i>'.repeat(6)}</div></div>`).join('')}</div>` : '');
+    const sw = el.querySelector('.vz-swatch'), labs = [...el.querySelectorAll('[data-o]')], strips = [...el.querySelectorAll('.vz-strip')];
+    const draw = () => {
+      const v = val[m];
+      sw.style.background = m === 'rgb' ? `rgb(${v.join(',')})` : `hsl(${v[0]},${v[1]}%,${v[2]}%)`;
+      labs.forEach((b, i) => (b.textContent = m === 'rgb' ? v[i] : v[i] + (i ? ' %' : '°')));
+      strips.forEach((st, k) => [...st.children].forEach((cell, t) => { const w = [...v]; w[k] = k === 0 ? t * 60 : 10 + t * 16; cell.style.background = `hsl(${w[0]},${w[1]}%,${w[2]}%)`; }));
+    };
+    const req = draw; // le site regroupe déjà les évènements du curseur (un redessin par image)
+    el.querySelectorAll('[data-mm]').forEach(b => (b.onclick = () => { m = b.dataset.mm; build(); }));
+    el.querySelectorAll('input[data-i]').forEach(inp => (inp.oninput = () => { val[m][+inp.dataset.i] = +inp.value; req(); }));
+    draw();
   };
-  draw();
+  build();
 };
 
 /* ---------- Classement d'efficacité ---------- */
@@ -202,40 +216,49 @@ VIZ.separability = el => {
 /* ---------- Repère SVG ---------- */
 VIZ.svgframe = el => {
   let x = 100, y = 100;
+  el.innerHTML = head('Le repère SVG', 'l\'origine est en haut à gauche, y descend') +
+    `<div class="viz-ctrl"><label>cx <input type="range" min="20" max="280" value="${x}" data-k="x"><b data-o="x"></b></label><label>cy <input type="range" min="20" max="180" value="${y}" data-k="y"><b data-o="y"></b></label></div><div data-live></div>`;
+  const live = el.querySelector('[data-live]'), ox = el.querySelector('[data-o=x]'), oy = el.querySelector('[data-o=y]');
   const draw = () => {
-    el.innerHTML = head('Le repère SVG', 'l\'origine est en haut à gauche, y descend') +
-      `<div class="viz-ctrl"><label>cx <input type="range" min="20" max="280" value="${x}" data-k="x"><b>${x}</b></label><label>cy <input type="range" min="20" max="180" value="${y}" data-k="y"><b>${y}</b></label></div>` +
-      svg(800, 210, `<g transform="translate(20,10)"><rect width="300" height="200" fill="none" stroke="var(--line-strong)"/><path d="M0,0H60M0,0V60" stroke="var(--red)" stroke-width="2" marker-end=""/><text x="64" y="12" class="vz-t">x</text><text x="6" y="74" class="vz-t">y</text><text x="4" y="-2" class="vz-t">(0,0)</text><line x1="${x}" y1="0" x2="${x}" y2="${y}" class="vz-grid"/><line x1="0" y1="${y}" x2="${x}" y2="${y}" class="vz-grid"/><circle cx="${x}" cy="${y}" r="16" fill="var(--c4)" stroke="var(--c2)" stroke-width="2"/></g>` +
-        `<g transform="translate(360,30)"><text class="vz-t" y="0">Barre de hauteur h posée sur la ligne y₀ = 160 :</text><line x1="0" x2="300" y1="160" y2="160" class="vz-axis"/><rect x="40" y="${160 - (y - 20) * 0.8}" width="50" height="${(y - 20) * 0.8}" fill="var(--c1)"/><text x="100" y="${170 - (y - 20) * 0.4}" class="vz-t">h = ${fmt((y - 20) * 0.8, 0)} → y = 160 − h = ${fmt(160 - (y - 20) * 0.8, 0)}</text></g>`, 'Repère SVG');
-    el.querySelectorAll('input').forEach(inp => (inp.oninput = () => { if (inp.dataset.k === 'x') x = +inp.value; else y = +inp.value; draw(); el.querySelector(`input[data-k="${inp.dataset.k}"]`).focus(); }));
+    ox.textContent = x; oy.textContent = y;
+    const h = (y - 20) * 0.8;
+    live.innerHTML = svg(800, 210, `<g transform="translate(20,10)"><rect width="300" height="200" fill="none" stroke="var(--line-strong)"/><path d="M0,0H60M0,0V60" stroke="var(--red)" stroke-width="2"/><text x="64" y="12" class="vz-t">x</text><text x="6" y="74" class="vz-t">y</text><text x="4" y="-2" class="vz-t">(0,0)</text><line x1="${x}" y1="0" x2="${x}" y2="${y}" class="vz-grid"/><line x1="0" y1="${y}" x2="${x}" y2="${y}" class="vz-grid"/><circle cx="${x}" cy="${y}" r="16" fill="var(--c4)" stroke="var(--c2)" stroke-width="2"/></g>` +
+      `<g transform="translate(360,30)"><text class="vz-t" y="0">Barre de hauteur h posée sur la ligne y₀ = 160 :</text><line x1="0" x2="300" y1="160" y2="160" class="vz-axis"/><rect x="40" y="${160 - h}" width="50" height="${h}" fill="var(--c1)"/><text x="100" y="${170 - h / 2}" class="vz-t">h = ${fmt(h, 0)} → y = 160 − h = ${fmt(160 - h, 0)}</text></g>`, 'Repère SVG');
   };
+  const req = draw; // le site regroupe déjà les évènements du curseur (un redessin par image)
+  el.querySelectorAll('input').forEach(inp => (inp.oninput = () => { if (inp.dataset.k === 'x') x = +inp.value; else y = +inp.value; req(); }));
   draw();
 };
 
 /* ---------- Échelles (domain → range) ---------- */
 VIZ.scales = el => {
-  let kind = 'lin', v = 2, r0 = 0, r1 = 1000;
-  const draw = () => {
-    const X = t => 40 + t * 720;
-    let body, out;
-    if (kind === 'lin') {
-      const y = r0 + (v - 0) / 10 * (r1 - r0);
-      body = `<line x1="${X(0)}" x2="${X(1)}" y1="40" y2="40" class="vz-axis"/><line x1="${X(0)}" x2="${X(1)}" y1="120" y2="120" class="vz-axis"/><text x="${X(0)}" y="28" class="vz-t">domain [0,10]</text><text x="${X(0)}" y="148" class="vz-t">range [${r0},${r1}]</text>` +
-        `<line x1="${X(v / 10)}" y1="40" x2="${X(v / 10)}" y2="120" stroke="var(--accent)" stroke-width="2"/><circle cx="${X(v / 10)}" cy="40" r="5" fill="var(--accent)"/><circle cx="${X(v / 10)}" cy="120" r="5" fill="var(--accent)"/><text x="${X(v / 10) + 8}" y="84" class="vz-t">${fmt(v)} → ${fmt(y)}</text>`;
-      out = `Échelle linéaire : scale(${fmt(v)}) = ${fmt(y)}.`;
-    } else {
-      const D = ['A', 'B', 'C', 'D', 'E'], bw = 1000 / D.length;
-      body = `<line x1="${X(0)}" x2="${X(1)}" y1="120" y2="120" class="vz-axis"/><text x="${X(0)}" y="148" class="vz-t">range [0,1000] · bandwidth = ${bw}</text>` +
-        D.map((d, i) => `<rect x="${X(i / 5) + 2}" y="70" width="${720 / 5 - 4}" height="40" fill="${i === Math.round(v / 2.5) ? 'var(--accent-soft)' : 'var(--paper-2)'}" stroke="var(--line)"/><text x="${X(i / 5) + 8}" y="94" class="vz-t">${d} → ${i * bw}</text><line x1="${X(i / 5)}" x2="${X(i / 5)}" y1="110" y2="126" stroke="var(--accent)" stroke-width="2"/>`).join('');
-      out = 'scaleBand : chaque valeur du domaine reçoit le début de sa bande ; la largeur d\'une bande est bandwidth().';
-    }
+  let kind = 'lin', v = 2, r0 = 0;
+  const X = t => 40 + t * 720;
+  const build = () => {
     el.innerHTML = head('Une échelle D3 transforme le domain en range', '') + seg('s', [['lin', 'scaleLinear'], ['band', 'scaleBand']], kind) +
-      (kind === 'lin' ? `<div class="viz-ctrl"><label>valeur <input type="range" min="0" max="10" step="0.5" value="${v}" data-k="v"><b>${fmt(v)}</b></label><label>range de départ <input type="range" min="0" max="500" step="100" value="${r0}" data-k="r0"><b>${r0}</b></label></div>` : '') +
-      svg(800, 160, body, 'Échelle') + `<p class="viz-out">${out}</p>`;
-    el.querySelectorAll('[data-s]').forEach(b => (b.onclick = () => { kind = b.dataset.s; draw(); }));
-    el.querySelectorAll('input').forEach(inp => (inp.oninput = () => { if (inp.dataset.k === 'v') v = +inp.value; else { r0 = +inp.value; r1 = r0 + 1000; } draw(); el.querySelector(`input[data-k="${inp.dataset.k}"]`).focus(); }));
+      (kind === 'lin' ? `<div class="viz-ctrl"><label>valeur <input type="range" min="0" max="10" step="0.1" value="${v}" data-k="v"><b data-o="v"></b></label><label>range de départ <input type="range" min="0" max="500" step="100" value="${r0}" data-k="r0"><b data-o="r0"></b></label></div>` : '') +
+      `<div data-live></div><p class="viz-out"></p>`;
+    const live = el.querySelector('[data-live]'), out = el.querySelector('.viz-out'), ov = el.querySelector('[data-o=v]'), or = el.querySelector('[data-o=r0]');
+    const draw = () => {
+      if (kind === 'lin') {
+        const r1 = r0 + 1000, y = r0 + v / 10 * (r1 - r0);
+        ov.textContent = fmt(v); or.textContent = r0;
+        live.innerHTML = svg(800, 160, `<line x1="${X(0)}" x2="${X(1)}" y1="40" y2="40" class="vz-axis"/><line x1="${X(0)}" x2="${X(1)}" y1="120" y2="120" class="vz-axis"/><text x="${X(0)}" y="28" class="vz-t">domain [0,10]</text><text x="${X(0)}" y="148" class="vz-t">range [${r0},${r1}]</text>` +
+          `<line x1="${X(v / 10)}" y1="40" x2="${X(v / 10)}" y2="120" stroke="var(--accent)" stroke-width="2"/><circle cx="${X(v / 10)}" cy="40" r="5" fill="var(--accent)"/><circle cx="${X(v / 10)}" cy="120" r="5" fill="var(--accent)"/><text x="${X(v / 10) + 8}" y="84" class="vz-t">${fmt(v)} → ${fmt(y)}</text>`, 'Échelle');
+        out.textContent = `Échelle linéaire : scale(${fmt(v)}) = ${fmt(y)}.`;
+      } else {
+        const D = ['A', 'B', 'C', 'D', 'E'], bw = 1000 / D.length;
+        live.innerHTML = svg(800, 160, `<line x1="${X(0)}" x2="${X(1)}" y1="120" y2="120" class="vz-axis"/><text x="${X(0)}" y="148" class="vz-t">range [0,1000] · bandwidth = ${bw}</text>` +
+          D.map((d, i) => `<rect x="${X(i / 5) + 2}" y="70" width="${720 / 5 - 4}" height="40" fill="var(--paper-2)" stroke="var(--line)"/><text x="${X(i / 5) + 8}" y="94" class="vz-t">${d} → ${i * bw}</text><line x1="${X(i / 5)}" x2="${X(i / 5)}" y1="110" y2="126" stroke="var(--accent)" stroke-width="2"/>`).join(''), 'Échelle');
+        out.textContent = 'scaleBand : chaque valeur du domaine reçoit le début de sa bande ; la largeur d\'une bande est bandwidth().';
+      }
+    };
+    const req = draw; // le site regroupe déjà les évènements du curseur (un redessin par image)
+    el.querySelectorAll('[data-s]').forEach(b => (b.onclick = () => { kind = b.dataset.s; build(); }));
+    el.querySelectorAll('input').forEach(inp => (inp.oninput = () => { if (inp.dataset.k === 'v') v = +inp.value; else r0 = +inp.value; req(); }));
+    draw();
   };
-  draw();
+  build();
 };
 
 /* ---------- TD exercice 4 : la figure a, b.1, b.2 ---------- */
