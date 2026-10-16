@@ -34,6 +34,12 @@ export const codesheet = [
     Q('cd-7', 'Clé composée'),
     Q('cd-8', 'Plage de clés sans reduce'),
   ] },
+  { part: 'CouchDB', lang: 'JavaScript / URL', t: 'CouchDB : les vues du TP 2', src: 'TP 2, corrigé', items: [
+    Q('tp2-2', 'Une ligne par élément d\'une liste imbriquée (forEach + emit)'),
+    Q('tp2-3', 'Lister des valeurs sans doublon : reduce _count + group=true'),
+    Q('tp2-4b', 'Clé composée et plage startkey / endkey avec {}'),
+    Q('tp2-5', 'Filtrer sur plusieurs critères avec une clé composée'),
+  ] },
   { part: 'AQL', lang: 'AQL', t: 'ArangoDB : requêtes AQL', src: 'CM, partie 5', items: [
     Q('aq-1', 'Jointure : FOR imbriqués + FILTER, SORT, RETURN'),
     Q('aq-2', 'Filtrer sur des champs indexés'),

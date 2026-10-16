@@ -8,6 +8,18 @@ const E = editions.docs;
 const X = (id, q, sol, more = {}) => ({ id, q, sol, ...more });
 const uniq = a => [...new Set(a)];
 const byAlpha = (a, b) => String(a).localeCompare(String(b), 'fr');
+// Imitation d'une vue CouchDB : lignes { key, value } triées selon la collation (nombres < chaînes < tableaux).
+const rank = v => v === null ? 0 : typeof v === 'boolean' ? 1 : typeof v === 'number' ? 2 : typeof v === 'string' ? 3 : Array.isArray(v) ? 4 : 5;
+function collate(a, b) {
+  const ra = rank(a), rb = rank(b);
+  if (ra !== rb) return ra - rb;
+  if (ra === 2) return a - b;
+  if (ra === 3) return a.localeCompare(b, 'fr');
+  if (ra === 4) { for (let i = 0; i < Math.min(a.length, b.length); i++) { const c = collate(a[i], b[i]); if (c) return c; } return a.length - b.length; }
+  return 0;
+}
+const view = pairs => pairs.map(([key, value]) => ({ key, value })).sort((x, y) => collate(x.key, y.key));
+const grouped = pairs => { const out = []; for (const r of view(pairs)) { const last = out[out.length - 1]; if (last && collate(last.key, r.key) === 0) last.value++; else out.push({ key: r.key, value: 1 }); } return out; };
 
 const TABLE = (name, cols) => `<div class="box def"><div class="box-h">table ${name}</div><p><code>${cols}</code></p></div>`;
 
@@ -194,8 +206,127 @@ AND a.date > '2024-07-01' AND a.date < '2024-08-31';`),
 
   /* ===================================================================== */
   {
+    id: 'tp2', title: 'TP 2 · CouchDB', lang: 'JavaScript / URL', src: 'TP 2, corrigé', kind: 'corrige',
+    intro: '<p>Les mêmes festivals qu\'au TP 1, cette fois dans <b>CouchDB</b>. Le corrigé propose <b>un document par édition de festival</b>, avec la liste des artistes imbriquée. Pour chaque question : la vue à créer (fonction <code>map</code>, et <code>reduce</code> si besoin) et les URL à appeler.</p><p><b>La recette du corrigé : émettre des clés correspondant aux critères sur lesquels on veut filtrer !</b></p><p class="math-note">Base <code>festivals</code>, design doc <code>tp2</code>. L\'adresse du serveur du TP et ses identifiants sont dans le sujet ; ils ne sont pas reproduits ici. Le résultat attendu est calculé à partir des données du TP (11 éditions) en imitant CouchDB : lignes triées par clé.</p>',
+    dataset: { name: 'base festivals, 11 documents', docs: E },
+    exos: [
+      X('tp2-0', '<p><b>Ex. 1</b> · Proposer un modèle non relationnel (orienté documents) pour stocker ces données.</p>', `{
+  "_id": "4fa1e268725e09e2fceded90fe003af3",
+  "nom": "Garorock",
+  "lieu": "Marmande",
+  "annee": 2021,
+  "max_personnes": 50000,
+  "artistes": [
+    { "nom": "Vianney", "pays": "France" },
+    { "nom": "Selah Sue", "pays": "Belgique" },
+    { "nom": "PNL", "pays": "France" },
+    { "nom": "Gorillaz", "pays": "Royaume Uni" },
+    { "nom": "Izïa", "pays": "France" }
+  ]
+}`, { lang: 'JSON', note: 'Un document par édition : le festival (nom, lieu, jauge) est répété à chaque édition, et les artistes sont imbriqués.' }),
+      X('tp2-1', '<p><b>Ex. 2</b> · Toutes les éditions de festival (nom du festival et année), en pouvant filtrer par festival.</p>', `// Sans vue : un document = une édition
+https://<serveur>/festivals/_all_docs?include_docs=true
+
+// Vue toutes_les_editions, map :
+function (doc) {
+  emit(doc.nom, { "nom": doc.nom, "annee": doc.annee });
+}
+
+https://<serveur>/festivals/_design/tp2/_view/toutes_les_editions
+https://<serveur>/festivals/_design/tp2/_view/toutes_les_editions?key="Garorock"`,
+        { expected: () => view(E.map(d => [d.nom, { nom: d.nom, annee: d.annee }])), note: 'Résultat attendu de la vue sans paramètre. Avec <code>?key="Garorock"</code>, on ne garde que les lignes de clé « Garorock ».' }),
+      X('tp2-2', '<p>Tous les festivals où Placebo a joué.</p>', `// Vue editions_par_artiste, map :
+function (doc) {
+  doc.artistes.forEach((a) => {
+    emit(a.nom, { festival: doc.nom, edition: doc.annee});
+  });
+}
+
+https://<serveur>/festivals/_design/tp2/_view/editions_par_artiste?key="Placebo"`,
+        { expected: () => view(E.flatMap(d => d.artistes.map(a => [a.nom, { festival: d.nom, edition: d.annee }]))).filter(r => r.key === 'Placebo'), note: 'Le corrigé propose ensuite de modifier un document pour ajouter Placebo à une édition, et de relancer la vue.' }),
+      X('tp2-3', '<p>Tous les artistes (chacun une seule fois).</p>', `// Chaque artiste peut apparaître plusieurs fois : reduce + group
+// Vue tous_les_artistes, map :
+function (doc) {
+  doc.artistes.forEach((a) => {
+    emit(a.nom, a);
+  })
+}
+// reduce : _count
+
+https://<serveur>/festivals/_design/tp2/_view/tous_les_artistes?reduce=false
+https://<serveur>/festivals/_design/tp2/_view/tous_les_artistes?group=true`,
+        { expected: () => grouped(E.flatMap(d => d.artistes.map(a => [a.nom, a]))), note: 'Résultat de <code>?group=true</code> : une ligne par artiste, avec son nombre d\'éditions. <code>?reduce=false</code> renvoie les lignes de map (un artiste par édition).' }),
+      X('tp2-3b', '<p>Le détail d\'un artiste (Angèle).</p>', `// On filtre par clé, et on enlève le reduce pour avoir la valeur
+https://<serveur>/festivals/_design/tp2/_view/tous_les_artistes?key="Angèle"
+https://<serveur>/festivals/_design/tp2/_view/tous_les_artistes?key="Angèle"&reduce=false
+https://<serveur>/festivals/_design/tp2/_view/tous_les_artistes?key="Angèle"&reduce=false&limit=1`,
+        { lang: 'URL', expected: () => view(E.flatMap(d => d.artistes.map(a => [a.nom, a]))).filter(r => r.key === 'Angèle').slice(0, 1), note: 'Avec le reduce, <code>?key="Angèle"</code> ne renvoie que le compte ; <code>reduce=false</code> donne les documents émis, <code>limit=1</code> n\'en garde qu\'un.' }),
+      X('tp2-4', '<p>Tous les artistes français : première idée, une clé = le pays.</p>', `// Vue artistes_par_pays, map :
+function (doc) {
+  doc.artistes.forEach((a) => {
+    emit(a.pays, a.nom);
+  })
+}
+// reduce : _count
+
+https://<serveur>/festivals/_design/tp2/_view/artistes_par_pays?key="France"&reduce=false
+https://<serveur>/festivals/_design/tp2/_view/artistes_par_pays?group=true`,
+        { expected: () => grouped(E.flatMap(d => d.artistes.map(a => [a.pays, a.nom]))), note: '« Zut… on a besoin d\'une autre stratégie. » Avec <code>group=true</code> on obtient un compte <b>par pays</b>, pas la liste des artistes ; avec <code>reduce=false</code>, un artiste revient autant de fois qu\'il a joué.' }),
+      X('tp2-4b', '<p>Tous les artistes français, chacun une seule fois : la bonne stratégie.</p>', `// Vue artistes_par_pays_2, map : clé composée [pays, nom]
+function (doc) {
+  doc.artistes.forEach((a) => {
+    emit([a.pays, a.nom], null);
+  })
+}
+// reduce : _count
+
+https://<serveur>/festivals/_design/tp2/_view/artistes_par_pays_2?reduce=false
+https://<serveur>/festivals/_design/tp2/_view/artistes_par_pays_2?group=true
+https://<serveur>/festivals/_design/tp2/_view/artistes_par_pays_2?startkey=["France"]&endkey=["France", {}]&group=true`,
+        { expected: () => grouped(E.flatMap(d => d.artistes.map(a => [[a.pays, a.nom], null]))).filter(r => r.key[0] === 'France').map(r => ({ key: JSON.stringify(r.key), value: r.value })), note: 'L\'objet vide <code>{}</code> à la fin de <code>endkey</code> se place <b>après</b> toutes les chaînes : ordre de collation <code>null &lt; booléens &lt; nombres &lt; chaînes &lt; tableaux &lt; objets</code>. On obtient ainsi toutes les clés qui commencent par "France". Marche aussi avec <code>endkey=["France "]</code> (un espace de plus), mais c\'est moins lisible.' }),
+      X('tp2-5', '<p>Tous les artistes français ayant joué aux Eurockéennes en 2018.</p>', `// Vue artistes_par_pays_et_edition, map :
+function (doc) {
+  doc.artistes.forEach((a) => {
+    emit([doc.nom, doc.annee, a.pays], a.nom);
+  });
+}
+
+https://<serveur>/festivals/_design/tp2/_view/artistes_par_pays_et_edition?key=["Les Eurockéennes",2018,"France"]
+https://<serveur>/festivals/_design/tp2/_view/artistes_par_pays_et_edition?startkey=["Les Eurockéennes"]&endkey=["Les Eurockéennes", {}]`,
+        { expected: () => view(E.flatMap(d => d.artistes.map(a => [[d.nom, d.annee, a.pays], a.nom]))).filter(r => r.key[0] === 'Les Eurockéennes' && r.key[1] === 2018 && r.key[2] === 'France').map(r => ({ key: JSON.stringify(r.key), value: r.value })), note: 'Résultat de la première URL. La seconde, avec <code>{}</code>, donne tous les artistes de toutes les éditions des Eurockéennes.' }),
+      X('tp2-5b', '<p>Tous les artistes français des Eurockéennes, <b>quelle que soit l\'édition</b>.</p>', `// Le corrigé : émettre la clé avec les mêmes éléments, mais dans un autre ordre :
+// nom du festival, pays de l'artiste, année
+function (doc) {
+  doc.artistes.forEach((a) => {
+    emit([doc.nom, a.pays, doc.annee], a.nom);
+  });
+}
+
+// puis :
+startkey=["Les Eurockéennes","France"]&endkey=["Les Eurockéennes","France "]`,
+        { expected: () => view(E.flatMap(d => d.artistes.map(a => [[d.nom, a.pays, d.annee], a.nom]))).filter(r => r.key[0] === 'Les Eurockéennes' && r.key[1] === 'France').map(r => ({ key: JSON.stringify(r.key), value: r.value })), note: 'Le corrigé décrit cette vue en une phrase ; la fonction map ci-dessus l\'écrit en suivant ce qu\'il dit. Une plage de clés ne peut porter que sur la <b>fin</b> d\'une clé composée : les critères fixés doivent venir en premier.', kind: 'propose' }),
+      X('tp2-6', '<p>Que se passe-t-il au niveau des vues lorsqu\'on ajoute ou modifie un document ?</p>', `Les vues sont mises à jour automatiquement ;
+l'index est mis à jour de façon incrémentale : seuls les documents
+modifiés/ajoutés depuis la dernière mise à jour passent dans le map.
+Par défaut, cette mise à jour a lieu au moment de la requête,
+ce qui rend la première requête après beaucoup d'écritures plus lente.`, { lang: 'texte' }),
+      X('tp2-7', '<p>Avec le recul, choisiriez-vous une modélisation différente ?</p>', `Avec une base de documents "à plat", aucune modélisation n'est parfaite
+dès lors que plusieurs concepts sont en jeu.
+
+Alternative : un document par occurrence d'un artiste dans une édition :
+{
+  "nom": "Garorock", "lieu": "Marmande", "annee": 2021, "max_personnes": 50000,
+  "artiste": { "nom": "Vianney", "pays": "France" }
+}
+
+→ Encore plus de redondance, mais une granularité plus fine :
+  pas de boucle à faire dans le code des vues.`, { lang: 'texte' }),
+    ],
+  },
+
+  {
     id: 'aql-tp2', title: 'Entraînement AQL · festivals', lang: 'AQL', src: 'données du TP 2', kind: 'propose',
-    intro: '<p>Les questions du TP 1, cette fois en AQL sur la collection <code>editions</code> du fichier <code>tp2-editions.json</code> : un document par édition, avec <code>nom</code> (du festival), <code>lieu</code>, <code>annee</code>, <code>max_personnes</code> et la liste des <code>artistes</code> (<code>nom</code>, <code>pays</code>) imbriquée dans le document.</p><p><b>Ces solutions ont été rédigées pour le site</b> (l\'énoncé du TP 2 n\'est pas encore disponible) : ce ne sont pas des corrigés de l\'enseignant. Le résultat attendu est calculé à partir du fichier.</p>',
+    intro: '<p>Les questions du TP 1, cette fois en AQL sur la collection <code>editions</code> du fichier <code>tp2-editions.json</code> : un document par édition, avec <code>nom</code> (du festival), <code>lieu</code>, <code>annee</code>, <code>max_personnes</code> et la liste des <code>artistes</code> (<code>nom</code>, <code>pays</code>) imbriquée dans le document.</p><p><b>Ces solutions ont été rédigées pour le site</b> : le TP 2 se fait avec CouchDB (série précédente), cette série est un entraînement en plus, pas un corrigé de l\'enseignant. Le résultat attendu est calculé à partir du fichier.</p>',
     dataset: { name: 'collection editions, 11 documents', docs: E },
     exos: [
       X('t2-1', '<p>Toutes les éditions, triées par année puis par nom de festival.</p>', `FOR e IN editions
