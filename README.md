@@ -1,51 +1,43 @@
 # Mes révisions
 
-Site de révision multi-cours : fiches avec formules et illustrations interactives, flashcards, QCM, annales corrigées et TP.
-En ligne : https://florientmarchal.github.io/revision/
+Site personnel de révision pour le **M1 MIASHS** (Université Paul-Valéry Montpellier 3), semestre 1, 2026-2027.
+
+**En ligne : https://florientmarchal.github.io/revision/**
+
+## Les cours
+
+| Cours | Code |
+|---|---|
+| Visualisation d'informations | TW113MI |
+| Bases de données NoSQL | TW111MI |
+| Analyse de données multidimensionnelles (ACP) | TW122MI |
+| Modèles de régression linéaire et outils du diagnostic | TW133MI |
+| Régularisation et optimisation | TW131MI |
+| Classification supervisée et non supervisée | TW132MI |
+| Introduction à la science des données | TW121MI |
+
+L'accueil affiche les dates de partiel et de rattrapage, et classe les cours par prochaine évaluation.
+
+## Pour chaque cours
+
+- **Cours complet** : une leçon par chapitre, avec illustrations interactives.
+- **Fiches** et **formulaire** : l'essentiel et toutes les formules à connaître.
+- **Mémo code** : les commandes R, Python, SQL ou D3 à connaître.
+- **Flashcards** et **QCM** pour s'entraîner.
+- **TD et annales corrigés**.
+- **Labos de TP** : du code à exécuter directement dans le navigateur (R, Python, D3, requêtes NoSQL), sans rien installer.
+
+La progression est enregistrée dans le navigateur et peut être synchronisée entre appareils.
 
 ## Lancer en local
 
-```
+```bash
 npm install
 npm run dev
 ```
 
-`npm run build` produit le site dans `dist/`. Chaque push sur `main` le compile et le publie sur GitHub Pages (`.github/workflows/deploy.yml`).
-
-## Organisation
-
-- `src/courses/<id>/course.js` : fiche d'identité d'un cours (titre, code, enseignant·e, crédits, consignes). Tout dossier qui contient ce fichier apparaît automatiquement sur l'accueil.
-- `src/courses/<id>/data.js` : le contenu (chapitres, fiches HTML avec formules LaTeX `\( … \)` / `\[ … \]`, flashcards, QCM, annales, TP). Chaque carte et chaque question a un identifiant stable : la progression ne se décale pas quand on ajoute du contenu.
-- `src/courses/<id>/lessons.js` (facultatif) : l'onglet « Cours complet », une leçon par chapitre (sommaire, encadrés, démonstrations, illustrations interactives).
-- `src/courses/<id>/queries.js` (facultatif) : l'onglet « Requêtes » (cours NoSQL). Chaque question a une solution (`kind` : corrigé de l'enseignant, requête du cours, ou solution proposée) ; on tape sa requête, on affiche la solution à côté, et le site signale les mots-clés, valeurs, champs et tables de la solution absents de la réponse. Rien n'est exécuté ; `expected` peut donner le résultat attendu, calculé à partir des données du cours.
-- `src/courses/optreg/content.json` : généré depuis le dépôt du cours en ligne du master (parties « Optimisation » et « Régularisation ») ; ne pas le modifier à la main. Pour le régénérer : cloner `master-miashs/machine_learning`, puis `node scripts/optreg/convert.mjs <dépôt> /tmp/out.json && node scripts/optreg/build.mjs /tmp/out.json src/courses/optreg/content.json`.
-- Onglets « R » et « Python » : blocs de code exécutés dans le navigateur, avec webR (`src/lib/webr.js`, données `rlabs`) ou Pyodide (`src/lib/pyodide.js`, données `pylabs`), par le même composant `RLab.svelte`. Pyodide charge NumPy, Pandas, Matplotlib (et Seaborn via micropip) quand le code les importe ; les fichiers listés dans `pyfiles` (CSV, modules `.py` de `public/courses/<id>/data/`) sont copiés dans la session quand le code les cite. Commandes de notebook prises en charge : affichage de la dernière expression, `display`, `input` (fenêtre de saisie), `%timeit`, `%run`, `%%writefile`.
-- `src/courses/introds/pylabs.json` : généré depuis les notebooks corrigés (`scripts/introds/nb/`) par `python3 scripts/introds/nb2lab.py` ; ne pas le modifier à la main.
-- `src/courses/<id>/viz.js`, `tools.js` (facultatifs) : illustrations interactives des fiches (`<figure class="viz" data-viz="…">`) et outils de l'onglet « Exercices interactifs ».
-- `public/courses/<id>/img/` : figures des annales.
-- `src/components/` : les écrans (accueil, cours, fiches, flashcards, QCM, annales, TP, compte).
-- `src/lib/progress.js` : progression locale ; `src/lib/sync.js` : connexion et synchronisation Supabase.
-
-## Labo de TP (cours de visualisation)
-
-`src/courses/visu/labs.js` décrit les TP : énoncé résumé, extraits de code et fichier de départ de chaque exercice. **Règle : on n'y met que le code fourni par l'enseignant**, recopié tel quel des supports (seules l'indentation et les lignes coupées par la mise en page du PDF sont retouchées, et c'est signalé). Les fichiers de départ sont dans `src/courses/visu/start/`, les fichiers de données dans `public/courses/visu/tp/<tp>/` sous leur nom d'origine. `scripts/tp-libs.mjs` (lancé avant `dev` et `build`) copie `d3.min.js` et `jquery.min.js` à côté, pour que les balises `<script src="d3.min.js">` des TP marchent telles quelles. L'aperçu tourne dans une iframe isolée (`sandbox`), avec une `<base>` qui pointe vers le dossier du TP.
-
-## Dates d'évaluation
-
-Dans `course.js` : `evals: [{ label: 'Partiel', date: 'AAAA-MM-JJ' }, { label: 'Rattrapage', date: null }]`. L'accueil classe les cours par prochaine évaluation.
-
-## Ajouter un cours
-
-Déposer les PDF du cours, des annales et des TP, puis créer `src/courses/<id>/course.js` et `data.js` sur le modèle de `classif`.
-
-## Synchronisation de la progression
-
-La progression est enregistrée dans le navigateur, puis synchronisée avec Supabase quand on a saisi son adresse e-mail (page Compte). Pas de compte, pas de mot de passe, aucun e-mail envoyé : l'adresse sert d'identifiant et le serveur n'en reçoit que l'empreinte SHA-256. Qui connaît l'adresse peut donc lire et modifier la progression associée ; c'est accepté, ces données ne sont pas sensibles.
-
-1. Créer un projet sur https://supabase.com.
-2. SQL Editor : exécuter `supabase/schema.sql` (table `progress_by_key`, sans accès direct, et fonctions `get_progress` / `save_progress`).
-3. Renseigner l'URL du projet et la clé publique (`sb_publishable_…`) dans `src/config.js`. Ne jamais y mettre la clé `service_role` / secrète.
+Chaque push sur `main` publie le site sur GitHub Pages. Les détails techniques (organisation du code, ajout d'un cours, synchronisation) sont dans [docs/DEVELOPPEMENT.md](docs/DEVELOPPEMENT.md).
 
 ## Crédits
 
-Le contenu de chaque cours appartient à ses auteurs (voir le pied de page de chaque cours). Site personnel non officiel.
+Site personnel non officiel, sans lien avec les enseignants ni l'université. Le contenu de chaque cours appartient à ses auteurs : les sources sont citées en pied de page de chaque cours. Réalisé avec Svelte et Vite.
