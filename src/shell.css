@@ -147,10 +147,6 @@ header.shell{flex-wrap:nowrap}
 .vz-seg .chip{min-height:36px}
 .vz-stats{display:flex; flex-wrap:wrap; gap:6px; font:12px var(--f-mono); color:var(--muted)}
 .vz-stats span{border:1px solid var(--line); border-radius:6px; padding:2px 8px; background:var(--paper-2)}
-.vz-notes{display:grid; grid-template-columns:repeat(auto-fill,minmax(58px,1fr)); gap:4px; font:13px var(--f-mono)}
-.vz-notes span{border:1px solid var(--line); border-radius:4px; padding:3px 6px; text-align:right; background:var(--paper-2)}
-.vz-notes span.hi{background:var(--good-soft); border-color:var(--good-line); font-weight:700}
-.vz-notes span.mid{background:var(--accent-soft); border-color:var(--accent-line); font-weight:700}
 .vz-gallery{display:grid; grid-template-columns:repeat(auto-fill,minmax(118px,1fr)); gap:8px}
 .vz-thumb{display:grid; gap:4px; padding:6px; border:1px solid var(--line); border-radius:8px; background:var(--paper); cursor:pointer; font:600 12px var(--f-body); color:var(--ink); text-align:center}
 .vz-thumb[aria-pressed=true]{border-color:var(--accent); box-shadow:0 0 0 2px var(--accent-soft)}
@@ -499,3 +495,11 @@ details.fold[open] summary::before{transform:translateY(2px) rotate(180deg)}
   .course-card:hover, .course-card:active{transform:none}
 }
 @media print{ .rv{opacity:1 !important; transform:none !important} .confetti{display:none} }
+
+/* Figures reprises des diapositives */
+.slide-fig{margin:12px 0; display:grid; gap:4px; justify-items:start}
+.slide-fig img{display:block; max-width:min(100%, 760px); height:auto; border:1px solid var(--line); border-radius:6px; background:#fff}
+.slide-fig figcaption{font-size:12px; color:var(--muted)}
+.slide-row{display:grid; grid-template-columns:repeat(auto-fill, minmax(min(100%, 240px), 1fr)); gap:10px 14px; margin:12px 0; align-items:start}
+.slide-row .slide-fig{margin:0}
+.slide-row .slide-fig img{width:100%}

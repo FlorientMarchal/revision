@@ -42,30 +42,6 @@ VIZ.anscombe = el => {
 };
 // Note : la diapositive du cours indique une corrélation de 0,876 ; la valeur de référence du quartet est 0,816.
 
-/* ---------- Notes : liste, triée, boîte à moustaches ---------- */
-VIZ.notes = el => {
-  const N = [13.36, 4.28, 4.30, 2.28, 8.81, 17.87, 14.42, 19.00, 9.61, 4.19, 0.65, 19.51, 2.50, 5.03, 7.55, 3.79, 7.03, 19.97, 2.54, 9.49, 0.72, 7.81, 0.90, 14.55, 10.71, 8.61, 12.17, 0.24, 11.73, 5.48, 0.26, 9.47, 10.11, 10.61, 13.87, 4.94, 10.58, 3.69, 8.15, 5.12];
-  const S = [...N].sort((a, b) => a - b);
-  const q = p => { const i = (S.length - 1) * p, lo = Math.floor(i), hi = Math.ceil(i); return S[lo] + (S[hi] - S[lo]) * (i - lo); };
-  let mode = 'brut';
-  const draw = () => {
-    let body = '';
-    if (mode === 'boite') {
-      const x = v => 30 + v / 20 * 740, Q = [S[0], q(0.25), q(0.5), q(0.75), S[S.length - 1]];
-      body = svg(800, 120, `<line x1="${x(Q[0])}" x2="${x(Q[1])}" y1="50" y2="50" class="vz-axis"/><line x1="${x(Q[3])}" x2="${x(Q[4])}" y1="50" y2="50" class="vz-axis"/><rect x="${x(Q[1])}" y="30" width="${x(Q[3]) - x(Q[1])}" height="40" fill="var(--accent-soft)" stroke="var(--accent)"/>` +
-        Q.map((v, i) => `<line x1="${x(v)}" x2="${x(v)}" y1="${i === 2 ? 30 : 38}" y2="${i === 2 ? 70 : 62}" stroke="var(--accent)" stroke-width="${i === 2 ? 3 : 2}"/><text x="${x(v)}" y="${i % 2 ? 92 : 104}" class="vz-t" text-anchor="middle">${['min', 'Q1', 'médiane', 'Q3', 'max'][i]} ${fmt(v)}</text>`).join('') +
-        `<line x1="30" x2="770" y1="16" y2="16" class="vz-grid"/>${[0, 5, 10, 15, 20].map(v => `<text x="${x(v)}" y="12" class="vz-t" text-anchor="middle">${v}</text>`).join('')}`, 'Boîte à moustaches');
-    } else {
-      const L = mode === 'brut' ? N : S;
-      body = `<div class="vz-notes">${L.map((v, i) => `<span class="${mode === 'trie' && (i === L.length - 1) ? 'hi' : ''}${mode === 'trie' && (i === 19 || i === 20) ? ' mid' : ''}">${fmt(v)}</span>`).join('')}</div>`;
-    }
-    const msg = { brut: 'Quelle est la note la plus élevée ? Il faut tout parcourir.', trie: 'Triée : le maximum (19,97) est à la fin, la médiane entre la 20ᵉ et la 21ᵉ valeur.', boite: 'La boîte à moustaches donne d\'un coup min, Q1, médiane, Q3 et max… mais on ne voit plus chaque note : c\'est un compromis.' }[mode];
-    el.innerHTML = head('40 notes, trois représentations', 'exemple du CM 1') + seg('m', [['brut', 'Liste brute'], ['trie', 'Triée'], ['boite', 'Boîte à moustaches']], mode) + body + `<p class="viz-out">${msg}</p>`;
-    el.querySelectorAll('[data-m]').forEach(b => (b.onclick = () => { mode = b.dataset.m; draw(); }));
-  };
-  draw();
-};
-
 /* ---------- Catalogue des graphiques (CM 2) ---------- */
 const CHARTS = {
   ts: { n: 'Table surlignée', v: [['abscisses', '1 nominale/ordinale'], ['ordonnées', '1 nominale/ordinale'], ['couleur', '1 quantitative']] },

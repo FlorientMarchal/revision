@@ -7,6 +7,9 @@ const ex = (t, h) => box('ex', 'Exemple · ' + t, h);
 const warn = (t, h) => box('warn', 'Attention · ' + t, h);
 const method = (t, h) => box('method', 'Méthode · ' + t, h);
 const code = (src, c) => box('code', 'Code fourni · ' + src, `<pre><code>${c.replace(/&/g, '&amp;').replace(/</g, '&lt;')}</code></pre>`);
+// Figures reprises des diapositives des CM (A. Sallaberry), dans public/courses/visu/img/cm/
+const slide = (f, cap) => `<figure class="slide-fig"><img src="img/cm/${f}.webp" alt="${cap.replace(/<[^>]+>/g, '')}" loading="lazy"><figcaption>${cap}</figcaption></figure>`;
+const slides = (...figs) => `<div class="slide-row">${figs.map(([f, c]) => slide(f, c)).join('')}</div>`;
 const demo = name => `<figure class="viz" data-viz="${name}"></figure>`;
 const YN = { o: '<td class="yes">Oui</td>', e: '<td class="maybe">Éventuellement</td>', n: '<td class="no">Non</td>' };
 const vvRow = (n, a, b, c) => `<tr><td>${n}</td>${YN[a]}${YN[b]}${YN[c]}</tr>`;
@@ -28,16 +31,20 @@ export const lessons = [
       { id: 'def', t: 'Qu\'est-ce qu\'une visualisation ?', sub: 'Données, tâches, efficacité, vues et idiomes', html: `
 ${def('Visualisation', `<p>Une visualisation part d'un <b>jeu de données</b>. Elle est <b>conçue pour aider à accomplir des tâches de façon efficace</b>, l'efficacité se mesurant en <b>temps</b> (aller vite) et en <b>exactitude</b> (ne pas se tromper). Elle se compose d'une ou plusieurs <b>représentations visuelles</b>, appelées <b>vues</b>, elles-mêmes composées d'<b>idiomes</b>.</p>`)}
 <p>Chaque mot compte. Une visualisation n'est pas un « joli dessin » : elle se juge à sa capacité à faire accomplir une tâche précise. Le même jeu de données peut donc appeler des visualisations différentes selon la question posée.</p>
-${ex('trouver la note la plus élevée', `<p>Face à une liste de 40 notes non triées (13,36 ; 4,28 ; 4,30 ; 2,28 ; …), trouver la plus haute demande de parcourir toutes les valeurs. Une représentation où la note la plus haute « saute aux yeux » (liste triée, barres, mise en évidence) rend la tâche immédiate : c'est le rôle d'une visualisation.</p>`)}
+${ex('trouver la note la plus élevée', `<p>Face à une liste de 40 notes non triées (13,36 ; 4,28 ; 4,30 ; 2,28 ; …), trouver la plus haute demande de parcourir toutes les valeurs. Une représentation où la note la plus haute « saute aux yeux » (tableau coloré, diagramme en barres) rend la tâche immédiate : c'est le rôle d'une visualisation.</p>`)}
+${slides(['cm1-notes-couleur', 'CM 1 : les notes brutes, puis colorées'], ['cm1-notes-barres', 'CM 1 : les notes brutes, puis en diagramme en barres'])}
 ` },
       { id: 'objectifs', t: 'Deux objectifs', sub: 'Présenter des résultats connus ; analyser et explorer', html: `
 ${prop('Les deux objectifs d\'une visualisation', `<ul><li><b>Présentation de résultats connus</b> : on sait déjà ce qu'on veut montrer et on cherche à le communiquer.</li><li><b>Analyse et exploration des données</b> : on ne sait pas encore ce qu'il y a dans les données ; la visualisation sert à le découvrir.</li></ul>`)}
 <h4>Présenter : la carte de Minard (1869)</h4>
 <p>Charles Joseph Minard représente la campagne de Russie de Napoléon. Une seule image montre <b>6 dimensions</b> : la <b>taille</b> de l'armée (épaisseur du flux), sa <b>position en 2D</b> et sa <b>direction</b> (aller, retour), les <b>températures</b> et les <b>dates</b> pendant la retraite. Les résultats sont connus (l'armée a été décimée) ; la visualisation les rend saisissants.</p>
+${slide('cm1-minard', 'CM 1 : la carte de Minard (1869)')}
 <h4>Explorer : John Snow et le choléra (Londres, 1854)</h4>
 <p>En reportant les décès sur une carte du quartier, John Snow voit les cas se concentrer autour d'une pompe à eau. La visualisation a permis de <b>découvrir</b> une structure dans les données (l'origine de l'épidémie).</p>
+${slide('cm1-snow', 'CM 1 : la carte de John Snow (1855)')}
 <h4>Explorer : le quartet d'Anscombe</h4>
 <p>Quatre jeux de données de 11 points ont les mêmes statistiques : moyenne des x = 9, moyenne des y = 7,5, variance des x = 10, variance des y = 3,75, même droite de régression y = 3 + 0,5x, même somme des carrés des écarts à la moyenne (110), et la même corrélation (la diapositive indique 0,876 ; la valeur de référence du quartet est 0,816). Pourtant leurs nuages de points sont radicalement différents.</p>
+${slide('cm1-anscombe', 'CM 1 : le quartet d\'Anscombe, les données et les quatre nuages')}
 ${demo('anscombe')}
 ${prop('Leçon d\'Anscombe', '<p>Des résumés statistiques identiques peuvent cacher des données très différentes : <b>il faut visualiser</b> les données, pas seulement les résumer.</p>')}
 ` },
@@ -48,8 +55,8 @@ ${prop('Leçon d\'Anscombe', '<p>Des résumés statistiques identiques peuvent c
       { id: 'conception', t: 'Concevoir : un espace vaste, des compromis', sub: 'Vues, idiomes, et l\'exemple des notes', html: `
 ${method('Concevoir une visualisation', `<ol><li>Proposer une ou plusieurs <b>vues</b>.</li><li>Pour chaque vue, déterminer les <b>idiomes</b> : les <b>encodages visuels</b> (types de représentation : diagramme en barres, camembert…) et les <b>techniques d'interaction</b> (filtres, sélections…).</li></ol>`)}
 <p>L'<b>espace conceptuel</b> est <b>vaste</b> : on peut imaginer une infinité de représentations. Mais <b>la plupart sont inefficaces</b> pour une tâche donnée. Il faut donc faire des <b>compromis</b>.</p>
-${ex('les notes, suite', `<ul><li>« Quelle est la note la plus élevée ? » : la liste triée suffit.</li><li>« Quelle est la note médiane ? » : la liste triée la donne aussi (entre la 20<sup>e</sup> et la 21<sup>e</sup> valeur).</li><li>« Quels sont le minimum, le premier quartile, le troisième quartile… ? » : une <b>boîte à moustaches</b> donne tout d'un coup (minimum, Q1, médiane, Q3, maximum), mais on ne voit plus chaque note.</li></ul><p>Aucune représentation n'est la meilleure pour toutes les tâches : chaque choix gagne sur certaines questions et perd sur d'autres.</p>`)}
-${demo('notes')}
+${ex('les notes, suite', `<p>Le CM reprend les 40 notes avec des questions de plus en plus nombreuses :</p><ul><li>« Quelle est la note la plus élevée ? » : le <b>tableau coloré</b> comme le <b>diagramme en barres</b> conviennent.</li><li>« … et la note médiane ? » : le diagramme en barres ne la montre pas. Le CM surligne seulement la note maximale (en vert) et les deux notes du milieu (en jaune).</li><li>« … la note minimale, le premier quartile, le troisième quartile… ? » : le tableau coloré, avec une légende qui associe les couleurs au minimum, au premier quartile, à la médiane, au troisième quartile et au maximum.</li></ul><p>Aucune représentation n'est la meilleure pour toutes les tâches : chaque choix gagne sur certaines questions et perd sur d'autres.</p>`)}
+${slides(['cm1-notes-max-mediane', 'CM 1 : maximum et médiane surlignés'], ['cm1-notes-quartiles', 'CM 1 : tableau coloré et sa légende (minimum à maximum)'])}
 ` },
       { id: 'qpc', t: 'Quoi ? Pourquoi ? Comment ?', sub: 'Le cadre d\'analyse de Munzner', html: `
 <p>Toute visualisation s'analyse avec trois questions (Tamara Munzner) :</p>
@@ -123,6 +130,7 @@ ${def('Individu', '<p>Entité particulière de type <b>discret</b>. Synonymes : 
 ${def('Variable', '<p>Propriété <b>observée, calculée ou enregistrée</b>. Synonymes : <i>attribut</i>, <i>dimension</i>. Exemples : salaire, prix, nombre de ventes…</p>')}
 ${def('Table', '<p>Ensemble de lignes et de colonnes définissant des cellules : <b>les lignes représentent des individus</b>, <b>les colonnes des variables</b>, et chaque cellule (i, j) contient la valeur de la variable j pour l\'individu i. On peut ajouter d\'autres dimensions (table multidimensionnelle).</p>')}
 ${ex('table de commandes', '<p>Une table de commandes avec les colonnes « Order ID », « Order Date », « Order Priority » (1-Urgent, 2-High, 3-Medium…), « Product Container » (Small Box, Wrap Bag…), « Product Base Margin », « Ship Date ». On y trouve les trois types de variables : <b>quantitative</b> (la marge, les dates), <b>ordinale</b> (la priorité), <b>nominale</b> (le contenant).</p>')}
+${slides(['cm2-table', 'CM 2 : individu (item), variable (attribute), cellule (cell)'], ['cm2-table-types', 'CM 2 : variables quantitative, ordinale, catégorielle'])}
 ` },
       { id: 'types', t: 'Les trois types de variables', sub: 'Nominale, ordinale, quantitative', html: `
 ${def('Variable nominale', '<p><b>Pas d\'ordre implicite</b> : patronyme, fruit, nom de ville… Une seule opération implicite : <b>égal ou différent</b>. On peut cependant calculer un ordre : un <b>ordre arbitraire</b> (classer les patronymes par ordre alphabétique) ou un ordre tiré d\'<b>une autre variable</b> (classer les fruits par ordre de prix).</p>')}
@@ -141,7 +149,7 @@ ${demo('charts')}
 <p>Les graphiques dans l'ordre du CM, avec ce que représente chaque axe ou chaque couleur :</p>
 <ul>
 <li><b>Table surlignée</b> : axe des abscisses = 1 variable nominale ou ordinale ; axe des ordonnées = 1 variable nominale ou ordinale ; couleurs = 1 variable quantitative.</li>
-<li><b>Diagramme en barres</b> : axe des abscisses = 1 variable nominale ou ordinale ; axe des ordonnées = 1 variable quantitative. La même diapo montre un <b>histogramme</b>.</li>
+<li><b>Diagramme en barres</b> : axe des abscisses = 1 variable nominale ou ordinale ; axe des ordonnées = 1 variable quantitative. Sur la diapo, le mot « Histogramme » est <b>barré</b> : un diagramme en barres n'est pas un histogramme.</li>
 <li><b>Diagramme en barres empilées</b> : axe des abscisses = 1 variable nominale ou ordinale ; axe des ordonnées = 1 variable quantitative ; couleurs = 1 variable nominale.</li>
 <li><b>Diagramme en barres côte-à-côte</b> : axe des abscisses / couleur = 2 variables nominales ou ordinales ; axe des ordonnées = 1 variable quantitative.</li>
 <li><b>Diagramme en secteurs</b> (le « camembert » du TD 1) : secteurs / couleurs = 1 variable nominale ; taille des secteurs = 1 variable quantitative.</li>
@@ -153,6 +161,8 @@ ${demo('charts')}
 <li><b>Coordonnées parallèles</b> : les individus sont représentés par des lignes ; axes verticaux = n variables quantitatives. Le TP 5 ajoute : avantage, visualiser un grand nombre de variables grâce à la variable visuelle position ; inconvénient, on compare difficilement les variables dont les axes ne sont pas consécutifs.</li>
 <li><b>Diagramme de Kiviat</b> : les individus sont représentés par des lignes ; axes circulaires = n variables quantitatives.</li>
 </ul>
+<h4>Les graphiques des diapos</h4>
+${slides(['cm2-surlignee', 'Table surlignée'], ['cm2-barres', 'Diagramme en barres'], ['cm2-empilees', 'Barres empilées'], ['cm2-cote-a-cote', 'Barres côte-à-côte'], ['cm2-secteurs', 'Diagramme en secteurs'], ['cm2-lignes', 'Diagramme en lignes'], ['cm2-aires', 'Aires empilées'], ['cm2-flots', 'Diagramme en flots'], ['cm2-nuage', 'Nuage de points'], ['cm2-matrice', 'Matrice de nuages de points'], ['cm2-coord-par', 'Coordonnées parallèles'], ['cm2-kiviat', 'Diagramme de Kiviat'])}
 ` },
       { id: 'comparer', t: 'Comparer deux graphiques', sub: 'Barres empilées ou côte à côte (TD, exercice 2)', html: `
 <p>Les deux représentent 1 quantitative et 2 nominales/ordinales. Le bon choix dépend de la tâche.</p>
@@ -182,6 +192,7 @@ ${demo('charts')}
       { id: 'choisir', t: 'Lequel choisir ?', sub: 'Treemap ou diagramme en barres', html: `
 <p>Le CM part de deux graphiques des profits par catégorie (fournitures de bureau, mobilier, produits technologiques) : une <b>treemap</b> et un <b>diagramme en barres</b>. Qu'est-ce qui représente la somme des profits ? Dans les deux cas, la <b>couleur</b> ; en plus, l'<b>aire des rectangles</b> dans la treemap et la <b>longueur des barres</b> dans le diagramme.</p>
 <p>D'où la question : <b>vaut-il mieux représenter une variable quantitative avec des aires ou des longueurs ?</b> Réponse au CM 4 (efficacité) : les longueurs.</p>
+${slide('cm3-treemap-barres', 'CM 3 : treemap et diagramme en barres des profits par catégorie')}
 ` },
       { id: 'objets', t: 'Objets graphiques et variables visuelles', sub: 'Définitions', html: `
 ${def('Objet graphique', '<p>Une visualisation est composée d\'objets graphiques (des rectangles dans les deux exemples, mais aussi des points, des lignes…). L\'<b>apparence</b> des objets graphiques représente les variables du jeu de données.</p>')}
@@ -189,19 +200,24 @@ ${ex('les deux graphiques', '<ul><li>Diagramme en barres : longueurs et couleurs
 ${def('Variable visuelle', '<p>Une composante de l\'apparence des objets graphiques qui <b>représente une variable</b> du jeu de données. Les variables visuelles <b>déterminent l\'aspect</b> des objets graphiques et <b>représentent des variables</b> des données.</p>')}
 <p>Liste de base : <b>taille 1D</b> (longueur), <b>taille 2D</b> (aire), <b>couleur</b>, <b>forme</b>, <b>position x</b>, <b>position y</b>.</p>
 ${ex('nuage de points des ventes', '<p>Taille 2D (aire) = profit ; couleur = pays ; forme = catégorie ; position x = ventes ; position y = profit.</p>')}
+${slide('cm3-nuage-ventes', 'CM 3 : le nuage de points des ventes')}
 ${warn('une propriété qui ne représente rien n\'est pas une variable visuelle', '<p>Dans un nuage où tous les points sont des ronds, la forme n\'est <b>pas</b> une variable visuelle : elle ne représente aucune variable.</p>')}
+${slide('cm3-nuage-forme', 'CM 3 : tous les points sont des ronds, la forme ne représente rien')}
 ` },
       { id: 'types', t: 'Quels types de données pour quelles variables visuelles ?', sub: 'Le raisonnement, variable visuelle par variable visuelle', html: `
 <p>Dans le nuage précédent : aire (profit) et positions (ventes, profit) représentent des <b>quantitatives</b> ; couleur (pays) et forme (catégorie) des <b>nominales</b>. Mais la couleur peut aussi représenter une quantitative (palette dégradée), et la position une nominale (les catégories le long de l'axe d'un diagramme en barres). Il faut donc raisonner sur ce que chaque variable visuelle <b>peut</b> représenter.</p>
 <h4>Taille (longueur, aire)</h4>
 <p>Une taille est <b>ordonnée</b> : on voit qu'un trait est plus long qu'un autre. Elle convient à une <b>quantitative</b>, <b>éventuellement</b> à une <b>ordinale</b> (des carrés de plus en plus grands pour S, M, L, XL), mais <b>pas à une nominale</b> : la taille suggérerait un ordre qui n'existe pas.</p>
+${slide('cm3-tshirts', 'CM 3 : des tailles de plus en plus grandes pour S, M, L, XL')}
 <h4>Forme</h4>
 <p>« Est-ce qu'un long trait est supérieur à un court ? » Oui (taille 1D). « Est-ce qu'une croix est supérieure à un rond ? » Non. Il n'y a <b>pas d'ordre implicite sur les formes</b> : on les utilise pour des <b>nominales</b>, pas pour des ordonnées.</p>
 <h4>Position</h4>
 <p>Pour une <b>ordinale</b> : oui (les modalités dans leur ordre le long d'un axe). Pour une <b>nominale</b> : <b>éventuellement</b>, car la position impose un ordre ; on utilise alors un <b>ordre conventionnel</b> (par exemple alphabétique) ou un <b>ordre calculé à partir d'une autre variable</b> (trier les barres par valeur).</p>
+${slides(['cm3-pos-ordinale', 'Ordinale : oui (S, M, L, XL)'], ['cm3-pos-alpha', 'Nominale : ordre conventionnel (alphabétique)'], ['cm3-pos-calcule', 'Nominale : ordre calculé à partir d\'une autre variable (le profit)'])}
 ` },
       { id: 'formes', t: 'Types de formes', sub: 'Géométriques et symboliques', html: `
 <ul><li><b>Formes géométriques</b>, abstraites : cercle, carré, triangle, pentagone, octogone, ellipse, trapèze…</li><li><b>Formes symboliques</b>, de plus en plus parlantes : <b>conventionnelles</b> (le symbole ®), <b>évocatrices</b> (une fourchette et un couteau pour un restaurant), <b>figuratives</b> (une personne attablée).</li></ul>
+${slide('cm3-formes', 'CM 3 : types de formes')}
 ` },
       { id: 'recap', t: 'Récapitulatif', sub: 'Le tableau à connaître par cœur', html: `
 <table class="t vv-table">${vvHead}<tbody>
@@ -209,9 +225,11 @@ ${vvRow('Position (1D ou 2D)', 'e', 'o', 'o')}${vvRow('Taille 1D', 'n', 'e', 'o'
 ` },
       { id: 'autres', t: 'Autres variables visuelles', sub: '3D, orientation, grain, texture, mouvement… et la couleur', html: `
 <p>Un graphique en 3D ajoute la <b>position 3D</b> et la <b>taille 3D</b> (volume), qui se comportent comme leurs équivalents 2D :</p>
+${slide('cm3-3d', 'CM 3 : un nuage de points en 3D (position 3D et taille 3D)')}
 <table class="t vv-table">${vvHead}<tbody>
 ${vvRow('Position 1D ou 2D', 'e', 'o', 'o')}${vvRow('Position 3D', 'e', 'o', 'o')}${vvRow('Taille 1D', 'n', 'e', 'o')}${vvRow('Taille 2D', 'n', 'e', 'o')}${vvRow('Taille 3D', 'n', 'e', 'o')}${vvRow('Forme', 'o', 'n', 'n')}</tbody></table>
 <p>Il existe aussi l'<b>orientation</b>, le <b>grain</b>, la <b>texture</b>, le <b>mouvement</b>… et bien sûr la <b>couleur</b>, sujet du CM 4.</p>
+${slide('cm3-autres', 'CM 3 : le tableau étendu, et orientation, grain, texture, mouvement')}
 ${demo('area')}
 ` },
     ],
@@ -237,14 +255,17 @@ ${demo('area')}
       { id: 'rappel', t: 'Rappel', sub: 'Une variable visuelle par variable', html: `
 <p>Une visualisation est composée d'objets graphiques dont les variables visuelles représentent les variables des données : un diagramme en barres (1 variable → taille 1D, 1 → position X), un nuage de points (1 → position X, 1 → position Y, 1 → couleur, 1 → taille 2D)…</p>
 <p>La couleur peut représenter une variable <b>nominale</b> (des continents) comme une variable <b>quantitative</b> (une densité de population). Tout dépend de la <b>palette</b>.</p>
+${slides(['cm4-couleur-nominale', 'CM 4 : couleur pour une variable nominale'], ['cm4-couleur-quantitative', 'CM 4 : couleur pour une variable quantitative'])}
 ` },
       { id: 'palettes', t: 'Quelle palette utiliser ?', sub: 'Séquentielle, divergente, qualitative', html: `
 ${demo('palettes')}
+${slide('cm4-palettes', 'CM 4 : les palettes, ce qu\'elles font varier et les types de variables qu\'elles représentent')}
 ${def('Palette séquentielle', '<p>Pour une variable <b>quantitative ou ordinale</b>. On fait varier la <b>luminosité</b> (et/ou la saturation) ; on peut faire varier légèrement la teinte.</p>')}
 ${def('Palette divergente', '<p>Pour une variable <b>quantitative</b>, <b>seulement si les mesures comportent une valeur « pivot »</b>. Deux teintes, et la luminosité varie sur chacune. Exemples : relief (profondeur – niveau de la mer – altitude), température (négatif – 0° – positif), profit (négatif – 0 – positif).</p>')}
 ${def('Palette qualitative', '<p>Pour une variable <b>nominale</b>. On fait varier la <b>teinte</b> ; luminosité et saturation identiques.</p>')}
 <table class="t vv-table"><thead><tr><th>Palette</th><th>Nominale</th><th>Ordinale</th><th>Quantitative</th></tr></thead><tbody>
 ${vvRow('Séquentielle', 'n', 'o', 'o')}${vvRow('Divergente', 'n', 'n', 'o')}${vvRow('Qualitative', 'o', 'n', 'n')}</tbody></table>
+${slides(['cm4-sequentielle', 'CM 4 : palette séquentielle'], ['cm4-divergente', 'CM 4 : palette divergente'], ['cm4-qualitative', 'CM 4 : palette qualitative'])}
 ` },
       { id: 'modeles', t: 'Modèles colorimétriques', sub: 'RVB et TSL', html: `
 ${def('Modèle colorimétrique', '<p>Un modèle permettant de coder les couleurs en informatique : chaque couleur correspond à des valeurs numériques.</p>')}
@@ -268,9 +289,11 @@ ${demo('color')}
 <tr><td>4</td><td>qualitative + séquentielle</td><td class="yes">Oui</td><td>teinte et luminosité varient indépendamment</td></tr>
 <tr><td>5</td><td>séquentielle + divergente</td><td class="maybe">Éventuellement</td><td>la divergente utilise déjà la luminosité</td></tr>
 <tr><td>6</td><td>divergente + qualitative</td><td class="no">Non</td><td>la divergente utilise déjà des teintes</td></tr></tbody></table>
+${slides(['cm4-combi-1-3', 'CM 4 : cas 1 à 3'], ['cm4-combi-4-6', 'CM 4 : cas 4 à 6'])}
 ` },
       { id: 'pratique', t: 'Bonnes pratiques', sub: 'ColorBrewer, saturation, daltonisme', html: `
-<ul><li><b>Où trouver des palettes ?</b> ColorBrewer 2.0 (colorbrewer2.org).</li><li><b>Aire et saturation</b> (palette qualitative) : pour de <b>grosses zones</b>, des couleurs <b>non saturées</b> ; pour de <b>petites zones</b>, des couleurs <b>saturées</b> (une grande surface très saturée agresse et écrase le reste).</li><li><b>Daltonisme et impression en noir et blanc</b> (outil Viz Palette) : une palette qualitative peut être distinguable par les personnes daltoniennes mais pas imprimée en noir et blanc, et une autre l'inverse (rouge et vert indistinguables en deutéranopie, mais de luminosités différentes en N&amp;B). Il faut vérifier les deux.</li></ul>
+<ul><li><b>Où trouver des palettes ?</b> ColorBrewer 2.0 (colorbrewer2.org).</li><li><b>Aire et saturation</b> (palette qualitative) : pour de <b>grosses zones</b>, des couleurs <b>non saturées</b> ; pour de <b>petites zones</b>, des couleurs <b>saturées</b>.</li><li><b>Daltonisme et impression en noir et blanc</b> (outil Viz Palette) : une palette qualitative peut être distinguable par les personnes daltoniennes mais pas imprimée en noir et blanc, et une autre l'inverse (rouge et vert indistinguables en deutéranopie, mais de luminosités différentes en N&amp;B). Il faut vérifier les deux.</li></ul>
+${slide('cm4-saturation', 'CM 4 : aire et saturation, une même carte avec des couleurs non saturées puis saturées')}
 ` },
       { id: 'tableau', t: 'Le tableau complet', sub: 'Toutes les variables visuelles du cours', html: `
 <table class="t vv-table">${vvHead}<tbody>
@@ -279,6 +302,7 @@ ${vvRow('Position 1D ou 2D', 'e', 'o', 'o')}${vvRow('Position 3D', 'e', 'o', 'o'
       { id: 'efficacite', t: 'Efficacité', sub: 'Classer les variables visuelles', html: `
 <p>Toutes les variables visuelles adaptées ne se valent pas : certaines sont lues plus vite et plus exactement. Classement du plus au moins efficace :</p>
 ${demo('ranking')}
+${slide('cm4-efficacite', 'CM 4 : le classement par efficacité, avec les remarques du CM')}
 <ul><li><b>Nominale</b> : couleur (palette qualitative), forme, position (<i>avec ordre conventionnel ou calculé</i>).</li><li><b>Ordinale</b> : position 1D ou 2D, taille 1D, taille 2D, position 3D, couleur (palette séquentielle), taille 3D. Les tailles seulement <i>si les données s'y prêtent</i> : tailles d'habits, oui ; mention à un diplôme, non.</li><li><b>Quantitative</b> : position 1D ou 2D, taille 1D, taille 2D, position 3D, couleur (palette séquentielle, ou divergente <i>si valeur « pivot »</i>), taille 3D.</li></ul>
 ${prop('Aire ou longueur ?', '<p>Réponse à la question du CM 3 : pour une quantitative, la <b>longueur</b> (taille 1D) est plus efficace que l\'aire (taille 2D). Le diagramme en barres l\'emporte sur la treemap pour comparer les profits.</p>')}
 ${prop('Variables ordonnées', '<p>Les variables visuelles pour représenter les variables ordinales et quantitatives sont <b>quasiment les mêmes</b> : d\'où le regroupement en variables « ordonnées », contrairement au vocabulaire statistique.</p>')}
@@ -286,8 +310,10 @@ ${prop('Variables ordonnées', '<p>Les variables visuelles pour représenter les
       { id: 'combinaison', t: 'Combinaison et séparabilité', sub: 'Plusieurs variables sur les mêmes objets', html: `
 <p>On combine des variables visuelles pour représenter plusieurs variables avec les mêmes objets :</p>
 <ul><li>2 variables nominales : teinte + forme (cercles et triangles de 3 couleurs) ;</li><li>1 nominale + 1 ordonnée : teinte + taille ;</li><li>2 ordonnées : luminosité + taille.</li></ul>
+${slide('cm4-combinaison', 'CM 4 : exemples de combinaisons')}
 ${def('Séparabilité', '<p>Toutes les variables visuelles ne sont pas indépendantes : certaines combinaisons se lisent séparément, d\'autres se confondent.</p>')}
 ${demo('separability')}
+${slide('cm4-separabilite', 'CM 4 : de la faible à la forte séparabilité')}
 <ul><li><b>Faible séparabilité</b> : largeur + hauteur (on perçoit une forme ou une aire globale, pas deux valeurs).</li><li><b>Intermédiaire</b> : taille + teinte.</li><li><b>Forte séparabilité</b> : position + teinte.</li></ul>
 ` },
     ],

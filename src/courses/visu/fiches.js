@@ -26,7 +26,7 @@ intro: `
 <ul>
   <li>Proposer une ou plusieurs vues ; pour chaque vue, choisir les <b>idiomes</b> : <b>encodages visuels</b> (diagramme en barres, camembert…) et <b>techniques d'interaction</b> (filtres, sélections…).</li>
   <li>L'espace des possibilités est <b>vaste</b> et la plupart sont <b>inefficaces</b> pour une tâche donnée : il faut faire des <b>compromis</b>.</li>
-  <li>Exemple des notes : une liste brute ne permet pas de trouver vite la plus haute note ; triée, elle donne le maximum et la médiane ; une <b>boîte à moustaches</b> donne d'un coup min, Q1, médiane, Q3, max, mais on perd les valeurs individuelles.</li>
+  <li>Exemple des notes : dans le tableau brut, on ne trouve pas vite la plus haute note ; le tableau coloré et le diagramme en barres la montrent ; le diagramme en barres ne montre pas la médiane ; pour le minimum, les quartiles et le maximum, le CM utilise le tableau coloré avec sa légende.</li>
 </ul>
 <figure class="viz" data-viz="notes"></figure>
 <h3>Quoi ? Pourquoi ? Comment ? (Munzner)</h3>

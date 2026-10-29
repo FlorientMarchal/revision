@@ -11,7 +11,7 @@ export const cards = [
   {"id":"vc_info","ch":"intro","q":"Visualisation en informatique : 3 caractéristiques ?","a":"Une application informatique ; une visualisation avec des vues coordonnées / interactives ; utilisée pour automatiser la génération des représentations."},
   {"id":"vc_idiome","ch":"intro","q":"Que choisit-on pour chaque vue d'une visualisation ?","a":"Ses idiomes : des encodages visuels et des techniques d'interaction."},
   {"id":"vc_compromis","ch":"intro","q":"Pourquoi parle-t-on de compromis en conception ?","a":"L'espace des possibilités est vaste et la plupart sont inefficaces pour une tâche donnée."},
-  {"id":"vc_compromis_2","ch":"intro","q":"Notes : que permet une boîte à moustaches, et que perd-on ?","a":"Elle donne min, Q1, médiane, Q3 et max d'un coup, mais on ne voit plus les valeurs individuelles."},
+  {"id":"vc_compromis_2","ch":"intro","q":"Exemple des notes : quelle représentation montre la note la plus élevée mais pas la médiane ?","a":"Le diagramme en barres."},
   {"id":"vc_qpc","ch":"intro","q":"Sur quoi porte le « Quoi ? » de Munzner ?","a":"Les données : que visualiser ?"},
   {"id":"vc_qpc_2","ch":"intro","q":"Sur quoi porte le « Pourquoi ? » de Munzner ?","a":"Les tâches : pourquoi les utilisateurs ont-ils besoin de visualiser ?"},
   {"id":"vc_qpc_3","ch":"intro","q":"Sur quoi porte le « Comment ? » de Munzner ?","a":"Les idiomes : comment visualiser ?"},
