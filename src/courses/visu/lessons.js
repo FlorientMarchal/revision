@@ -122,7 +122,7 @@ ${def('Jeu de données', '<p>L\'ensemble de données sur lequel porte l\'analyse
 ${def('Individu', '<p>Entité particulière de type <b>discret</b>. Synonymes : <i>item</i>, <i>élément</i>. Exemples : personnes, actions, gènes, villes, magasins…</p>')}
 ${def('Variable', '<p>Propriété <b>observée, calculée ou enregistrée</b>. Synonymes : <i>attribut</i>, <i>dimension</i>. Exemples : salaire, prix, nombre de ventes…</p>')}
 ${def('Table', '<p>Ensemble de lignes et de colonnes définissant des cellules : <b>les lignes représentent des individus</b>, <b>les colonnes des variables</b>, et chaque cellule (i, j) contient la valeur de la variable j pour l\'individu i. On peut ajouter d\'autres dimensions (table multidimensionnelle).</p>')}
-${ex('table de commandes', '<p>Une table de commandes avec les colonnes « Order ID », « Order Date », « Order Priority » (1-Urgent, 2-High, 3-Medium…), « Product Container » (Small Box, Wrap Bag…), « Product Base Margin », « Ship Date ». On y trouve les trois types de variables : <b>quantitative</b> (la marge, les dates), <b>ordinale</b> (la priorité), <b>catégorielle</b> (le contenant).</p>')}
+${ex('table de commandes', '<p>Une table de commandes avec les colonnes « Order ID », « Order Date », « Order Priority » (1-Urgent, 2-High, 3-Medium…), « Product Container » (Small Box, Wrap Bag…), « Product Base Margin », « Ship Date ». On y trouve les trois types de variables : <b>quantitative</b> (la marge, les dates), <b>ordinale</b> (la priorité), <b>nominale</b> (le contenant).</p>')}
 ` },
       { id: 'types', t: 'Les trois types de variables', sub: 'Nominale, ordinale, quantitative', html: `
 ${def('Variable nominale', '<p><b>Pas d\'ordre implicite</b> : patronyme, fruit, nom de ville… Une seule opération implicite : <b>égal ou différent</b>. On peut cependant calculer un ordre : un <b>ordre arbitraire</b> (classer les patronymes par ordre alphabétique) ou un ordre tiré d\'<b>une autre variable</b> (classer les fruits par ordre de prix).</p>')}
@@ -138,9 +138,9 @@ ${warn('l\'ordinale change de camp', '<p>En statistique, l\'ordinale est rangée
       { id: 'catalogue', t: 'Le catalogue des graphiques', sub: 'Que représente chaque axe, chaque couleur ?', html: `
 <p>Pour chaque graphique, il faut savoir dire <b>combien de variables de chaque type</b> il représente, et <b>avec quoi</b> (axe, couleur, taille…). Clique sur les vignettes :</p>
 ${demo('charts')}
-<h4>Une variable qualitative et une quantitative</h4>
+<h4>Une nominale (ou ordinale) et une quantitative</h4>
 <ul><li><b>Diagramme en barres</b> : abscisses = 1 nominale ou ordinale ; ordonnées = 1 quantitative. L'<b>histogramme</b> est un diagramme en barres dont les barres représentent les effectifs de classes de valeurs.</li><li><b>Diagramme en secteurs</b> (camembert) : secteurs / couleurs = 1 nominale ; taille des secteurs = 1 quantitative.</li></ul>
-<h4>Deux qualitatives et une quantitative</h4>
+<h4>Deux nominales (ou ordinales) et une quantitative</h4>
 <ul><li><b>Table surlignée</b> : abscisses = 1 nominale ou ordinale ; ordonnées = 1 nominale ou ordinale ; couleur = 1 quantitative.</li><li><b>Diagramme en barres empilées</b> : abscisses = 1 nominale ou ordinale ; ordonnées = 1 quantitative ; couleurs = 1 nominale.</li><li><b>Diagramme en barres côte à côte</b> : abscisses et couleur = 2 nominales ou ordinales ; ordonnées = 1 quantitative.</li></ul>
 <h4>Une évolution (souvent dans le temps)</h4>
 <ul><li><b>Diagramme en lignes</b> : abscisses = 1 quantitative (souvent une date) ; ordonnées = 1 quantitative ; lignes / couleurs = 1 nominale (une ligne par catégorie).</li><li><b>Diagramme en aires empilées</b> : mêmes variables, les aires de chaque catégorie s'empilent.</li><li><b>Diagramme en flots</b> (streamgraph) : mêmes variables, les aires s'empilent autour d'un axe central.</li></ul>
