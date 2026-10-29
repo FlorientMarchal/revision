@@ -138,14 +138,21 @@ ${warn('l\'ordinale change de camp', '<p>En statistique, l\'ordinale est rangée
       { id: 'catalogue', t: 'Le catalogue des graphiques', sub: 'Que représente chaque axe, chaque couleur ?', html: `
 <p>Pour chaque graphique, il faut savoir dire <b>combien de variables de chaque type</b> il représente, et <b>avec quoi</b> (axe, couleur, taille…). Clique sur les vignettes :</p>
 ${demo('charts')}
-<h4>Une nominale (ou ordinale) et une quantitative</h4>
-<ul><li><b>Diagramme en barres</b> : abscisses = 1 nominale ou ordinale ; ordonnées = 1 quantitative. L'<b>histogramme</b> est un diagramme en barres dont les barres représentent les effectifs de classes de valeurs.</li><li><b>Diagramme en secteurs</b> (camembert) : secteurs / couleurs = 1 nominale ; taille des secteurs = 1 quantitative.</li></ul>
-<h4>Deux nominales (ou ordinales) et une quantitative</h4>
-<ul><li><b>Table surlignée</b> : abscisses = 1 nominale ou ordinale ; ordonnées = 1 nominale ou ordinale ; couleur = 1 quantitative.</li><li><b>Diagramme en barres empilées</b> : abscisses = 1 nominale ou ordinale ; ordonnées = 1 quantitative ; couleurs = 1 nominale.</li><li><b>Diagramme en barres côte à côte</b> : abscisses et couleur = 2 nominales ou ordinales ; ordonnées = 1 quantitative.</li></ul>
-<h4>Une évolution (souvent dans le temps)</h4>
-<ul><li><b>Diagramme en lignes</b> : abscisses = 1 quantitative (souvent une date) ; ordonnées = 1 quantitative ; lignes / couleurs = 1 nominale (une ligne par catégorie).</li><li><b>Diagramme en aires empilées</b> : mêmes variables, les aires de chaque catégorie s'empilent.</li><li><b>Diagramme en flots</b> (streamgraph) : mêmes variables, les aires s'empilent autour d'un axe central.</li></ul>
-<h4>Plusieurs quantitatives</h4>
-<ul><li><b>Nuage de points</b> : abscisses = 1 quantitative ; ordonnées = 1 quantitative.</li><li><b>Matrice de nuages de points</b> : n quantitatives en abscisse et en ordonnée, un nuage par paire de variables.</li><li><b>Coordonnées parallèles</b> : les individus sont des lignes ; axes verticaux = n quantitatives. Avantage : beaucoup de variables grâce à la position ; inconvénient : on compare mal deux variables dont les axes ne sont pas voisins (TP 5).</li><li><b>Diagramme de Kiviat</b> (radar) : les individus sont des lignes ; axes circulaires = n quantitatives.</li></ul>
+<p>Les graphiques dans l'ordre du CM, avec ce que représente chaque axe ou chaque couleur :</p>
+<ul>
+<li><b>Table surlignée</b> : axe des abscisses = 1 variable nominale ou ordinale ; axe des ordonnées = 1 variable nominale ou ordinale ; couleurs = 1 variable quantitative.</li>
+<li><b>Diagramme en barres</b> : axe des abscisses = 1 variable nominale ou ordinale ; axe des ordonnées = 1 variable quantitative. La même diapo montre un <b>histogramme</b>.</li>
+<li><b>Diagramme en barres empilées</b> : axe des abscisses = 1 variable nominale ou ordinale ; axe des ordonnées = 1 variable quantitative ; couleurs = 1 variable nominale.</li>
+<li><b>Diagramme en barres côte-à-côte</b> : axe des abscisses / couleur = 2 variables nominales ou ordinales ; axe des ordonnées = 1 variable quantitative.</li>
+<li><b>Diagramme en secteurs</b> (le « camembert » du TD 1) : secteurs / couleurs = 1 variable nominale ; taille des secteurs = 1 variable quantitative.</li>
+<li><b>Diagramme en lignes</b> : axe des abscisses = 1 variable quantitative (souvent une date) ; axe des ordonnées = 1 variable quantitative ; lignes (si plusieurs) / couleurs = 1 variable nominale.</li>
+<li><b>Diagramme en aires empilées</b> : axe des abscisses = 1 variable quantitative (souvent une date) ; axe des ordonnées = 1 variable quantitative ; aires / couleurs = 1 variable nominale.</li>
+<li><b>Diagramme en flots</b> : axe des abscisses = 1 variable quantitative (souvent une date) ; axe des ordonnées = 1 variable quantitative ; aires / couleurs = 1 variable nominale.</li>
+<li><b>Nuage de points</b> : axe des abscisses = 1 variable quantitative ; axe des ordonnées = 1 variable quantitative.</li>
+<li><b>Matrice de nuages de points</b> : axe des abscisses = n variables quantitatives ; axe des ordonnées = n variables quantitatives.</li>
+<li><b>Coordonnées parallèles</b> : les individus sont représentés par des lignes ; axes verticaux = n variables quantitatives. Le TP 5 ajoute : avantage, visualiser un grand nombre de variables grâce à la variable visuelle position ; inconvénient, on compare difficilement les variables dont les axes ne sont pas consécutifs.</li>
+<li><b>Diagramme de Kiviat</b> : les individus sont représentés par des lignes ; axes circulaires = n variables quantitatives.</li>
+</ul>
 ` },
       { id: 'comparer', t: 'Comparer deux graphiques', sub: 'Barres empilées ou côte à côte (TD, exercice 2)', html: `
 <p>Les deux représentent 1 quantitative et 2 nominales/ordinales. Le bon choix dépend de la tâche.</p>

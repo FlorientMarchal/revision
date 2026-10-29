@@ -63,7 +63,7 @@ export const cards = [
   {"id":"vc_pc","ch":"tables","q":"Coordonnées parallèles : variables ?","a":"Individus = lignes ; axes verticaux : n quantitatives."},
   {"id":"vc_pc_2","ch":"tables","q":"Avantage des coordonnées parallèles ?","a":"Beaucoup de variables grâce à la position."},
   {"id":"vc_pc_3","ch":"tables","q":"Inconvénient des coordonnées parallèles ?","a":"On compare mal deux variables dont les axes ne sont pas consécutifs."},
-  {"id":"vc_kiviat","ch":"tables","q":"Diagramme de Kiviat ?","a":"Individus = lignes ; axes circulaires (en étoile) : n quantitatives."},
+  {"id":"vc_kiviat","ch":"tables","q":"Diagramme de Kiviat ?","a":"Individus = lignes ; axes circulaires : n quantitatives."},
   {"id":"vc_vvdef","ch":"vv1","q":"Qu'est-ce qu'une variable visuelle ?","a":"Une composante de l'apparence des objets graphiques qui représente une variable du jeu de données."},
   {"id":"vc_vvlist","ch":"vv1","q":"Variables visuelles de base ?","a":"Taille 1D (longueur), taille 2D (aire), couleur, forme, position x, position y."},
   {"id":"vc_vvlist_2","ch":"vv1","q":"Autres variables visuelles du cours ?","a":"Position 3D, taille 3D (volume), orientation, grain, texture, mouvement."},

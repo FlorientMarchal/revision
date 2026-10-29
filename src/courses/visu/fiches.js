@@ -105,17 +105,17 @@ tables: `
 <thead><tr><th>Graphique</th><th>Variables représentées</th></tr></thead>
 <tbody>
 <tr><td>Table surlignée</td><td>abscisses : 1 nominale/ordinale ; ordonnées : 1 nominale/ordinale ; couleur : 1 quantitative</td></tr>
-<tr><td>Diagramme en barres (et histogramme)</td><td>abscisses : 1 nominale/ordinale ; ordonnées : 1 quantitative</td></tr>
+<tr><td>Diagramme en barres</td><td>abscisses : 1 nominale/ordinale ; ordonnées : 1 quantitative</td></tr>
 <tr><td>Barres empilées</td><td>abscisses : 1 nominale/ordinale ; ordonnées : 1 quantitative ; couleur : 1 nominale</td></tr>
 <tr><td>Barres côte à côte</td><td>abscisses + couleur : 2 nominales/ordinales ; ordonnées : 1 quantitative</td></tr>
-<tr><td>Diagramme en secteurs (camembert)</td><td>secteurs / couleurs : 1 nominale ; taille des secteurs : 1 quantitative</td></tr>
+<tr><td>Diagramme en secteurs</td><td>secteurs / couleurs : 1 nominale ; taille des secteurs : 1 quantitative</td></tr>
 <tr><td>Diagramme en lignes</td><td>abscisses : 1 quantitative (souvent une date) ; ordonnées : 1 quantitative ; lignes / couleurs : 1 nominale</td></tr>
 <tr><td>Aires empilées</td><td>abscisses : 1 quantitative (souvent une date) ; ordonnées : 1 quantitative ; aires / couleurs : 1 nominale</td></tr>
-<tr><td>Diagramme en flots (streamgraph)</td><td>même chose que les aires empilées, empilées autour d'un axe central</td></tr>
+<tr><td>Diagramme en flots</td><td>abscisses : 1 quantitative (souvent une date) ; ordonnées : 1 quantitative ; aires / couleurs : 1 nominale</td></tr>
 <tr><td>Nuage de points</td><td>abscisses : 1 quantitative ; ordonnées : 1 quantitative</td></tr>
 <tr><td>Matrice de nuages de points</td><td>n quantitatives en abscisse et en ordonnée (un nuage par paire)</td></tr>
 <tr><td>Coordonnées parallèles</td><td>individus = lignes ; axes verticaux : n quantitatives</td></tr>
-<tr><td>Diagramme de Kiviat (radar)</td><td>individus = lignes ; axes circulaires : n quantitatives</td></tr>
+<tr><td>Diagramme de Kiviat</td><td>individus = lignes ; axes circulaires : n quantitatives</td></tr>
 </tbody></table>
 <details class="fold"><summary>Barres empilées ou côte à côte ? (exercice 2 du TD)</summary>
 <p style="margin-top:8px">Les deux représentent 1 quantitative et 2 nominales/ordinales. <b>Empilées</b> : on lit directement le <b>total</b> de chaque barre et on compare bien la catégorie du bas (alignée sur l'axe), mais les segments supérieurs n'ont pas de base commune : leurs longueurs se comparent mal. <b>Côte à côte</b> : toutes les barres partent de l'axe, on compare précisément chaque valeur (position sur une échelle commune), mais le total n'est plus visible et le graphique s'élargit quand il y a beaucoup de modalités.</p></details>
