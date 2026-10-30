@@ -87,8 +87,16 @@ header.shell{flex-wrap:nowrap}
 /* écran d'ordinateur : le labo déborde de la colonne du site pour laisser plus de place au code */
 .lab-wide{grid-template-columns:minmax(0,1fr) minmax(0,1.45fr); align-items:start;
   width:min(1560px, calc(100vw - 64px)); margin-inline:calc(50% - min(780px, 50vw - 32px))}
-.lab-wide .lab-editor{height:52vh}
 .lab-wide .lab-run{position:sticky; top:72px; max-height:calc(100vh - 88px); overflow:auto}
+/* écran d'ordinateur : code et aperçu tiennent ensemble dans la hauteur de l'écran, sans défiler */
+@media (min-height:620px){
+  .lab-wide .lab-run{height:calc(100vh - 88px); overflow:hidden; grid-template-rows:auto minmax(0,1.1fr) auto minmax(0,1fr) auto; gap:8px}
+  .lab-wide .lab-editor{height:100%; min-height:0; resize:none}
+  .lab-wide .lab-out{min-height:0; display:grid}
+  .lab-wide .lab-out iframe{height:100%}
+  .lab-wide .lab-console{max-height:110px}
+}
+
 .lab-steps{display:grid; gap:12px}
 .lab-steps header{display:grid; gap:6px}
 .lab-files{margin:0; font-size:14px; color:var(--muted)}
@@ -108,7 +116,8 @@ header.shell{flex-wrap:nowrap}
 .lab-run{display:grid; gap:10px}
 .lab-bar{display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:8px}
 .lab-file{font:600 14px var(--f-mono)}
-.lab-btns{display:inline-flex; flex-wrap:wrap; gap:8px}
+.lab-btns{display:inline-flex; flex-wrap:wrap; align-items:center; gap:8px}
+.lab-live{display:inline-flex; align-items:center; gap:6px; font-size:13px; color:var(--muted); cursor:pointer}
 .lab-editor{width:100%; min-height:300px; height:42vh; resize:vertical; padding:10px 12px; border:1px solid var(--line); border-radius:8px; background:var(--field); color:var(--ink); font:13px/1.55 var(--f-mono); tab-size:4; white-space:pre; overflow:auto}
 .lab-editor:focus{outline:2px solid var(--accent); outline-offset:1px}
 .lab-hint{margin:0; font-size:12px; color:var(--muted)}

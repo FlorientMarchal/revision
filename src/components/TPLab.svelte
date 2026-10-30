@@ -43,6 +43,10 @@
   let copied = $state('');
   let ran = $state(false);
   let wide = $state(false);
+  // aperçu en direct : la page se met à jour peu après chaque modification du code
+  let live = $state(ui.get('labLive', true));
+  let liveT = null;
+  function changed() { if (live && ran) { clearTimeout(liveT); liveT = setTimeout(() => run(true), 600); } }
   let runSt = $state('');   // '' | 'run' | 'done' : le bouton passe de ▶ à la roue puis à la coche
   let runT = null;
   function runDone() {
@@ -74,12 +78,14 @@
     if (/<html[^>]*>/i.test(html)) return html.replace(/<html[^>]*>/i, m => m + '<head>' + head + '</head>');
     return head + html;
   }
-  async function run() {
+  async function run(quiet) {
     save();
     logs = [];
-    srcdoc = '';
-    await tick();
-    runSt = 'run'; clearTimeout(runT); runT = setTimeout(runDone, 2500);
+    if (quiet !== true) {
+      srcdoc = '';
+      await tick();
+      runSt = 'run'; clearTimeout(runT); runT = setTimeout(runDone, 2500);
+    }
     srcdoc = build(code);
     ran = true;
   }
@@ -100,7 +106,7 @@
     if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') { e.preventDefault(); run(); return; }
   }
   let saveTimer = null;
-  function onInput(e) { code = e.currentTarget.value; clearTimeout(saveTimer); saveTimer = setTimeout(save, 400); }
+  function onInput(e) { code = e.currentTarget.value; clearTimeout(saveTimer); saveTimer = setTimeout(save, 400); changed(); }
 
   // insère l'extrait sur sa propre ligne, aligné sur l'indentation de la ligne du curseur
   async function insert(snippet) {
@@ -118,7 +124,7 @@
     if (v.slice(b, eol === -1 ? v.length : eol).trim()) text += '\n' + indent;
     editor.focus();
     editor.setRangeText(text, a, b, 'end');
-    code = editor.value; save();
+    code = editor.value; save(); changed();
   }
   async function copy(snippet, key) {
     try { await navigator.clipboard.writeText(snippet); copied = key; setTimeout(() => { if (copied === key) copied = ''; }, 1500); }
@@ -202,13 +208,14 @@
     <div class="lab-bar">
       <b class="lab-file">{exo.save || 'exercice.html'}</b>
       <span class="lab-btns">
-        <button class="btn primary mc-run" class:is-run={runSt === 'run'} class:is-done={runSt === 'done'} onclick={run} title="Ctrl/⌘ + Entrée"><span class="mc-run-ic" aria-hidden="true"><svg viewBox="0 0 16 16"><path class="i-play" d="M5 3.2v9.6L12.6 8z" /><circle class="i-spin" cx="8" cy="8" r="5.6" pathLength="1" /><path class="i-ok" d="M3.6 8.4l3 3 5.8-6.6" pathLength="1" /></svg></span>{runSt === 'done' ? 'Exécuté' : 'Exécuter'}</button>
+        <button class="btn primary mc-run" class:is-run={runSt === 'run'} class:is-done={runSt === 'done'} onclick={() => run()} title="Ctrl/⌘ + Entrée"><span class="mc-run-ic" aria-hidden="true"><svg viewBox="0 0 16 16"><path class="i-play" d="M5 3.2v9.6L12.6 8z" /><circle class="i-spin" cx="8" cy="8" r="5.6" pathLength="1" /><path class="i-ok" d="M3.6 8.4l3 3 5.8-6.6" pathLength="1" /></svg></span>{runSt === 'done' ? 'Exécuté' : 'Exécuter'}</button>
         <button class="btn small ed-hist" onclick={e => historyStep(e.currentTarget, -1)} title="Annuler (Ctrl/⌘ + Z)" aria-label="Annuler">↶</button><button class="btn small ed-hist" onclick={e => historyStep(e.currentTarget, 1)} title="Rétablir (Ctrl/⌘ + Maj + Z)" aria-label="Rétablir">↷</button>
         <button class="btn small" onclick={reset}>{exo.start.html !== undefined ? 'Fichier de départ' : 'Repartir de l\'exo précédent'}</button>
         <button class="btn small" onclick={download}>Télécharger</button>
+        <label class="lab-live" title="Après une première exécution, la page se met à jour pendant que tu tapes"><input type="checkbox" checked={live} onchange={e => { live = e.currentTarget.checked; ui.set('labLive', live); }} /> Aperçu en direct</label>
       </span>
     </div>
-    <textarea class="lab-editor" bind:this={editor} value={code} oninput={onInput} onkeydown={onKey} use:codeEditor={{ unit: '\t', onChange: v => { code = v; save(); } }}
+    <textarea class="lab-editor" bind:this={editor} value={code} oninput={onInput} onkeydown={onKey} use:codeEditor={{ unit: '\t', onChange: v => { code = v; save(); changed(); } }}
       spellcheck="false" autocapitalize="off" autocomplete="off" aria-label="Code de l'exercice"></textarea>
     <p class="lab-hint">Ton code est enregistré sur cet appareil. <kbd>Tab</kbd> / <kbd>Maj</kbd> + <kbd>Tab</kbd> indentent ou désindentent les lignes sélectionnées (le retour à la ligne garde l'indentation), <kbd>Ctrl</kbd>/<kbd>⌘</kbd> + <kbd>Z</kbd> annule, <kbd>Ctrl</kbd>/<kbd>⌘</kbd> + <kbd>Entrée</kbd> exécute.</p>
     <div class="lab-out">
