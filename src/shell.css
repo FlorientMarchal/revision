@@ -84,7 +84,10 @@ header.shell{flex-wrap:nowrap}
 .lab-intro p{margin:0}
 .lab-exos{margin:0}
 .lab{display:grid; gap:16px; grid-template-columns:minmax(0,1fr)}
-.lab-wide{grid-template-columns:minmax(0,1fr) minmax(0,1.05fr); align-items:start}
+/* écran d'ordinateur : le labo déborde de la colonne du site pour laisser plus de place au code */
+.lab-wide{grid-template-columns:minmax(0,1fr) minmax(0,1.45fr); align-items:start;
+  width:min(1560px, calc(100vw - 64px)); margin-inline:calc(50% - min(780px, 50vw - 32px))}
+.lab-wide .lab-editor{height:52vh}
 .lab-wide .lab-run{position:sticky; top:72px; max-height:calc(100vh - 88px); overflow:auto}
 .lab-steps{display:grid; gap:12px}
 .lab-steps header{display:grid; gap:6px}
@@ -506,3 +509,9 @@ details.fold[open] summary::before{transform:translateY(2px) rotate(180deg)}
 
 /* Annuler / rétablir dans les zones de code */
 .btn.ed-hist{min-width:30px; padding-inline:6px; font-size:15px; line-height:1}
+
+/* labos R / Python sur écran d'ordinateur : plus larges que la colonne du site, texte gardé lisible */
+@media (min-width:1200px){
+  .r-lab{width:min(1400px, calc(100vw - 64px)); margin-inline:calc(50% - min(700px, 50vw - 32px))}
+  .r-text, .r-lab > header{max-width:90ch}
+}
