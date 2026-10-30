@@ -1,4 +1,6 @@
-// Zones de code des labos : Tab / Maj+Tab indentent ou désindentent la ligne ou toute la sélection,
+// Zones de code des labos : Tab / Maj+Tab indentent ou désindentent la ligne ou toute la sélection ;
+// Entrée reprend l'indentation de la ligne (un niveau de plus après { ( [ ou : en Python) ;
+// une fermante } ) ] tapée en début de ligne retire un niveau ; Retour arrière efface un niveau d'espaces d'un coup ;
 // et un historique propre à chaque zone permet d'annuler / rétablir (Ctrl/⌘+Z, Ctrl/⌘+Maj+Z ou Ctrl+Y, et boutons).
 // Usage : <textarea use:codeEditor={{ unit: '  ', onChange: v => … }}>
 const HIST = new WeakMap();
@@ -32,6 +34,25 @@ function indent(v, a, b, unit, out) {
     return l;
   });
   return { v: v.slice(0, s) + lines.join('\n') + v.slice(e), a: na, b: Math.max(na, nb) };
+}
+
+const OPEN = /[{([]\s*$/;
+const PAIR = { '{': '}', '(': ')', '[': ']' };
+
+// Entrée : nouvelle ligne alignée sur la ligne courante, un niveau de plus après une ouvrante ;
+// entre deux accolades {|}, la fermante descend sur sa propre ligne
+function newline(v, a, b, unit, py) {
+  const start = v.lastIndexOf('\n', a - 1) + 1;
+  const before = v.slice(start, a);
+  const base = before.match(/^[ \t]*/)[0];
+  const open = OPEN.test(before) || (py && /:\s*(#.*)?$/.test(before));
+  const next = v[b];
+  if (open && next && PAIR[before.trimEnd().slice(-1)] === next) {
+    const ins = '\n' + base + unit + '\n' + base;
+    return { v: v.slice(0, a) + ins + v.slice(b), a: a + 1 + base.length + unit.length };
+  }
+  const ins = '\n' + base + (open ? unit : '');
+  return { v: v.slice(0, a) + ins + v.slice(b), a: a + ins.length };
 }
 
 export function codeEditor(t, params) {
@@ -72,10 +93,35 @@ export function codeEditor(t, params) {
     const mod = e.metaKey || e.ctrlKey;
     if (mod && !e.altKey && (e.key === 'z' || e.key === 'Z')) { e.preventDefault(); h.step(e.shiftKey ? 1 : -1); return; }
     if (mod && !e.altKey && e.key === 'y') { e.preventDefault(); h.step(1); return; }
-    if (e.key !== 'Tab' || mod || e.altKey) return;
+    if (e.isComposing || mod || e.altKey) return;
+    const v = t.value, a = t.selectionStart, b = t.selectionEnd;
+    const unit = p.unit || '  ';
+    const lineStart = v.lastIndexOf('\n', a - 1) + 1;
+    const lead = v.slice(lineStart, a);
+    let r = null;
+    if (e.key === 'Enter') r = newline(v, a, b, unit, p.py);
+    // fermante tapée sur une ligne vide d'indentation : on retire un niveau
+    else if ((e.key === '}' || e.key === ')' || e.key === ']') && a === b && lead && !lead.trim()) {
+      const cut = lead.endsWith('\t') ? 1 : Math.min(lead.length, unit === '\t' ? 4 : unit.length);
+      r = { v: v.slice(0, a - cut) + e.key + v.slice(b), a: a - cut + 1 };
+    }
+    // Retour arrière dans l'indentation (espaces) : efface jusqu'au niveau précédent
+    else if (e.key === 'Backspace' && a === b && unit !== '\t' && lead && /^ +$/.test(lead)) {
+      const cut = (lead.length % unit.length) || unit.length;
+      if (cut > 1) r = { v: v.slice(0, a - cut) + v.slice(b), a: a - cut };
+    }
+    if (r) {
+      e.preventDefault();
+      sync();
+      t.value = r.v; t.setSelectionRange(r.a, r.a);
+      h.kind = ''; push('');
+      p.onChange?.(r.v);
+      return;
+    }
+    if (e.key !== 'Tab') return;
     e.preventDefault();
     sync();
-    const r = indent(t.value, t.selectionStart, t.selectionEnd, p.unit || '  ', e.shiftKey);
+    r = indent(v, a, b, unit, e.shiftKey);
     if (r.v === t.value) return;
     t.value = r.v; t.setSelectionRange(r.a, r.b);
     h.kind = ''; push('');

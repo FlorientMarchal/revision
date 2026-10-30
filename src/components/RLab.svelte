@@ -108,7 +108,7 @@
             {#if ch.sol}<button class="btn small" aria-pressed={!!showSol[ch.id]} onclick={() => (showSol = { ...showSol, [ch.id]: !showSol[ch.id] })}>{showSol[ch.id] ? 'Masquer le corrigé' : 'Voir le corrigé'}</button>{/if}
           </span>
         </div>
-        <textarea class="r-code" rows={rows(codes[ch.id])} value={codes[ch.id]} oninput={e => edit(ch, e.currentTarget.value)} onkeydown={e => onKey(e, ch)} use:codeEditor={{ unit: PY ? '    ' : '  ', onChange: v => edit(ch, v) }}
+        <textarea class="r-code" rows={rows(codes[ch.id])} value={codes[ch.id]} oninput={e => edit(ch, e.currentTarget.value)} onkeydown={e => onKey(e, ch)} use:codeEditor={{ unit: PY ? '    ' : '  ', py: PY, onChange: v => edit(ch, v) }}
           spellcheck="false" autocapitalize="off" autocomplete="off" aria-label={'Code ' + L.name}></textarea>
       </div>
       {/if}

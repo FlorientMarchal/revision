@@ -210,7 +210,7 @@
     </div>
     <textarea class="lab-editor" bind:this={editor} value={code} oninput={onInput} onkeydown={onKey} use:codeEditor={{ unit: '\t', onChange: v => { code = v; save(); } }}
       spellcheck="false" autocapitalize="off" autocomplete="off" aria-label="Code de l'exercice"></textarea>
-    <p class="lab-hint">Ton code est enregistré sur cet appareil. <kbd>Tab</kbd> / <kbd>Maj</kbd> + <kbd>Tab</kbd> indentent ou désindentent les lignes sélectionnées, <kbd>Ctrl</kbd>/<kbd>⌘</kbd> + <kbd>Z</kbd> annule, <kbd>Ctrl</kbd>/<kbd>⌘</kbd> + <kbd>Entrée</kbd> exécute.</p>
+    <p class="lab-hint">Ton code est enregistré sur cet appareil. <kbd>Tab</kbd> / <kbd>Maj</kbd> + <kbd>Tab</kbd> indentent ou désindentent les lignes sélectionnées (le retour à la ligne garde l'indentation), <kbd>Ctrl</kbd>/<kbd>⌘</kbd> + <kbd>Z</kbd> annule, <kbd>Ctrl</kbd>/<kbd>⌘</kbd> + <kbd>Entrée</kbd> exécute.</p>
     <div class="lab-out">
       {#if ran}
         <iframe bind:this={frame} title="Aperçu de la page" sandbox={SANDBOX} {srcdoc} onload={runDone}></iframe>
