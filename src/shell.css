@@ -503,3 +503,6 @@ details.fold[open] summary::before{transform:translateY(2px) rotate(180deg)}
 .slide-row{display:grid; grid-template-columns:repeat(auto-fill, minmax(min(100%, 240px), 1fr)); gap:10px 14px; margin:12px 0; align-items:start}
 .slide-row .slide-fig{margin:0}
 .slide-row .slide-fig img{width:100%}
+
+/* Annuler / rétablir dans les zones de code */
+.btn.ed-hist{min-width:30px; padding-inline:6px; font-size:15px; line-height:1}

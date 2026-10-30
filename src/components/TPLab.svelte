@@ -4,6 +4,7 @@
   import { onMount, tick } from 'svelte';
   import { kv, progress, setVal } from '../lib/progress.js';
   import { lens } from '../lib/motion-components.js';
+  import { codeEditor, historyStep } from '../lib/editor.js';
 
   let { course, data } = $props();
   const ui = kv(course.id);
@@ -97,12 +98,6 @@
   // ---------- éditeur ----------
   function onKey(e) {
     if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') { e.preventDefault(); run(); return; }
-    if (e.key === 'Tab' && !e.shiftKey && !e.altKey) {
-      e.preventDefault();
-      const t = e.currentTarget, a = t.selectionStart, b = t.selectionEnd;
-      t.setRangeText('\t', a, b, 'end');
-      code = t.value; save();
-    }
   }
   let saveTimer = null;
   function onInput(e) { code = e.currentTarget.value; clearTimeout(saveTimer); saveTimer = setTimeout(save, 400); }
@@ -203,18 +198,19 @@
     </label>
   </article>{/key}
 
-  <section class="card lab-run" aria-label="Éditeur et aperçu">
+  <section class="card lab-run" aria-label="Éditeur et aperçu" data-editor>
     <div class="lab-bar">
       <b class="lab-file">{exo.save || 'exercice.html'}</b>
       <span class="lab-btns">
         <button class="btn primary mc-run" class:is-run={runSt === 'run'} class:is-done={runSt === 'done'} onclick={run} title="Ctrl/⌘ + Entrée"><span class="mc-run-ic" aria-hidden="true"><svg viewBox="0 0 16 16"><path class="i-play" d="M5 3.2v9.6L12.6 8z" /><circle class="i-spin" cx="8" cy="8" r="5.6" pathLength="1" /><path class="i-ok" d="M3.6 8.4l3 3 5.8-6.6" pathLength="1" /></svg></span>{runSt === 'done' ? 'Exécuté' : 'Exécuter'}</button>
+        <button class="btn small ed-hist" onclick={e => historyStep(e.currentTarget, -1)} title="Annuler (Ctrl/⌘ + Z)" aria-label="Annuler">↶</button><button class="btn small ed-hist" onclick={e => historyStep(e.currentTarget, 1)} title="Rétablir (Ctrl/⌘ + Maj + Z)" aria-label="Rétablir">↷</button>
         <button class="btn small" onclick={reset}>{exo.start.html !== undefined ? 'Fichier de départ' : 'Repartir de l\'exo précédent'}</button>
         <button class="btn small" onclick={download}>Télécharger</button>
       </span>
     </div>
-    <textarea class="lab-editor" bind:this={editor} value={code} oninput={onInput} onkeydown={onKey}
+    <textarea class="lab-editor" bind:this={editor} value={code} oninput={onInput} onkeydown={onKey} use:codeEditor={{ unit: '\t', onChange: v => { code = v; save(); } }}
       spellcheck="false" autocapitalize="off" autocomplete="off" aria-label="Code de l'exercice"></textarea>
-    <p class="lab-hint">Ton code est enregistré sur cet appareil. <kbd>Tab</kbd> indente, <kbd>Ctrl</kbd>/<kbd>⌘</kbd> + <kbd>Entrée</kbd> exécute.</p>
+    <p class="lab-hint">Ton code est enregistré sur cet appareil. <kbd>Tab</kbd> / <kbd>Maj</kbd> + <kbd>Tab</kbd> indentent ou désindentent les lignes sélectionnées, <kbd>Ctrl</kbd>/<kbd>⌘</kbd> + <kbd>Z</kbd> annule, <kbd>Ctrl</kbd>/<kbd>⌘</kbd> + <kbd>Entrée</kbd> exécute.</p>
     <div class="lab-out">
       {#if ran}
         <iframe bind:this={frame} title="Aperçu de la page" sandbox={SANDBOX} {srcdoc} onload={runDone}></iframe>

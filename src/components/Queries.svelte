@@ -3,6 +3,7 @@
   // Rien n'est exécuté : le « résultat attendu » éventuel est calculé à l'avance à partir des données du cours.
   import { kv, progress, setVal } from '../lib/progress.js';
   import { highlight, missing } from '../lib/code.js';
+  import { codeEditor, historyStep } from '../lib/editor.js';
   import { lens, markMissing, html } from '../lib/motion-components.js';
 
   let { course, data } = $props();
@@ -21,15 +22,6 @@
   const count = s => s.exos.filter(x => ($prog['rq:' + x.id] || {}).v === 'ok').length;
   function choose(s) { id = s; ui.set('rqSet', s); }
 
-  // Tabulation dans la zone de saisie : insère deux espaces au lieu de quitter le champ.
-  function tab(e, x) {
-    if (e.key !== 'Tab' || e.shiftKey) return;
-    e.preventDefault();
-    const t = e.currentTarget, a = t.selectionStart, b = t.selectionEnd;
-    const v = t.value.slice(0, a) + '  ' + t.value.slice(b);
-    edit(x, v);
-    requestAnimationFrame(() => { t.selectionStart = t.selectionEnd = a + 2; });
-  }
   const rows = x => (typeof x.expected === 'function' ? x.expected(data) : x.expected) || [];
   const cols = r => (r.length && r[0] !== null && typeof r[0] === 'object' && !Array.isArray(r[0])) ? Object.keys(r[0]) : null;
   const cell = v => (v !== null && typeof v === 'object') ? JSON.stringify(v) : String(v);
@@ -63,17 +55,18 @@
   {#each set.exos as x, k (x.id)}
     {@const s = st(x)}
     {@const v = draft(x)}
-    <article class="card rq" class:rq-ok={s === 'ok'} class:rq-todo={s === 'revoir'}>
+    <article class="card rq" data-editor class:rq-ok={s === 'ok'} class:rq-todo={s === 'revoir'}>
       <div class="rq-q"><span class="rq-n">{k + 1}</span><div>{@html x.q}</div></div>
       <div class="rq-field">
       <textarea class="rq-input" rows={Math.max(3, Math.min(14, (v.match(/\n/g) || []).length + 2))} spellcheck="false" autocapitalize="off" autocomplete="off"
         placeholder={'Écris ta requête ' + (x.lang || set.lang) + '…'} aria-label={'Ta requête pour la question ' + (k + 1)}
-        value={v} oninput={e => edit(x, e.currentTarget.value)} onkeydown={e => tab(e, x)}></textarea>
+        value={v} oninput={e => edit(x, e.currentTarget.value)} use:codeEditor={{ unit: '  ', onChange: v => edit(x, v) }}></textarea>
       <i class="rq-line" aria-hidden="true"></i>
       </div>
       <div class="row">
         <button class="btn small" class:primary={!shown[x.id]} aria-expanded={!!shown[x.id]} onclick={() => (shown[x.id] = !shown[x.id])}>{shown[x.id] ? 'Masquer la solution' : 'Voir la solution'}</button>
         {#if v}<button class="btn small" onclick={() => edit(x, '')}>Effacer</button>{/if}
+        <button class="btn small ed-hist" onclick={e => historyStep(e.currentTarget, -1)} title="Annuler (Ctrl/⌘ + Z)" aria-label="Annuler">↶</button><button class="btn small ed-hist" onclick={e => historyStep(e.currentTarget, 1)} title="Rétablir (Ctrl/⌘ + Maj + Z)" aria-label="Rétablir">↷</button>
       </div>
       {#if shown[x.id]}
         {@const miss = v.trim() ? missing(v, x.sol) : []}

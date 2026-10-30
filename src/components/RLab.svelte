@@ -5,6 +5,7 @@
   import { kv, progress, setVal } from '../lib/progress.js';
   import { typeset } from '../lib/math.js';
   import { lens } from '../lib/motion-components.js';
+  import { codeEditor, historyStep } from '../lib/editor.js';
   import { runR, resetR, rState as rSt, rMessage as rMsg } from '../lib/webr.js';
   import { runPy, resetPy, pyState, pyMessage, provideFiles } from '../lib/pyodide.js';
 
@@ -60,10 +61,6 @@
 
   function onKey(e, ch) {
     if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') { e.preventDefault(); run(ch); return; }
-    if (e.key === 'Tab' && !e.shiftKey) {
-      e.preventDefault();
-      const t = e.currentTarget; t.setRangeText(PY ? '    ' : '  ', t.selectionStart, t.selectionEnd, 'end'); edit(ch, t.value);
-    }
   }
   const rows = s => Math.min(24, Math.max(3, (s || '').split('\n').length + 1));
 
@@ -101,16 +98,17 @@
       <div class="r-work" class:with-sol={ch.sol && showSol[ch.id]}>
       <div class="r-mine">
       {#if ch.code !== undefined || ch.sol}
-      <div class="r-editor">
+      <div class="r-editor" data-editor>
         <div class="r-bar">
           <span class="r-src">{ch.src || L.name}</span>
           <span class="r-btns">
+            <button class="btn small ed-hist" onclick={e => historyStep(e.currentTarget, -1)} title="Annuler (Ctrl/⌘ + Z)" aria-label="Annuler">↶</button><button class="btn small ed-hist" onclick={e => historyStep(e.currentTarget, 1)} title="Rétablir (Ctrl/⌘ + Maj + Z)" aria-label="Rétablir">↷</button>
             <button class="btn primary small mc-run" class:is-run={running[ch.id]} class:is-done={!running[ch.id] && flash[ch.id] === 'ok'} class:is-err={!running[ch.id] && flash[ch.id] === 'err'} onclick={() => run(ch)} disabled={running[ch.id]} title="Ctrl/⌘ + Entrée"><span class="mc-run-ic" aria-hidden="true"><svg viewBox="0 0 16 16"><path class="i-play" d="M5 3.2v9.6L12.6 8z" /><circle class="i-spin" cx="8" cy="8" r="5.6" pathLength="1" /><path class="i-ok" d="M3.6 8.4l3 3 5.8-6.6" pathLength="1" /><path class="i-err" d="M5 5l6 6M11 5l-6 6" pathLength="1" /></svg></span>{running[ch.id] ? 'Calcul…' : 'Exécuter'}</button>
             {#if ch.code !== undefined && codes[ch.id] !== ch.code}<button class="btn small" onclick={() => restore(ch, ch.code)}>Code de départ</button>{/if}
             {#if ch.sol}<button class="btn small" aria-pressed={!!showSol[ch.id]} onclick={() => (showSol = { ...showSol, [ch.id]: !showSol[ch.id] })}>{showSol[ch.id] ? 'Masquer le corrigé' : 'Voir le corrigé'}</button>{/if}
           </span>
         </div>
-        <textarea class="r-code" rows={rows(codes[ch.id])} value={codes[ch.id]} oninput={e => edit(ch, e.currentTarget.value)} onkeydown={e => onKey(e, ch)}
+        <textarea class="r-code" rows={rows(codes[ch.id])} value={codes[ch.id]} oninput={e => edit(ch, e.currentTarget.value)} onkeydown={e => onKey(e, ch)} use:codeEditor={{ unit: PY ? '    ' : '  ', onChange: v => edit(ch, v) }}
           spellcheck="false" autocapitalize="off" autocomplete="off" aria-label={'Code ' + L.name}></textarea>
       </div>
       {/if}
