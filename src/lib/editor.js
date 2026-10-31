@@ -93,6 +93,7 @@ export function codeEditor(t, params) {
     push(k.startsWith('insertText') ? 'type' : k.startsWith('delete') ? 'del' : '');
   }
   function onKey(e) {
+    onFocus();
     const mod = e.metaKey || e.ctrlKey;
     if (mod && !e.altKey && (e.key === 'z' || e.key === 'Z')) { e.preventDefault(); h.step(e.shiftKey ? 1 : -1); return; }
     if (mod && !e.altKey && e.key === 'y') { e.preventDefault(); h.step(1); return; }
@@ -131,11 +132,12 @@ export function codeEditor(t, params) {
     p.onChange?.(r.v);
   }
   t.addEventListener('focus', onFocus);
+  t.addEventListener('beforeinput', onFocus);
   t.addEventListener('input', onInput);
   t.addEventListener('keydown', onKey);
   return {
     update(n) { p = n; },
-    destroy() { t.removeEventListener('focus', onFocus); t.removeEventListener('input', onInput); t.removeEventListener('keydown', onKey); HIST.delete(t); },
+    destroy() { t.removeEventListener('focus', onFocus); t.removeEventListener('beforeinput', onFocus); t.removeEventListener('input', onInput); t.removeEventListener('keydown', onKey); HIST.delete(t); },
   };
 }
 
