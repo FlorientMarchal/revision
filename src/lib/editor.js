@@ -77,6 +77,7 @@ export function codeEditor(t, params) {
     p.onChange?.(s.v);
   }
   h.step = dir => {
+    onFocus();
     sync();
     const j = h.i + dir;
     if (j < 0 || j >= h.stack.length) return;
