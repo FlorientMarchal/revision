@@ -1,4 +1,4 @@
-// Le cours en entier, leçon par leçon, rédigé à partir des diapositives du CM (début du cours) et du TP 1.
+// Le cours en entier, leçon par leçon, rédigé à partir des diapositives du CM, des TP 1 à 4 et de l'annexe « De SQL à AQL ».
 // Les requêtes citées sont celles des supports (seuls l'indentation et les guillemets typographiques ont été retouchés).
 const box = (k, title, html) => `<div class="box ${k}"><div class="box-h">${title}</div>${html}</div>`;
 const def = (t, h) => box('def', 'Définition · ' + t, h);
@@ -193,13 +193,14 @@ ${go}
 
   /* ===================================================================== */
   {
-    id: 'n4', ch: 'arango', short: 'ArangoDB & AQL', src: 'CM, partie 5.1',
+    id: 'n4', ch: 'arango', short: 'ArangoDB & AQL', src: 'CM, partie 5.1 · TP 3 · annexe SQL → AQL',
     t: 'ArangoDB : modèle documents et langage AQL',
     sub: 'Un SGBD multi-modèle qui remet un peu de relationnel dans le NoSQL : collections et jointures en AQL.',
     goals: [
       'Présenter ArangoDB et ce qui le distingue de CouchDB.',
       'Expliquer ce qu\'on garde et ce qu\'on abandonne du relationnel.',
-      'Traduire une requête SQL simple en AQL (FOR, FILTER, SORT, RETURN).',
+      'Traduire une requête SQL en AQL (FOR, FILTER, SORT, LIMIT, RETURN, COLLECT, sous-requêtes) et écrire des données (INSERT, UPDATE, REPLACE, UPSERT, REMOVE).',
+      'Modéliser des données en plusieurs collections sans table d\'association (TP 3).',
     ],
     sections: [
       { id: 'presentation', t: 'Un SGBD NoSQL multi-modèle', sub: 'Documents et graphes', html: `
@@ -248,23 +249,134 @@ ${code('AQL', `FOR o IN ouvrages
 <li><code>COLLECT … WITH COUNT INTO n</code> ou <code>COLLECT … INTO g</code> regroupent comme un <code>GROUP BY</code> ; un <code>FILTER</code> après le <code>COLLECT</code> joue le rôle du <code>HAVING</code>.</li></ul>
 ${go}
 ` },
+      { id: 'ordre', t: 'L\'ordre des opérations compte', sub: 'Une succession d\'opérations', html: `
+<p>Une requête AQL est une <b>succession d'opérations exécutées dans l'ordre où elles sont écrites</b> (en SQL, l'ordre d'écriture diffère de l'ordre d'interprétation par le moteur). Ces deux requêtes ne donnent pas le même résultat :</p>
+<div class="grid2">
+${code('trie, garde 10 ouvrages, PUIS filtre', `FOR o IN ouvrages
+  SORT o.parution
+  LIMIT 10
+  FILTER o.genre == "roman"
+  RETURN o`)}
+${code('filtre, trie, PUIS garde 10 romans', `FOR o IN ouvrages
+  FILTER o.genre == "roman"
+  SORT o.parution
+  LIMIT 10
+  RETURN o`)}
+</div>
+<p>La première renvoie les romans parmi les 10 ouvrages les plus anciens (peut-être aucun) ; la seconde, les 10 romans les plus anciens. Un <code>FILTER</code> placé après <code>LIMIT</code> filtre les seuls résultats déjà limités.</p>
+` },
+      { id: 'tp3', t: 'Modéliser les festivals en collections', sub: 'TP 3', html: `
+<p>Les festivals des TP 1 et 2 passent dans ArangoDB, en séparant les concepts. Le corrigé propose <b>3 collections</b> : <code>artistes</code> (nom, pays, style), <code>festivals</code> (nom, lieu, capacite) et <code>editions</code> (nom_festival, annee, artistes).</p>
+${prop('Faut-il autant de collections que de tables SQL ? Non', '<p>En SQL, la relation n-n entre artistes et éditions demande une table d\'association (<code>edition_artiste</code>). Ici, on <b>stocke directement la liste des noms d\'artistes dans chaque édition</b> : 3 collections pour 4 tables.</p>')}
+${code('un document de la collection editions', `{
+  "nom_festival": "Les Déferlantes",
+  "annee": 2023,
+  "artistes": [ "Pomme", "Alt-J", "Big Flo & Oli", "Deluxe", … ]
+}`)}
+<p>Deux façons d'écrire la jointure entre une édition et les artistes :</p>
+<div class="grid2">
+${code('boucle sur la liste, puis sur la collection', `FOR e IN editions
+  FILTER e.nom_festival == "Les Eurockéennes"
+  FILTER e.annee == 2018
+  FOR a IN e.artistes
+    FOR a2 in artistes
+      FILTER a2.nom == a
+      RETURN {
+        nom: a,
+        pays: a2.pays
+      }`)}
+${code('version simplifiée : FILTER … IN', `FOR e IN editions
+  FILTER e.nom_festival == "Les Eurockéennes"
+  FILTER e.annee == 2018
+  FOR a IN artistes
+    FILTER a.nom IN e.artistes
+    RETURN {
+      nom: a.nom,
+      pays: a.pays
+    }`)}
+</div>
+<p>Pour lister sans doublon : <code>RETURN DISTINCT</code>, ou <code>COLLECT art = a</code> qui regroupe par valeur.</p>
+${warn('pas de typage', '<p>Dans les données du TP, <code>capacite</code> est une <b>chaîne</b> (<code>"12000"</code>) : AQL ne convertit pas implicitement, <code>"12000" == 12000</code> est faux (<code>TO_NUMBER()</code> pour convertir).</p>')}
+${go}
+` },
+      { id: 'sqlaql', t: 'De SQL à AQL', sub: 'Le tableau de correspondance de l\'annexe', html: `
+<p>AQL se lit comme <b>du SQL à l'envers</b> : on part de la collection (<code>FOR</code>), on filtre et on trie, puis on dit ce qu'on renvoie (<code>RETURN</code>). AQL est un langage de <b>manipulation de données uniquement</b> : ni <code>CREATE TABLE</code> ni <code>GRANT</code> ; collections et index se créent depuis l'interface web, <code>arangosh</code> ou l'API.</p>
+<div class="grid2">
+<table class="t"><thead><tr><th>SQL</th><th>ArangoDB</th></tr></thead><tbody>
+<tr><td>base de données</td><td>base de données</td></tr>
+<tr><td>table</td><td>collection (pas de schéma fixe)</td></tr>
+<tr><td>ligne</td><td>document JSON (attributs imbriqués possibles)</td></tr>
+<tr><td>colonne</td><td>attribut (peut être absent d'un document à l'autre)</td></tr>
+<tr><td>clé primaire</td><td><code>_key</code> (chaîne, générée si absente) ; <code>_id</code> = <code>collection/_key</code></td></tr>
+<tr><td>index</td><td>index primaire sur <code>_key</code> automatique</td></tr>
+<tr><td>jointure de tables</td><td>boucles <code>FOR</code> imbriquées</td></tr></tbody></table>
+<table class="t"><thead><tr><th>Clause SQL</th><th>AQL</th></tr></thead><tbody>
+<tr><td><code>SELECT … FROM t</code></td><td><code>FOR x IN t … RETURN …</code></td></tr>
+<tr><td><code>WHERE</code></td><td><code>FILTER</code></td></tr>
+<tr><td><code>ORDER BY</code></td><td><code>SORT</code></td></tr>
+<tr><td><code>LIMIT n OFFSET m</code></td><td><code>LIMIT m, n</code></td></tr>
+<tr><td><code>GROUP BY</code></td><td><code>COLLECT</code></td></tr>
+<tr><td><code>HAVING</code></td><td><code>FILTER</code> placé après <code>COLLECT</code></td></tr>
+<tr><td><code>DISTINCT</code></td><td><code>RETURN DISTINCT</code></td></tr>
+<tr><td>alias, colonne calculée</td><td><code>LET</code></td></tr></tbody></table>
+</div>
+<h4>Écrire</h4>
+<table class="t"><thead><tr><th>SQL</th><th>AQL</th></tr></thead><tbody>
+<tr><td><code>INSERT INTO livres … VALUES …</code></td><td><code>INSERT { titre: "Les Choses", annee: 1965 } INTO livres</code></td></tr>
+<tr><td><code>UPDATE livres SET … WHERE id = 12345</code></td><td><code>UPDATE "12345" WITH { genre: "roman" } IN livres</code> : <b>fusionne</b> (attributs non cités conservés)</td></tr>
+<tr><td><code>REPLACE INTO</code> (MariaDB)</td><td><code>REPLACE "12345" WITH { … } IN livres</code> : <b>écrase</b> tout sauf <code>_key</code> et <code>_id</code> ; échoue si le document n'existe pas</td></tr>
+<tr><td><code>INSERT … ON DUPLICATE KEY UPDATE</code></td><td><code>UPSERT { isbn: … } INSERT { … } UPDATE { tirages: OLD.tirages + 1 } IN livres</code></td></tr>
+<tr><td><code>DELETE FROM livres WHERE …</code></td><td><code>FOR l IN livres FILTER … REMOVE l IN livres</code></td></tr>
+<tr><td><code>ALTER TABLE … DROP COLUMN x</code></td><td><code>UPDATE l WITH { x: null } IN livres OPTIONS { keepNull: false }</code></td></tr></tbody></table>
+<p>Pour viser plusieurs documents, on enveloppe l'écriture dans un <code>FOR … FILTER</code>. Toute écriture peut renvoyer les documents touchés : <code>RETURN NEW</code> (après) ou <code>RETURN OLD</code> (avant). Sans schéma, ajouter une « colonne » = mettre à jour les documents concernés (pas de <code>DEFAULT</code>).</p>
+<h4>Conditions</h4>
+<table class="t"><thead><tr><th>SQL</th><th>AQL</th></tr></thead><tbody>
+<tr><td><code>genre = 'roman'</code></td><td><code>l.genre == "roman"</code></td></tr>
+<tr><td><code>genre &lt;&gt; 'roman'</code></td><td><code>l.genre != "roman"</code></td></tr>
+<tr><td><code>genre IN ('roman', 'essai')</code></td><td><code>l.genre IN ["roman", "essai"]</code></td></tr>
+<tr><td><code>titre LIKE '%nuit%'</code></td><td><code>l.titre LIKE "%nuit%"</code> ou <code>LIKE(l.titre, "%nuit%", true)</code> (insensible à la casse)</td></tr>
+<tr><td><code>annee BETWEEN 1950 AND 1960</code></td><td><code>l.annee &gt;= 1950 AND l.annee &lt;= 1960</code></td></tr>
+<tr><td><code>isbn IS NULL</code></td><td><code>l.isbn == null</code> (vrai aussi si l'attribut est absent)</td></tr></tbody></table>
+<h4>Requêtes avancées</h4>
+<ul><li><b>Jointure</b> : deux <code>FOR</code> imbriqués + <code>FILTER l.auteur_id == a._key</code> ; sur la clé, <code>LET a = DOCUMENT("auteurs", l.auteur_id)</code> lit directement le document. <code>MERGE(a, l)</code> écrase les attributs de même nom : on préfère <code>RETURN { livre: l, auteur: a }</code>.</li>
+<li><b>Jointure externe</b> (<code>LEFT JOIN</code>) : une <b>sous-requête</b> <code>LET titres = (FOR l IN livres FILTER … RETURN l.titre)</code> rattache à chaque auteur la liste de ses livres, vide s'il n'en a aucun. AQL peut renvoyer des résultats <b>imbriqués</b> plutôt qu'une table plate.</li>
+<li><b>Regrouper</b> : <code>COLLECT genre = l.genre WITH COUNT INTO n</code> ; autres agrégats avec <code>AGGREGATE moy = AVG(l.pages), premier = MIN(l.annee)</code> ; les documents de chaque groupe avec <code>COLLECT … INTO groupe</code> (puis <code>groupe[*].l._key</code>) ou <code>INTO groupe = l.titre</code>.</li>
+<li><b>Compter tout</b> : <code>COLLECT WITH COUNT INTO n</code> ; sans filtre, <code>RETURN LENGTH(livres)</code>. Agrégats sans regroupement : <code>COLLECT AGGREGATE plus_ancien = MIN(l.annee), …</code>.</li>
+<li><b>Sous-requête scalaire</b> : <code>LET moyenne = AVERAGE(livres[*].pages)</code>. Toute sous-requête entre parenthèses renvoie un <b>tableau</b> : <code>FIRST(...)</code> en extrait la première valeur.</li></ul>
+${warn('pièges fréquents en venant de SQL', `<ul><li><code>==</code> et non <code>=</code> : <code>=</code> sert à l'affectation (<code>LET x = …</code>, <code>COLLECT g = …</code>).</li>
+<li><code>null</code> se compare normalement : <code>l.isbn == null</code> renvoie <code>true</code> ou <code>false</code>, jamais <code>null</code>. Un attribut absent vaut <code>null</code>.</li>
+<li><b>Pas de conversion implicite</b> : <code>"1965" == 1965</code> est faux ; <code>TO_NUMBER()</code>, <code>TO_STRING()</code>.</li>
+<li><b>Ordre entre types</b> : <code>null</code> &lt; booléen &lt; nombre &lt; chaîne &lt; tableau &lt; objet ; <code>FILTER l.annee &lt; 1900</code> retient aussi les documents <b>sans</b> <code>annee</code>.</li>
+<li>La <code>_key</code> est une <b>chaîne</b> : <code>"12345"</code>, pas <code>12345</code>.</li>
+<li><b>Casse</b> : mots-clés insensibles (<code>FOR</code>, <code>filter</code>) ; noms d'attributs et de collections sensibles.</li>
+<li>Paramètres liés : <code>@annee</code> pour une valeur, <code>@@coll</code> pour un nom de collection.</li>
+<li>Pagination stable : sans <code>SORT</code> avant <code>LIMIT</code>, l'ordre n'est pas garanti. Pas de <code>ROW_NUMBER()</code>.</li>
+<li><code>CASE WHEN</code> → opérateur ternaire : <code>l.pages &gt; 500 ? "long" : "court"</code>.</li></ul>`)}
+${go}
+` },
     ],
     keep: [
       'ArangoDB : multi-modèle (documents + graphes), plusieurs collections, langage AQL, index.',
       'On garde : collections, jointures. On reste NoSQL : pas de schéma, pas de clés étrangères, redondance, pas d\'ACID.',
       'AQL : FOR … IN …, FILTER, SORT … DESC, RETURN { … } ; plus itératif qu\'ensembliste.',
+      'Les opérations s\'exécutent dans l\'ordre écrit : FILTER après LIMIT ≠ FILTER avant LIMIT.',
+      'TP 3 : 3 collections (artistes, festivals, editions), la liste des artistes dans chaque édition : pas de collection d\'association.',
+      'WHERE → FILTER, ORDER BY → SORT, LIMIT n OFFSET m → LIMIT m, n, GROUP BY → COLLECT, HAVING → FILTER après COLLECT, DISTINCT → RETURN DISTINCT.',
+      'UPDATE fusionne, REPLACE écrase, UPSERT insère ou met à jour, REMOVE supprime ; RETURN NEW / OLD.',
+      'Pièges : == pour comparer, pas de conversion implicite, _key est une chaîne, null < nombre (un FILTER < garde les attributs absents).',
     ],
   },
 
   /* ===================================================================== */
   {
-    id: 'n5', ch: 'graphes', short: 'Graphes', src: 'CM, partie 5.2',
+    id: 'n5', ch: 'graphes', short: 'Graphes', src: 'CM, partie 5.2 · TP 4',
     t: 'ArangoDB : le modèle graphes',
     sub: 'Sommets et arêtes, traversées de profondeur variable en AQL.',
     goals: [
       'Décrire un graphe ArangoDB : collections de sommets et d\'arêtes, champs _from et _to.',
       'Écrire une traversée AQL (FOR vertex, edge, path IN min..max INBOUND/OUTBOUND/ANY … GRAPH …).',
       'Expliquer pourquoi une traversée est plus simple qu\'une suite de jointures.',
+      'Utiliser path.vertices, path.edges[*], ANY, COLLECT … INTO dans les traversées du TP 4.',
     ],
     sections: [
       { id: 'modele', t: 'Sommets et arêtes', sub: '1 graphe = collections « edges » + collections « vertices »', html: `
@@ -332,12 +444,48 @@ ${code('version par jointures', `FOR ami IN amis                                
 ${warn('les problèmes des jointures', '<p>Comment obtenir la distance ? Les nœuds déjà vus à la profondeur d − 1 ? Et une profondeur de 3000 ? La traversée gère une <b>profondeur variable</b> naturellement.</p>')}
 ${go}
 ` },
+      { id: 'tp4', t: 'Les traversées du TP 4', sub: 'worldCountry et imdb', html: `
+<h4>Le visualiseur de graphes</h4>
+<p>Menu « Graphs » de l'interface web, puis le graphe. Si on rafraîchit la page, le graphe est recalculé à partir d'un <b>nœud de départ pris au hasard</b> ; pour le voir en entier, définir dans « Settings » le nœud de départ <code>worldVertices/world</code>.</p>
+<h4>worldCountry : path.vertices</h4>
+<p><code>path.vertices</code> est la liste des nœuds parcourus, dans l'ordre : <code>path.vertices[0]</code> est le nœud de référence, <code>path.vertices[1]</code> le premier nœud atteint…</p>
+${code('toutes les capitales d\'Asie', `FOR vertex, edge, path IN 1..4 inbound "worldVertices/world" GRAPH worldCountry
+  FILTER vertex.type == "capital"
+  FILTER path.vertices[1].name == "Asia"
+  RETURN {
+    nom: vertex.name,
+    type: vertex.type,
+    distance: LENGTH(path.edges)
+  }`)}
+<p>Plus simple : partir du continent, <code>IN 1..2 inbound "worldVertices/continent-asia"</code>. Comme le graphe est un arbre, tous les pays sont à distance 2 de « world » : <code>IN 2..2</code> suffit pour les pays.</p>
+<h4>imdb : Person → Movie ← Genre</h4>
+<p>Arêtes <code>ACTS_IN</code> et <code>DIRECTED</code> (attribut <code>$label</code>) de la personne vers le film ; le genre pointe aussi vers le film.</p>
+<ul><li><b>Partir d'un document</b> : on trouve d'abord le nœud par une requête classique, puis on traverse depuis lui : <code>FOR v IN imdb_vertices FILTER v.name == "…" FOR vertex, edge, path IN 1..1 OUTBOUND v GRAPH imdb</code>.</li>
+<li>Si edge et path ne servent pas, on peut ne déclarer que le nœud : <code>FOR film IN 1..1 OUTBOUND v GRAPH imdb</code>.</li>
+<li><b>ANY</b> quand le chemin change de sens : Person → Movie ← Genre (2 arêtes qui pointent toutes deux vers le film), ou Person → Movie ← Person.</li>
+<li><code>path.edges[0].$label == "DIRECTED"</code> teste la première arête ; <code>path.edges[*].$label ALL == "ACTS_IN"</code> teste <b>toutes</b> les arêtes du chemin.</li>
+<li>Dédoublonner : <code>COLLECT nom = personne.label</code>, ou <code>OPTIONS { uniqueVertices: "global" }</code> (qui impose <code>order: "bfs"</code>). <code>uniqueVertices: "path"</code> interdit seulement de repasser par un nœud sur un même chemin.</li>
+<li>Compter les films en commun : <code>COLLECT personne = vertex.label INTO films</code> puis <code>FILTER LENGTH(films) &gt;= 2</code> ; <code>UNIQUE(films)</code> retire les doublons d'une liste.</li></ul>
+${code('toutes les personnes ayant joué avec Monica Bellucci, sans doublons', `FOR v IN imdb_vertices
+  FILTER v.name == "Monica Bellucci"
+  FOR personne, edge, path IN 2..2 ANY v GRAPH imdb
+    FILTER personne.type == "Person"
+    FILTER path.edges[*].$label ALL == "ACTS_IN"
+    COLLECT nom = personne.label
+    RETURN nom`)}
+<p>Lire <code>film.genre</code> directement dans le document film plutôt que traverser jusqu'au nœud Genre est un exemple de <b>dénormalisation</b> : lecture plus simple, modification plus complexe.</p>
+${go}
+` },
     ],
     keep: [
       'Graphe ArangoDB : collections de sommets (documents) + collections d\'arêtes (edges, avec _from et _to).',
       'FOR vertex, edge, path IN min..max INBOUND|OUTBOUND|ANY "coll/cle" GRAPH nom.',
       'LENGTH(path.edges) = distance ; OPTIONS { uniqueVertices, order: "bfs" } ; PRUNE.',
       'Une traversée gère une profondeur variable, contrairement aux jointures.',
+      'path.vertices[0] = nœud de référence, path.vertices[1] = premier nœud atteint ; path.edges[*].$label ALL == "ACTS_IN".',
+      'Partir d\'un document : FOR v IN coll FILTER … puis FOR x IN 1..1 OUTBOUND v GRAPH g.',
+      'Person → Movie ← Genre : arêtes de sens opposés sur le chemin → ANY.',
+      'Dédoublonner : COLLECT, ou OPTIONS { uniqueVertices: "global" } (impose bfs) ; "path" = pas deux fois le même nœud sur un chemin.',
     ],
   },
 

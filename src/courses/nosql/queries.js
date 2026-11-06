@@ -3,6 +3,7 @@
 // Les requêtes « corrige » et « cours » sont recopiées des supports ; seuls l'indentation et les guillemets typographiques
 // (‘…’, “…”) remplacés par des guillemets droits ont été retouchés.
 import editions from './editions.json';
+import { arangoSets } from './queries-arango.js';
 
 const E = editions.docs;
 const X = (id, q, sol, more = {}) => ({ id, q, sol, ...more });
@@ -23,7 +24,7 @@ const grouped = pairs => { const out = []; for (const r of view(pairs)) { const 
 
 const TABLE = (name, cols) => `<div class="box def"><div class="box-h">table ${name}</div><p><code>${cols}</code></p></div>`;
 
-export const queries = [
+const base = [
   /* ===================================================================== */
   {
     id: 'tp1', title: 'TP 1 · SQL', lang: 'SQL', src: 'TP 1, corrigé', kind: 'corrige',
@@ -377,3 +378,8 @@ Alternative : un document par occurrence d'un artiste dans une édition :
     ],
   },
 ];
+
+// Ordre des séries : celui du cours (SQL, CouchDB, ArangoDB, graphes), puis l'annexe et l'entraînement.
+const ORDER = ['tp1', 'sql-cours', 'couch', 'tp2', 'aql-cours', 'tp3', 'tp4', 'annexe', 'aql-tp2'];
+const all = [...base, ...arangoSets];
+export const queries = ORDER.map(id => all.find(s => s.id === id));

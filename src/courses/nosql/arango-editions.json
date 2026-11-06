@@ -1,0 +1,181 @@
+[
+    {
+        "_key": "1650810",
+        "_id": "editions/1650810",
+        "_rev": "_gpHazmK---",
+        "nom_festival": "Francofolies",
+        "annee": 2019,
+        "artistes": [
+            "Angèle",
+            "Aya Nakamura",
+            "Christine & The Queens",
+            "Deluxe",
+            "Lomepal"
+        ]
+    },
+    {
+        "_key": "1650811",
+        "_id": "editions/1650811",
+        "_rev": "_gpHazmK--_",
+        "nom_festival": "Francofolies",
+        "annee": 2022,
+        "artistes": [
+            "Clara Luciani",
+            "Juliette Armanet",
+            "Orelsan",
+            "Roméo Elvis",
+            "Angèle"
+        ]
+    },
+    {
+        "_key": "1650812",
+        "_id": "editions/1650812",
+        "_rev": "_gpHazmK--A",
+        "nom_festival": "Garorock",
+        "annee": 2018,
+        "artistes": [
+            "Dj Snake",
+            "Indochine",
+            "L'Impératrice",
+            "Macklemore",
+            "MGMT",
+            "Roméo Elvis",
+            "The Vaccines",
+            "Therapie Taxi",
+            "Tryo",
+            "Angèle"
+        ]
+    },
+    {
+        "_key": "1650813",
+        "_id": "editions/1650813",
+        "_rev": "_gpHazmK--B",
+        "nom_festival": "Garorock",
+        "annee": 2020,
+        "artistes": [
+            "Black Eyed Peas",
+            "Deluxe",
+            "Izïa",
+            "L'Impératrice",
+            "Lomepal",
+            "PNL",
+            "Pomme",
+            "Sean Paul",
+            "The Strokes",
+            "Vladimir Cauchemar"
+        ]
+    },
+    {
+        "_key": "1650814",
+        "_id": "editions/1650814",
+        "_rev": "_gpHazmK--C",
+        "nom_festival": "Garorock",
+        "annee": 2021,
+        "artistes": [
+            "Gorillaz",
+            "Izïa",
+            "PNL",
+            "Pomme",
+            "Selah Sue",
+            "Tryo",
+            "Vianney"
+        ]
+    },
+    {
+        "_key": "1650815",
+        "_id": "editions/1650815",
+        "_rev": "_gpHazmK--D",
+        "nom_festival": "Les Déferlantes",
+        "annee": 2023,
+        "artistes": [
+            "Pomme",
+            "Alt-J",
+            "Big Flo & Oli",
+            "Deluxe",
+            "Indochine",
+            "Izïa",
+            "Lomepal",
+            "Phoenix"
+        ]
+    },
+    {
+        "_key": "1650816",
+        "_id": "editions/1650816",
+        "_rev": "_gpHazmK--E",
+        "nom_festival": "Les Eurockéennes",
+        "annee": 2018,
+        "artistes": [
+            "Macklemore",
+            "Orelsan",
+            "The Limiñanas",
+            "Therapie Taxi",
+            "Big Flo & Oli",
+            "Juliette Armanet",
+            "Lomepal"
+        ]
+    },
+    {
+        "_key": "1650817",
+        "_id": "editions/1650817",
+        "_rev": "_gpHazmK--F",
+        "nom_festival": "Les Eurockéennes",
+        "annee": 2023,
+        "artistes": [
+            "Indochine",
+            "Lomepal",
+            "Orelsan",
+            "Phoenix",
+            "Pomme",
+            "Vladimir Cauchemar"
+        ]
+    },
+    {
+        "_key": "1650818",
+        "_id": "editions/1650818",
+        "_rev": "_gpHazmK--G",
+        "nom_festival": "Rock en Seine",
+        "annee": 2023,
+        "artistes": [
+            "The Murder Capital",
+            "The Strokes",
+            "Tove Lo",
+            "Yeah yeah yeahs",
+            "Billie Eilish",
+            "Bonobo",
+            "Charlotte de Witte",
+            "Christine & The Queens",
+            "L'Impératrice",
+            "Placebo"
+        ]
+    },
+    {
+        "_key": "1650819",
+        "_id": "editions/1650819",
+        "_rev": "_gpHazmK--H",
+        "nom_festival": "Solidays",
+        "annee": 2019,
+        "artistes": [
+            "Angèle",
+            "Therapie Taxi",
+            "Vladimir Cauchemar"
+        ]
+    },
+    {
+        "_key": "1650820",
+        "_id": "editions/1650820",
+        "_rev": "_gpHazmK--I",
+        "nom_festival": "Solidays",
+        "annee": 2023,
+        "artistes": [
+            "The Murder Capital",
+            "Angèle",
+            "Big Flo & Oli",
+            "Deluxe",
+            "Juliette Armanet",
+            "La Femme",
+            "Vladimir Cauchemar",
+            "Black Eyed Peas",
+            "Orelsan"
+        ]
+    }
+]

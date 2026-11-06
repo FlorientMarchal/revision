@@ -25,7 +25,7 @@
   const rows = x => (typeof x.expected === 'function' ? x.expected(data) : x.expected) || [];
   const cols = r => (r.length && r[0] !== null && typeof r[0] === 'object' && !Array.isArray(r[0])) ? Object.keys(r[0]) : null;
   const cell = v => (v !== null && typeof v === 'object') ? JSON.stringify(v) : String(v);
-  const label = { cours: 'Requête du cours', corrige: 'Corrigé de l\'enseignant', propose: 'Solution proposée (pas un corrigé officiel)' };
+  const label = { cours: 'Requête du cours', corrige: 'Corrigé de l\'enseignant', propose: 'Solution proposée (pas un corrigé officiel)', annexe: 'Équivalent AQL de l\'annexe' };
 </script>
 
 <div class="chips" role="tablist" aria-label="Séries de requêtes" use:lens>
