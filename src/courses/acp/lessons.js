@@ -1,5 +1,6 @@
 // Le cours en entier, leçon par leçon, rédigé à partir des diapositives (notations, ACP : problèmes et solutions, analyse
-// des résultats, Varimax, features engineering, CLV) et du document de démonstrations de l'enseignant.
+// des résultats, Varimax, features engineering, CLV) et du document de démonstrations de l'enseignant ;
+// la leçon UMAP, du CM « Dimension reduction : UMAP » de Paul Tresson et du TD 1.
 // Les gabarits utilisent String.raw (R`…`) pour que les antislashs du LaTeX passent tels quels.
 const R = String.raw;
 const box = (k, title, html) => `<div class="box ${k}"><div class="box-h">${title}</div>${html}</div>`;
@@ -11,6 +12,8 @@ const method = (t, h) => box('method', 'Méthode · ' + t, h);
 const proof = (t, h) => `<details class="fold"><summary>${t}</summary><div style="margin-top:8px;display:grid;gap:8px">${h}</div></details>`;
 const M = tex => `<div class="math">\\[${tex}\\]</div>`;
 const demo = name => `<figure class="viz" data-viz="${name}"></figure>`;
+// Figures reprises des diapositives du CM UMAP (P. Tresson), dans public/courses/acp/img/umap/
+const slide = (f, cap) => `<figure class="slide-fig"><img src="img/${f}.webp" alt="${cap.replace(/<[^>]+>/g, '')}" loading="lazy"><figcaption>${cap}</figcaption></figure>`;
 const D = '<p class="math-note">Démonstration à savoir faire : elle est corrigée dans l\'onglet <b>Démonstrations</b>.</p>';
 
 export const lessons = [
@@ -297,6 +300,132 @@ ${demo('clv')}
       'Agréger y_a et y_b en f : perte var(y_a) + var(y_b) − var(f), minimale si f = 1re composante principale.',
       'On agrège les variables (groupes) les plus corrélées ; deux variables réduites : perte 1 − |r|.',
       'ΔT ≤ 0 pour l\'inertie : T augmente, d\'où une hiérarchie (dendrogramme de variables).',
+    ],
+  },
+  /* ===================================================================== */
+  {
+    id: 'a7', ch: 'umap', short: 'UMAP', src: 'CM « Dimension reduction : UMAP » (P. Tresson) et TD 1',
+    t: 'Réduction de dimension non linéaire : UMAP',
+    sub: 'Quand l\'ACP ne suffit plus : approcher la variété sur laquelle vivent les données par un graphe, puis le déplier en basse dimension.',
+    goals: [
+      'Dire pourquoi on réduit les dimensions et ce qu\'est le fléau de la dimension.',
+      'Citer les avantages et la limite de l\'ACP (données non linéaires).',
+      'Définir une variété (manifold) et situer SNE, t-SNE et UMAP.',
+      'Décrire les deux étapes d\'UMAP : graphe des plus proches voisins pondéré, puis optimisation de la représentation en basse dimension.',
+      'Expliquer le rôle de n_neighbors, min_dist et metric, et choisir une distance.',
+      'Comparer UMAP et t-SNE, et connaître les pièges d\'interprétation.',
+    ],
+    sections: [
+      { id: 'pourquoi', t: 'Pourquoi réduire les dimensions ?', sub: 'Visualiser, débruiter, calculer', html: R`
+<ul><li><b>Visualisation et exploration</b> : on ne voit pas en 784 dimensions.</li>
+<li>Des dimensions peuvent être <b>redondantes</b>, ou <b>non informatives</b>.</li>
+<li>Le <b>fléau de la dimension</b> (curse of dimensionality).</li></ul>
+${slide('umap/curse', 'Distribution des distances aux 20 plus proches voisins, en 2, 8, 32 et 128 dimensions (diapo d\'après L. McInnes).')}
+<p>Quand la dimension augmente, les distances aux plus proches voisins <b>grandissent</b> et se <b>concentrent</b> autour d'une même valeur : tous les points deviennent à peu près aussi loin les uns des autres, et la notion de « voisin » perd son sens.</p>
+<p>Travailler avec moins de dimensions aide pour le <b>clustering</b>, la <b>détection de valeurs aberrantes</b> et le <b>passage à l'échelle</b>.</p>
+${ex('les chiffres manuscrits', R`<p>Une image de chiffre de 28 × 28 pixels est une ligne de 784 colonnes (une valeur de gris par pixel) plus son étiquette. Avec des données de ce type (MNIST, Fashion-MNIST au TD), aucun graphique ne montre directement la structure.</p>`)}
+` },
+      { id: 'acp', t: 'L\'ACP et sa limite', sub: 'Rapide, mais linéaire', html: R`
+<table class="t"><thead><tr><th>Avantages de l'ACP</th><th>Inconvénient</th></tr></thead><tbody>
+<tr><td>rapide ; passe bien à l'échelle ; explicative (les axes sont des combinaisons des variables, interprétables)</td><td><b>pas adaptée aux données non linéaires</b></td></tr></tbody></table>
+${slide('umap/nonlineaire', 'Une transformation linéaire est « défaite » par l\'ACP, une transformation non linéaire non (figure de Du, 2019).')}
+${slide('umap/digits', 'Le jeu de données Digits : projection ACP (à gauche), projection UMAP (à droite).')}
+<p>Sur les chiffres manuscrits, les deux premières composantes de l'ACP mélangent les classes, alors qu'UMAP les sépare en groupes nets.</p>
+` },
+      { id: 'variete', t: 'Variétés et méthodes non linéaires', sub: 'Manifold, SNE, t-SNE, UMAP', html: R`
+${def('variété (manifold)', R`<p>Un <b>espace topologique qui ressemble localement à un espace euclidien</b> au voisinage de chaque point. Plus précisément, une variété de dimension \(n\) est un espace topologique dans lequel chaque point a un voisinage homéomorphe à un ouvert de l'espace euclidien de dimension \(n\).</p>`)}
+<p>Idée : les données en haute dimension vivent près d'une variété de petite dimension, éventuellement repliée (non linéaire). Pour travailler avec des données non linéaires :</p>
+${method('les deux étapes', '<ol><li>trouver une bonne <b>représentation des données en haute dimension</b> ;</li><li>ajuster une bonne <b>représentation en basse dimension</b>.</li></ol>')}
+<p>Les classiques :</p>
+<ul><li><b>SNE</b> (Stochastic Neighbor Embedding), Hinton et Roweis, 2002 ;</li>
+<li><b>t-SNE</b> (t-distributed SNE), van der Maaten et Hinton, 2008 ;</li>
+<li><b>UMAP</b> (<b>U</b>niform <b>M</b>anifold <b>A</b>pproximation and <b>P</b>rojection), McInnes et al., 2018.</li></ul>
+` },
+      { id: 'graphe', t: 'Étape 1 : le graphe en haute dimension', sub: 'Plus proches voisins, rayons locaux, graphe pondéré', html: R`
+${ex('le mammouth', R`<div class="slide-row">${slide('umap/mammouth', 'Le mammouth en 3D (jeu de données du Smithsonian).')}${slide('umap/mammouth-acp', 'Sa projection par ACP : le squelette est aplati.')}</div>`)}
+<p>UMAP relie chaque point à ses <b>plus proches voisins</b> : on obtient un graphe qui approche la variété.</p>
+${slide('umap/graphe', 'Le graphe des plus proches voisins du mammouth.')}
+<h4>Pourquoi « Uniform » ?</h4>
+<p>UMAP <b>suppose que les données sont uniformément distribuées sur la variété</b>. Dans les données réelles, certaines régions sont denses, d'autres clairsemées : chaque point reçoit donc <b>son propre rayon</b>, petit dans une zone dense, grand dans une zone clairsemée, de façon à couvrir le même nombre de voisins. Les distances sont ainsi rééchelonnées localement, ce qui <b>uniformise la distribution des points</b>.</p>
+${slide('umap/uniforme', 'Une région dense et une région clairsemée deviennent uniformément distribuées une fois les distances locales agrandies ou rétrécies (T. Hosgood, Understanding UMAP).')}
+${slide('umap/rayons', 'Un rayon par point, fixé par l\'équation ci-dessous (documentation UMAP).')}
+${M(R`\sum_{j=1}^{k}\exp\left(\frac{-\max\big(0,\,d(x_i,x_{i_j})-\rho_i\big)}{\sigma_i}\right)=\log_2(k)`)}
+<ul><li>\(k\) : le nombre de voisins (<code>n_neighbors</code>) ; \(x_{i_1},\dots,x_{i_k}\) les \(k\) plus proches voisins de \(x_i\) ;</li>
+<li>\(\rho_i\) : la distance de \(x_i\) à son <b>plus proche voisin</b> (chaque point est relié au moins à un voisin avec un poids 1) ;</li>
+<li>\(\sigma_i\) : le facteur d'échelle propre à \(x_i\), choisi pour que la somme vaille \(\log_2(k)\).</li></ul>
+<p>Chaque arête reçoit un <b>poids</b> entre 0 et 1 (logique floue, « fuzzy topology ») ; les deux graphes orientés vus depuis chaque point sont fusionnés en un seul graphe pondéré, de poids \(v_{ij}\).</p>
+` },
+      { id: 'optim', t: 'Étape 2 : la représentation en basse dimension', sub: 'Entropie croisée et descente de gradient stochastique', html: R`
+<p>On place les points en basse dimension (initialisation <b>déterministe</b>), on calcule les poids \(w_{ij}\) du graphe en basse dimension, et on rapproche les deux graphes en minimisant l'<b>entropie croisée</b> :</p>
+${M(R`C_{UMAP}=\sum_{i\neq j}\color{red}{v_{ij}\log\left(\frac{v_{ij}}{w_{ij}}\right)}+\color{blue}{(1-v_{ij})\log\left(\frac{1-v_{ij}}{1-w_{ij}}\right)}`)}
+<ul><li>terme <span style="color:#d11">positif</span> : les points reliés en haute dimension (\(v_{ij}\) grand) doivent être proches en basse dimension → <b>attraction</b> ;</li>
+<li>terme <span style="color:#25c">négatif</span> : les points non reliés (\(v_{ij}\) proche de 0) doivent être éloignés → <b>répulsion</b>.</li></ul>
+<p>L'optimisation se fait par <b>descente de gradient stochastique</b> (SGD), <b>par paires</b> : on tire une arête du graphe (<b>échantillon positif</b>) et on rapproche ses deux extrémités, et on tire des points au hasard (<b>échantillons négatifs</b>) qu'on éloigne.</p>
+${slide('umap/echantillons', 'Un échantillon positif tiré du graphe (rouge) et des échantillons négatifs aléatoires (bleu).')}
+${slide('umap/matrices', 'Les poids du graphe en haute dimension et en basse dimension : l\'optimisation rapproche les deux matrices.')}
+${slide('umap/mammouth-umap', 'Le mammouth déplié par UMAP à la fin de l\'optimisation.')}
+${prop('Les étapes d\'UMAP, dans l\'ordre', '<ol><li>construction du graphe des plus proches voisins ;</li><li>pondération des arêtes du graphe ;</li><li>optimisation de la représentation en basse dimension.</li></ol><p>Pas de divergence de Kullback-Leibler (c\'est t-SNE), ni d\'échantillonnage de points pour construire le graphe.</p>')}
+` },
+      { id: 'params', t: 'Les paramètres', sub: 'n_neighbors, min_dist, metric', html: R`
+<table class="t"><thead><tr><th>Paramètre</th><th>Rôle</th><th>Valeur par défaut</th></tr></thead><tbody>
+<tr><td><code>n_components</code></td><td>dimension d'arrivée</td><td>2</td></tr>
+<tr><td><code>n_neighbors</code></td><td>taille du voisinage</td><td>15</td></tr>
+<tr><td><code>min_dist</code></td><td>à quel point les points sont tassés</td><td>0.1</td></tr>
+<tr><td><code>metric</code></td><td>comment la distance est mesurée</td><td>euclidienne</td></tr></tbody></table>
+${slide('umap/voisins', 'Le mammouth avec un nombre de voisins croissant.')}
+<ul><li><b>Peu de voisins</b> : UMAP ne voit que la structure très locale, le résultat est morcelé et bruité.</li>
+<li><b>Beaucoup de voisins</b> : la structure globale (le squelette entier) apparaît, au prix des détails.</li>
+<li><code>min_dist</code> petit : points très tassés, groupes compacts ; grand (jusqu'à 1) : points plus étalés.</li></ul>
+<h4>Choisir la distance (<code>metric</code>)</h4>
+<table class="t"><thead><tr><th>Distance</th><th>Ce qu'elle mesure</th><th>Quand l'utiliser</th></tr></thead><tbody>
+<tr><td><b>euclidienne</b> (défaut)</td><td>la longueur du segment entre deux points : \(\sqrt{\sum_j(x_j-y_j)^2}\)</td><td>variables quantitatives continues, sur des échelles comparables</td></tr>
+<tr><td><b>Manhattan</b></td><td>la somme des écarts en valeur absolue \(\sum_j|x_j-y_j|\) (trajet « en quadrillage »)</td><td>variables quantitatives, moins sensible qu'euclidienne à un grand écart sur une seule variable</td></tr>
+<tr><td><b>cosinus</b></td><td>l'angle entre deux vecteurs : \(1-\frac{x\cdot y}{\|x\|\|y\|}\), la direction et non la longueur</td><td>données où compte la proportion plutôt que la quantité : textes, comptages, vecteurs creux, données mixtes vectorisées</td></tr>
+<tr><td><b>Hamming</b></td><td>la proportion de coordonnées qui diffèrent</td><td>données binaires ou catégorielles (après codage disjonctif, <code>pd.get_dummies</code>)</td></tr></tbody></table>
+<p>Au TD, sur le jeu « adult », on compare <code>euclidean</code>, <code>cosine</code>, <code>manhattan</code> et <code>hamming</code> sur les variables catégorielles codées en indicatrices, puis on vectorise un mélange de variables catégorielles et continues (<code>TableVectorizer</code> de skrub) et on essaie <code>metric='cosine'</code>.</p>
+` },
+      { id: 'tsne', t: 'UMAP ou t-SNE ?', sub: 'Pourquoi UMAP passe mieux à l\'échelle', html: R`
+<table class="t"><thead><tr><th>UMAP</th><th>t-SNE</th></tr></thead><tbody>
+<tr><td>théorie des graphes, logique floue</td><td>probabilités</td></tr>
+<tr><td>initialisation déterministe</td><td>initialisation aléatoire</td></tr>
+<tr><td>scores de similarité en \(\log_2\)</td><td>similarité par une distribution gaussienne</td></tr>
+<tr><td>mise à jour <b>par paires</b></td><td>mise à jour de <b>tous les points</b></td></tr>
+<tr><td>→ passe bien à l'échelle pour de grands jeux de données</td><td>passe moins bien à l'échelle</td></tr></tbody></table>
+${slide('umap/passage-echelle', 'Temps de calcul selon la taille du jeu de données pour plusieurs méthodes (figure de la documentation umap-learn).')}
+${ex('reconnaître la méthode sur une figure', R`<p>ACP : un nuage d'un seul tenant où les classes se chevauchent. UMAP : des groupes compacts, bien séparés par du vide. t-SNE : des groupes répartis de façon assez régulière dans un disque (voir l'annale 2025).</p>`)}
+` },
+      { id: 'pieges', t: 'Pièges d\'interprétation', sub: 'Ce qu\'une carte UMAP ne dit pas', html: R`
+${warn('les pièges possibles', R`<ul><li>Les <b>hyperparamètres comptent</b> (voir les exemples de <code>n_neighbors</code>).</li>
+<li>Les <b>distances absolues ne veulent rien dire</b> (elles sont relatives, d'une certaine façon).</li>
+<li>La <b>taille des groupes ne veut rien dire</b> (à cause de l'uniformisation).</li>
+<li>En haute dimension, <b>le bruit peut avoir une forme</b> (attention aux petites valeurs de <code>n_neighbors</code>).</li>
+<li>L'algorithme est <b>stochastique</b> : deux exécutions ne donnent pas exactement le même résultat.</li></ul>`)}
+` },
+      { id: 'pratique', t: 'En pratique : umap-learn (TD 1)', sub: 'Le workflow de base sur Fashion-MNIST', html: R`
+<pre><code>import umap
+mapper = umap.UMAP()                 # initialiser l'objet
+mapper = mapper.fit(fmnist.data)     # apprendre la transformation
+embeddings = mapper.transform(fmnist.data)   # l'appliquer
+# en une fois : umap.UMAP().fit_transform(fmnist.data)</code></pre>
+<ul><li><b>Clustering</b> : réduire à 50 dimensions (<code>umap.UMAP(n_components=50)</code>), puis <code>KMeans(n_clusters=10)</code> ou <code>HDBSCAN(min_cluster_size=3000)</code>, et comparer aux vraies classes avec <code>rand_score</code>.</li>
+<li><b>ACP en prétraitement</b> : même démarche avec <code>PCA(n_components=50)</code> pour comparer.</li>
+<li><b>Colorer la carte UMAP par l'ACP</b> : les 3 premières composantes, ramenées entre 0 et 1, servent de couleurs RVB ; <code>umap.plot.diagnostic(mapper, diagnostic_type='pca')</code> le fait directement.</li>
+<li><b>Hyperparamètres</b> : grille de cartes pour <code>n_neighbors</code> (3, 5, 15) et <code>min_dist</code> (0, 0.5, 1).</li>
+<li><code>umap.plot.points(mapper, labels=...)</code> trace la carte colorée par une variable.</li></ul>
+` },
+    ],
+    keep: [
+      'Réduire : visualiser, retirer les dimensions redondantes ou non informatives, lutter contre le fléau de la dimension (les distances se concentrent).',
+      'ACP : rapide, passe à l\'échelle, explicative, mais pas adaptée aux données non linéaires.',
+      'Variété : espace topologique localement semblable à un espace euclidien.',
+      'SNE (2002), t-SNE (2008), UMAP (2018, McInnes) ; UMAP = Uniform Manifold Approximation and Projection.',
+      '« Uniform » : un rayon par point (ρᵢ, σᵢ, somme = log₂ k) pour que les points soient uniformément distribués sur la variété.',
+      'Étapes : graphe des k plus proches voisins → pondération des arêtes → optimisation en basse dimension.',
+      'Perte : entropie croisée (attraction + répulsion), optimisée par SGD, par paires (échantillons positifs et négatifs).',
+      'Paramètres : n_components = 2, n_neighbors = 15 (local ↔ global), min_dist = 0.1 (tassement), metric = euclidienne.',
+      'Distances : euclidienne, Manhattan, cosinus (direction), Hamming (catégorielles).',
+      'UMAP vs t-SNE : graphes vs probabilités, init déterministe vs aléatoire, mise à jour par paires → passe mieux à l\'échelle.',
+      'Pièges : hyperparamètres, distances absolues et tailles de groupes sans signification, bruit qui prend forme, algorithme stochastique.',
     ],
   },
 ];
